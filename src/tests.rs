@@ -312,3 +312,14 @@ fn parsed_args_14() {
 
     assert_eq!("foo", parsed.other[0]);
 }
+
+#[test]
+fn parsed_args_15() {
+    let specs = OptSpecs::new();
+    let parsed = test_getopt_vec(
+        &specs, vec!["-abcd", "-e", "--debug", "--", "--debug=", "foo", "--debug=456"]);
+
+    assert_eq!(0, parsed.options.len());
+    assert_eq!(3, parsed.other.len());
+    assert_eq!(6, parsed.unknown.len());
+}
