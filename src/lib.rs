@@ -152,19 +152,19 @@ impl OptSpecs {
     ///     represent the same meaning, like `-h` and `--help` for
     ///     printing program’s help message.
     ///
-    ///  2. `name`: Option’s name string in the command line. If the
-    ///     string is a single character (like `h`) it defines a short
-    ///     option which is entered like `-h` in the command line. If
-    ///     there are more than one character in the string it defines a
-    ///     long option name (like `help`) which is entered like
-    ///     `--help` in the command line.
+    ///  2. `name`: Option’s name string in the command line (without
+    ///     prefix). If the string is a single character (like `h`) it
+    ///     defines a short option which is entered as `-h` in the
+    ///     command line. If there are more than one character in the
+    ///     string it defines a long option name (like `help`) which is
+    ///     entered as `--help` in the command line.
     ///
     ///     All options must have a unique `name` string. This method
     ///     will panic if the same `name` is added twice. The method
     ///     will also panic if the `name` string contains illegal
     ///     characters. Space characters are not accepted. Short option
-    ///     name can’t be `-` and long option names can’t have `=`
-    ///     character nor `-` as their first character.
+    ///     name can’t be `-` and long option names can’t have any `=`
+    ///     characters nor `-` as their first character.
     ///
     ///  3. `value_type`: A variant of enum `OptValueType` which defines
     ///     if this option accepts a value. If not, use
