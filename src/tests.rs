@@ -323,3 +323,16 @@ fn parsed_args_15() {
     assert_eq!(3, parsed.other.len());
     assert_eq!(6, parsed.unknown.len());
 }
+
+#[test]
+fn parsed_args_16() {
+    let specs = OptSpecs::new()
+        .option("file", "file", OptValueType::Required);
+
+    let parsed = test_getopt_vec(
+        &specs, vec!["--file", "--", "--", "--"]);
+
+    assert_eq!("--", parsed.options_first("file").unwrap().value.clone().unwrap());
+    assert_eq!(1, parsed.other.len());
+    assert_eq!("--", parsed.other[0]);
+}
