@@ -1,0 +1,11 @@
+[package]
+name = "just-getopt"
+version = "0.9.0"
+description = "Just a Getopt-like command-line option parser, without bloat"
+authors = ["Teemu Likonen <tlikonen@iki.fi>"]
+license = "CC0-1.0"
+keywords = ["command-line", "options", "parser", "getopt", "unix", "linux"]
+categories = ["command-line-interface"]
+edition = "2021"
+
+[dependencies]
