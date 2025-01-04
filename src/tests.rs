@@ -56,7 +56,7 @@ fn test_getopt_vec(o: &OptSpecs, args: Vec<&str>) -> Args {
 }
 
 #[test]
-fn parsed_args_1() {
+fn parsed_output_01() {
     let specs = OptSpecs::new()
         .option("help", "h", OptValueType::None)
         .option("help", "help", OptValueType::None)
@@ -91,7 +91,7 @@ fn parsed_args_1() {
 }
 
 #[test]
-fn parsed_args_2() {
+fn parsed_output_02() {
     let specs = OptSpecs::new().option("help", "h", OptValueType::None);
 
     let parsed = test_getopt_vec(&specs, vec!["-h", "foo", "-h"]);
@@ -102,7 +102,7 @@ fn parsed_args_2() {
 }
 
 #[test]
-fn parsed_args_3() {
+fn parsed_output_03() {
     let specs = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere)
         .option("help", "h", OptValueType::None)
@@ -130,7 +130,7 @@ fn parsed_args_3() {
 }
 
 #[test]
-fn parsed_args_4() {
+fn parsed_output_04() {
     let specs = OptSpecs::new()
         .option("debug", "d", OptValueType::Optional)
         .option("verbose", "verbose", OptValueType::Optional);
@@ -169,7 +169,7 @@ fn parsed_args_4() {
 }
 
 #[test]
-fn parsed_args_5() {
+fn parsed_output_05() {
     let specs = OptSpecs::new().option("debug", "d", OptValueType::Optional);
 
     let parsed = test_getopt_vec(&specs, vec!["-abcd", "-adbc"]);
@@ -186,7 +186,7 @@ fn parsed_args_5() {
 }
 
 #[test]
-fn parsed_args_6() {
+fn parsed_output_06() {
     let specs = OptSpecs::new()
         .option("aaa", "bbb", OptValueType::None)
         .option("aaa", "c", OptValueType::None)
@@ -203,7 +203,7 @@ fn parsed_args_6() {
 }
 
 #[test]
-fn parsed_args_7() {
+fn parsed_output_07() {
     let specs = OptSpecs::new()
         .flag(OptFlags::PrefixMatchLongOptions)
         .option("version", "version", OptValueType::None)
@@ -219,7 +219,26 @@ fn parsed_args_7() {
 }
 
 #[test]
-fn parsed_args_8() {
+fn parsed_output_08() {
+    let specs = OptSpecs::new()
+        // .flag(OptFlags::PrefixMatchLongOptions) Must be commented!
+        .option("version", "version", OptValueType::None)
+        .option("verbose", "verbose", OptValueType::None);
+
+    let parsed = test_getopt_vec(
+        &specs,
+        vec!["--version", "--ver", "--verb", "--versi", "--verbose"],
+    );
+
+    assert_eq!("ver", parsed.unknown[0]);
+    assert_eq!("verb", parsed.unknown[1]);
+    assert_eq!("versi", parsed.unknown[2]);
+    assert_eq!("version", parsed.options_first("version").unwrap().name);
+    assert_eq!("verbose", parsed.options_first("verbose").unwrap().name);
+}
+
+#[test]
+fn parsed_output_09() {
     let specs = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere)
         .option("help", "h", OptValueType::None)
@@ -244,26 +263,7 @@ fn parsed_args_8() {
 }
 
 #[test]
-fn parsed_args_9() {
-    let specs = OptSpecs::new()
-        // .flag(OptFlags::PrefixMatchLongOptions) Must be commented!
-        .option("version", "version", OptValueType::None)
-        .option("verbose", "verbose", OptValueType::None);
-
-    let parsed = test_getopt_vec(
-        &specs,
-        vec!["--version", "--ver", "--verb", "--versi", "--verbose"],
-    );
-
-    assert_eq!("ver", parsed.unknown[0]);
-    assert_eq!("verb", parsed.unknown[1]);
-    assert_eq!("versi", parsed.unknown[2]);
-    assert_eq!("version", parsed.options_first("version").unwrap().name);
-    assert_eq!("verbose", parsed.options_first("verbose").unwrap().name);
-}
-
-#[test]
-fn parsed_args_10() {
+fn parsed_output_10() {
     let specs = OptSpecs::new().option("file", "file", OptValueType::Required);
 
     let parsed = test_getopt_vec(&specs, vec!["--file=", "--file"]);
@@ -277,7 +277,7 @@ fn parsed_args_10() {
 }
 
 #[test]
-fn parsed_args_11() {
+fn parsed_output_11() {
     let specs = OptSpecs::new()
         .option("file", "f", OptValueType::Required)
         .option("debug", "d", OptValueType::Required);
@@ -302,7 +302,7 @@ fn parsed_args_11() {
 }
 
 #[test]
-fn parsed_args_12() {
+fn parsed_output_12() {
     let specs = OptSpecs::new()
         .option("file", "f", OptValueType::Required)
         .option("debug", "d", OptValueType::Required);
@@ -323,7 +323,7 @@ fn parsed_args_12() {
 }
 
 #[test]
-fn parsed_args_13() {
+fn parsed_output_13() {
     let specs = OptSpecs::new()
         .option("file", "file", OptValueType::Required)
         .option("debug", "debug", OptValueType::Required);
@@ -347,7 +347,7 @@ fn parsed_args_13() {
 }
 
 #[test]
-fn parsed_args_14() {
+fn parsed_output_14() {
     let specs = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere)
         .option("debug", "d", OptValueType::Optional)
@@ -382,7 +382,7 @@ fn parsed_args_14() {
 }
 
 #[test]
-fn parsed_args_15() {
+fn parsed_output_15() {
     let specs = OptSpecs::new();
     let parsed = test_getopt_vec(
         &specs,
@@ -403,7 +403,7 @@ fn parsed_args_15() {
 }
 
 #[test]
-fn parsed_args_16() {
+fn parsed_output_16() {
     let specs = OptSpecs::new().option("file", "file", OptValueType::Required);
 
     let parsed = test_getopt_vec(&specs, vec!["--file", "--", "--", "--"]);
