@@ -22,9 +22,17 @@
 //!
 //! # Parsing rules
 //!
-//! In command line the “pseudo option” `--` (two dashes) stops parsing
-//! options. The rest of the command line is parsed as regular arguments
-//! (that is, non-options).
+//! By default, all options are expected to come first in the command
+//! line. Other arguments (non-options) come after options. Therefore
+//! the first argument that does not look like an option stops option
+//! parsing and the rest of the command line is parsed as non-options.
+//! This default can be changed, so that options and non-options can be
+//! mixed in their order in the command line. See `OptSpecs` struct’s
+//! `flag()` method for more information.
+//!
+//! In command line the “pseudo option” `--` (two dashes) always stops
+//! the option parser. Then the rest of the command line is parsed as
+//! regular arguments (non-options).
 //!
 //! ## Short options
 //!
