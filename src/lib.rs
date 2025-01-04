@@ -476,9 +476,9 @@ impl Args {
     /// `OptSpecs` struct before parsing.) Method’s return value is a
     /// variant of enum `Option` which are:
     ///
-    ///   - `None`: No options found with the given `id`, options which
-    ///     also have a value assigned. There could be options for the
-    ///     same `id` but they don’t have a value.
+    ///   - `None`: No options found with the given `id`, an option
+    ///     which also has a value assigned. There could be options for
+    ///     the same `id` but they don’t have a value.
     ///
     ///   - `Some(&String)`: An option was found with the given `id` and
     ///     the option has a value assigned. A reference to the string
@@ -496,12 +496,13 @@ impl Args {
     /// Find the last option with a value for given option `id`.
     ///
     /// This is similar to `options_value_first()` method but this
-    /// method find and returns the last option’s value.
+    /// method finds and returns the last option’s value.
     ///
-    /// Program’s user may give the same option several times in the
-    /// command line. If the option accepts a value it may be suitable
-    /// to consider only the last value relevant. (Or the first, or
-    /// maybe print an error message for providing several values.)
+    /// Note: Program’s user may give the same option several times in
+    /// the command line. If the option accepts a value it may be
+    /// suitable to consider only the last value relevant. (Or the
+    /// first, or maybe print an error message for providing several,
+    /// possibly conflicting, values.)
 
     pub fn options_value_last(self: &Self, id: &str) -> Option<&String> {
         let all = self.options_value_all(id);
