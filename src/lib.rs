@@ -307,6 +307,16 @@ impl Args {
         }
     }
 
+    pub fn required_value_missing(self: &Self) -> Vec<&Opt> {
+        let mut vec = Vec::new();
+        for opt in &self.options {
+            if opt.value_required && opt.value.is_none() {
+                vec.push(opt);
+            }
+        }
+        vec
+    }
+
     pub fn options_first(self: &Self, id: &str) -> Option<&Opt> {
         for opt in &self.options {
             if opt.id == id { return Some(opt); }
@@ -328,16 +338,6 @@ impl Args {
         let mut vec = Vec::new();
         for opt in &self.options {
             if opt.id == id { vec.push(opt); }
-        }
-        vec
-    }
-
-    pub fn required_value_missing(self: &Self) -> Vec<&Opt> {
-        let mut vec = Vec::new();
-        for opt in &self.options {
-            if opt.value_required && opt.value.is_none() {
-                vec.push(opt);
-            }
         }
         vec
     }
