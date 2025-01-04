@@ -30,7 +30,8 @@ Documentation of this library crate is available in the source files. It
 can be built and shown in a web browser with command `cargo doc --open`.
 That requires the usual Rust development tools.
 
-See file [`examples/basic_usage.rs`][] for basic programming examples.
+See file [`examples/basic_usage.rs`](examples/basic_usage.rs) for basic
+programming examples.
 
 
 [Rust]: https://www.rust-lang.org/
