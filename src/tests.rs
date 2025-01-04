@@ -299,16 +299,18 @@ fn parsed_args_14() {
         .option("debug", "debug", OptValueType::Optional);
 
     let parsed = test_getopt_vec(
-        &specs, vec!["-d123", "-d", "--debug", "--debug=", "foo", "--debug=456"]);
+        &specs, vec!["-d", "-d123", "-d", "--debug", "--debug=", "foo", "--debug=456", "-d"]);
 
     let d = parsed.options_all("debug");
-    assert_eq!(5, d.len());
+    assert_eq!(7, d.len());
 
     let d = parsed.options_value_all("debug");
     assert_eq!(3, d.len());
     assert_eq!("123", d[0]);
     assert_eq!("", d[1]);
     assert_eq!("456", d[2]);
+    assert_eq!("123", parsed.options_value_first("debug").unwrap());
+    assert_eq!("456", parsed.options_value_last("debug").unwrap());
 
     assert_eq!("foo", parsed.other[0]);
 }

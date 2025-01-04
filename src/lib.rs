@@ -375,12 +375,25 @@ impl Args {
         vec
     }
 
+    // The first option that has a value.
     pub fn options_value_first(self: &Self, id: &str) -> Option<&String> {
-        options_value_engine(&self.options_first(id))
+        let all = self.options_value_all(id);
+        if all.len() > 0 {
+            Some(all[0])
+        } else {
+            None
+        }
     }
 
+    // The last option that has a value.
     pub fn options_value_last(self: &Self, id: &str) -> Option<&String> {
-        options_value_engine(&self.options_last(id))
+        let all = self.options_value_all(id);
+        let len = all.len();
+        if len > 0 {
+            Some(all[len - 1])
+        } else {
+            None
+        }
     }
 
     pub fn options_value_all(self: &Self, id: &str) -> Vec<&String> {
@@ -393,17 +406,5 @@ impl Args {
             }
         }
         vec
-    }
-}
-
-fn options_value_engine<'a>(option: &Option<&'a Opt>) -> Option<&'a String> {
-    match option {
-        None => None,
-        Some(opt) => {
-            match &opt.value {
-                None => None,
-                Some(value) => Some(value),
-            }
-        },
     }
 }
