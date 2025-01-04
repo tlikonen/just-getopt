@@ -255,7 +255,7 @@ impl OptSpecs {
         self
     }
 
-    /// Add a flag that changes parser’s behaviour.
+    /// Add a flag that changes parser’s behavior.
     ///
     /// Method’s only argument `flag` is a variant of enum `OptFlags`.
     /// Their names and meanings are:
@@ -390,20 +390,37 @@ impl Args {
         vec
     }
 
+    /// Find all options with the given `id`.
+    ///
+    /// Find all options which have the identifier `id`. (Option
+    /// identifiers have been defined in `OptSpecs` structs before
+    /// parsing.) The return value is a vector (possibly empty, if no
+    /// matches) and each element is a reference to `Opt` struct in the
+    /// original `Args` struct.
+
+    pub fn options_all(self: &Self, id: &str) -> Vec<&Opt> {
+        let mut vec = Vec::new();
+        for opt in &self.options {
+            if opt.id == id {
+                vec.push(opt);
+            }
+        }
+        vec
+    }
+
     /// Find the first option with the given `id`.
     ///
     /// Find and return the first match for option `id` in command-line
-    /// arguments’ order. Method’s argument `id` is an identifier string
-    /// for the wanted option. (Options’ identifiers have been defined
-    /// in `OptSpecs` struct before parsing.)
+    /// arguments’ order. (Options’ identifiers have been defined in
+    /// `OptSpecs` struct before parsing.)
     ///
     /// The return value is a variant of enum `Option`. Their meanings:
     ///
     ///   - `None`: No options found with the given `id`.
     ///
     ///   - `Some(&Opt)`: An option was found with the given `id` and a
-    ///     reference is to its `Opt` struct in the original `Args`
-    ///     struct is provided.
+    ///     reference to its `Opt` struct in the original `Args` struct
+    ///     is provided.
 
     pub fn options_first(self: &Self, id: &str) -> Option<&Opt> {
         for opt in &self.options {
@@ -431,44 +448,14 @@ impl Args {
         None
     }
 
-    /// Find all options with the given `id`.
+    /// Find and return all values for options with the given `id`.
     ///
-    /// Find and return all matches for option identifier `id`. (Option
-    /// identifiers have been defined in `OptSpecs` structs before
-    /// parsing.) The return value is a vector (possibly empty) and each
-    /// element is a reference to `Opt` struct in the original parsed
-    /// `Args` struct.
-
-    pub fn options_all(self: &Self, id: &str) -> Vec<&Opt> {
-        let mut vec = Vec::new();
-        for opt in &self.options {
-            if opt.id == id {
-                vec.push(opt);
-            }
-        }
-        vec
-    }
-
-    // The first option that has a value.
-    pub fn options_value_first(self: &Self, id: &str) -> Option<&String> {
-        let all = self.options_value_all(id);
-        if all.len() > 0 {
-            Some(all[0])
-        } else {
-            None
-        }
-    }
-
-    // The last option that has a value.
-    pub fn options_value_last(self: &Self, id: &str) -> Option<&String> {
-        let all = self.options_value_all(id);
-        let len = all.len();
-        if len > 0 {
-            Some(all[len - 1])
-        } else {
-            None
-        }
-    }
+    /// Find all options which match the identifier `id` and which have
+    /// a value assigned. (Options’ identifiers have been defined in
+    /// `OptSpecs` struct before parsing.) Collect options’ values into
+    /// a new vector. Vector’s elements are references to the value
+    /// strings in the original `Args` struct. The returned vector is
+    /// empty if there were no matches.
 
     pub fn options_value_all(self: &Self, id: &str) -> Vec<&String> {
         let mut vec = Vec::new();
@@ -480,5 +467,49 @@ impl Args {
             }
         }
         vec
+    }
+
+    /// Find the first option with a value for given option `id`.
+    ///
+    /// Find the first option which match the identifier `id` and which
+    /// has a value assigned. (Options’ identifiers have been defined in
+    /// `OptSpecs` struct before parsing.) Method’s return value is a
+    /// variant of enum `Option` which are:
+    ///
+    ///   - `None`: No options found with the given `id`, options which
+    ///     also have a value assigned. There could be options for the
+    ///     same `id` but they don’t have a value.
+    ///
+    ///   - `Some(&String)`: An option was found with the given `id` and
+    ///     the option has a value assigned. A reference to the string
+    ///     value in the original `Args` struct is provided.
+
+    pub fn options_value_first(self: &Self, id: &str) -> Option<&String> {
+        let all = self.options_value_all(id);
+        if all.len() > 0 {
+            Some(all[0])
+        } else {
+            None
+        }
+    }
+
+    /// Find the last option with a value for given option `id`.
+    ///
+    /// This is similar to `options_value_first()` method but this
+    /// method find and returns the last option’s value.
+    ///
+    /// Program’s user may give the same option several times in the
+    /// command line. If the option accepts a value it may be suitable
+    /// to consider only the last value relevant. (Or the first, or
+    /// maybe print an error message for providing several values.)
+
+    pub fn options_value_last(self: &Self, id: &str) -> Option<&String> {
+        let all = self.options_value_all(id);
+        let len = all.len();
+        if len > 0 {
+            Some(all[len - 1])
+        } else {
+            None
+        }
     }
 }
