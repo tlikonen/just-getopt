@@ -134,7 +134,7 @@ pub struct Args {
     ///
     /// Command-line arguments that look like options but were not part
     /// of `OptSpecs` specification are classified as unknown. They are
-    /// listed in this vector. Each element is a name string for the
+    /// listed in this vector. Each element is the name string for the
     /// option (without `-` or `--` prefix). For unknown short options
     /// the element is a single-character string. For unknown long
     /// options the string has more than one character. The whole vector
@@ -161,7 +161,7 @@ pub enum OptValueType {
     Required,
 }
 
-/// Flags for changing command-line parser’s behaviour.
+/// Flags for changing command-line parser’s behavior.
 ///
 /// See `OptSpecs` struct’s `flag()` method for more information.
 
@@ -251,7 +251,7 @@ impl OptSpecs {
     ///     and other arguments in mixed order in the command line. That
     ///     is, options can come after non-option arguments.
     ///
-    ///     This is not the default behaviour. By default the first
+    ///     This is not the default behavior. By default the first
     ///     non-option argument in the command line stops option parsing
     ///     and the rest of the command line is parsed as non-options
     ///     (other arguments), even if they look like options.
@@ -340,6 +340,21 @@ impl Args {
         }
     }
 
+    /// Find options with missing required value.
+    ///
+    /// This method finds all (otherwise valid) options which require a
+    /// value but the value is missing. That is, `OptSpecs` struct
+    /// specification defined that an option requires a value but
+    /// program’s user didn’t give one in the command line. Such thing
+    /// can happen if an option like `--file` is the last argument in
+    /// the command line and that option requires a value. Empty string
+    /// `""` is not classified as missing value because it can be valid
+    /// user input in many situations.
+    ///
+    /// This method returns a vector (possibly empty) and each element
+    /// is a reference to an `Opt` struct in the original `Args`
+    /// struct’s `options` field contents.
+
     pub fn required_value_missing(self: &Self) -> Vec<&Opt> {
         let mut vec = Vec::new();
         for opt in &self.options {
@@ -350,12 +365,32 @@ impl Args {
         vec
     }
 
+    /// Find the first option with the given `id`.
+    ///
+    /// Find and return the first match for option `id` in command-line
+    /// arguments’ order. Method’s argument `id` is an identifier string
+    /// for the wanted option. (Options’ identifiers have been defined
+    /// in `OptSpecs` struct before parsing.)
+    ///
+    /// The return value is a variant of enum `Option`. Their meanings:
+    ///
+    ///   - `None`: No options found with the given `id`.
+    ///
+    ///   - `Some(&Opt)`: An option was found with the given `id` and a
+    ///     reference is to its `Opt` struct in the original `Args`
+    ///     struct is provided.
+
     pub fn options_first(self: &Self, id: &str) -> Option<&Opt> {
         for opt in &self.options {
             if opt.id == id { return Some(opt); }
         }
         None
     }
+
+    /// Find the last option with the given `id`.
+    ///
+    /// This is similar to `options_first()` method but this returns the
+    /// last match in command-line arguments’ order.
 
     pub fn options_last(self: &Self, id: &str) -> Option<&Opt> {
         let len = self.options.len();
@@ -366,6 +401,14 @@ impl Args {
         }
         None
     }
+
+    /// Find all options with the given `id`.
+    ///
+    /// Find and return all matches for option identifier `id`. (Option
+    /// identifiers have been defined in `OptSpecs` structs before
+    /// parsing.) The return value is a vector (possibly empty) and each
+    /// element is a reference to `Opt` struct in the original parsed
+    /// `Args` struct.
 
     pub fn options_all(self: &Self, id: &str) -> Vec<&Opt> {
         let mut vec = Vec::new();
