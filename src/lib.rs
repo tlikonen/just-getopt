@@ -82,12 +82,12 @@ mod tests;
 
 /// Specification for program’s valid command-line options.
 ///
-/// An instance is this struct is needed before command-line options can
+/// An instance of this struct is needed before command-line options can
 /// be parsed. Instances are created with function `OptSpecs::new()` and
 /// they are modified with methods `option()` and `flag()`.
 ///
-/// The struct instance is used to parse command line given by program’s
-/// user. The parser methods are `getopt()` and `getopt_vec()`.
+/// The struct instance is used when parsing the command line given by
+/// program’s user. Parser methods are `getopt()` and `getopt_vec()`.
 
 #[derive(Debug, PartialEq)]
 pub struct OptSpecs {
@@ -128,7 +128,7 @@ pub enum OptValueType {
     Required,
 }
 
-/// Option flags which change command-line parser’s behaviour.
+/// Flags for changing command-line parser’s behaviour.
 ///
 /// See `OptSpecs` struct’s `flag()` method for more information.
 
@@ -170,18 +170,18 @@ impl OptSpecs {
     ///     All options must have a unique `name` string. This method
     ///     will panic if the same `name` is added twice. The method
     ///     will also panic if the `name` string contains illegal
-    ///     characters. Space characters are not accepted. Short option
-    ///     name can’t be `-` and long option names can’t have any `=`
-    ///     characters nor `-` as their first character.
+    ///     characters. Space characters are not accepted. A short
+    ///     option name can’t be `-` and long option names can’t have
+    ///     any `=` characters nor `-` as their first character.
     ///
     ///  3. `value_type`: A variant of enum `OptValueType` which defines
     ///     if this option accepts a value. If not, use
-    ///     `OptValueType::None` as method’s argument. If optional value
-    ///     is accepted, use `OptValueType::Optional`. If the option
-    ///     requires a value, use `OptValueType::Required`.
+    ///     `OptValueType::None` as method’s argument. If an optional
+    ///     value is accepted, use `OptValueType::Optional`. If the
+    ///     option requires a value, use `OptValueType::Required`.
     ///
-    /// Method’s return value is the same `OptSpecs` struct instance
-    /// which was modified.
+    /// Method returns the same `OptSpecs` struct instance which was
+    /// modified.
 
     pub fn option(mut self: Self, id: &str, name: &str, value_type: OptValueType) -> Self {
         assert!(id.len() > 0,
@@ -221,16 +221,17 @@ impl OptSpecs {
     ///     This is not the default behaviour. By default the first
     ///     non-option argument in the command line stops option parsing
     ///     and the rest of the command line is parsed as non-options
-    ///     (“other arguments”), even if they look like options.
+    ///     (other arguments), even if they look like options.
     ///
-    ///   - `OptFlags::PrefixMatchLongOptions`: Long options don’t need
-    ///      to be written in full in the command line. They can be
-    ///      shortened as long as there are enough characters to find a
-    ///      unique prefix match. If there are more than one match the
-    ///      option is classified as unknown.
+    ///   - `OptFlags::PrefixMatchLongOptions`: With this flag long
+    ///      options don’t need to be written in full in the command
+    ///      line. They can be shortened as long as there are enough
+    ///      characters to find a unique prefix match. If there are more
+    ///      than one match the option given in the command line is
+    ///      classified as unknown.
     ///
-    /// Method’s return value is the same `OptSpecs` struct instance
-    /// which was modified.
+    /// Method returns the same `OptSpecs` struct instance which was
+    /// modified.
 
     pub fn flag(mut self: Self, flag: OptFlags) -> Self {
         self.flags.push(flag);
@@ -241,12 +242,25 @@ impl OptSpecs {
         self.flags.contains(&flag)
     }
 
+    /// Parse program’s command line.
+    ///
+    /// This method parses current program’s command line arguments
+    /// (`std::env::args()`). It returns an instance of `Args` struct
+    /// which contains the command line information in organized form.
+    /// See the documentation of `Args` struct for more information.
+
     pub fn getopt(self: &Self) -> Args {
         let mut iter = std::env::args();
         iter.next();
         let vec = iter.collect();
         parser::parse(&self, &vec)
     }
+
+    /// Parse a vector as command-line.
+    ///
+    /// This method is similar to `getopt()` except that this method
+    /// parses the argument `args` which is a vector of strings. Each
+    /// element in the vector is an argument in command line.
 
     pub fn getopt_vec(self: &Self, args: &Vec<String>) -> Args {
         parser::parse(&self, args)
