@@ -19,21 +19,20 @@ pub fn parse(specs: &OptSpecs, args: &Vec<String>) -> Args {
             let name = get_long_option_name(&opt).to_string();
 
             if is_valid_long_option_name(&name) {
-                let spec_test =
-                    if specs.is_flag(OptFlags::PrefixMatchLongOptions) {
-                        match specs.get_long_option_prefix_matches(&name) {
-                            None => None,
-                            Some(vec) => {
-                                if vec.len() == 1 {
-                                    Some(vec[0])
-                                } else {
-                                    None
-                                }
-                            },
+                let spec_test = if specs.is_flag(OptFlags::PrefixMatchLongOptions) {
+                    match specs.get_long_option_prefix_matches(&name) {
+                        None => None,
+                        Some(vec) => {
+                            if vec.len() == 1 {
+                                Some(vec[0])
+                            } else {
+                                None
+                            }
                         }
-                    } else {
-                        specs.get_long_option_match(&name)
-                    };
+                    }
+                } else {
+                    specs.get_long_option_match(&name)
+                };
 
                 match spec_test {
                     None => (),
