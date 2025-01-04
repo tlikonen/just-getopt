@@ -1,7 +1,7 @@
 [package]
 name = "just-getopt"
 version = "0.9.0"
-description = "Just a Getopt-like command-line option parser, without bloat"
+description = "Just a getopt-like command-line option parser"
 authors = ["Teemu Likonen <tlikonen@iki.fi>"]
 license = "CC0-1.0"
 keywords = ["command-line", "options", "parser", "getopt_long", "unix", "linux"]
