@@ -389,7 +389,7 @@ impl Args {
         for opt in opt_vec {
             match &opt.value {
                 None => (),
-                Some(v) => vec.push(v),
+                Some(s) => vec.push(s),
             }
         }
         vec
