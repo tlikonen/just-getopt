@@ -2,17 +2,17 @@ use just_getopt::{OptSpecs, OptValueType, OptFlags};
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
-    // Create new option specification struct `OptSpecs` three different
-    // options for logical meanings "help", "file" and "verbose". All
-    // three options can be accessed in command-line with a short
-    // variant (like "-h") and a long variant (like "--help"). Some options
-    // accept or require a value.
+    // Create new option specification struct `OptSpecs` with three
+    // different options for logical meanings "help", "file" and
+    // "verbose". All three options can be accessed in command-line with
+    // a short variant (like "-h") and a long variant (like "--help").
+    // Some options accept or require a value.
     //
-    // Flag OptionsEverywhere changes parser's behaviour. This flag
-    // means that options and other arguments can be mixed in their
-    // order in the command line. Without the flag the option parsing
-    // stops at the first non-option argument and the rest of the
-    // command-line is parsed as non-options.
+    // Flag OptionsEverywhere changes parser's behavior. This flag means
+    // that options and other arguments can be mixed in their order in
+    // the command line. Without the flag the option parsing stops at
+    // the first non-option argument and the rest of the command-line is
+    // parsed as non-options.
     let specs = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere)
         .option("help", "h", OptValueType::None)
@@ -22,20 +22,20 @@ fn main() -> ExitCode {
         .option("verbose", "v", OptValueType::Optional)
         .option("verbose", "verbose", OptValueType::Optional);
 
-    // Parse the command-line `std::env::args()` with the given option
-    // specification (`OptSpecs`).
+    // Parse program's command-line `std::env::args()` with the given
+    // option specification (`OptSpecs`).
     let parsed = specs.getopt();
 
-    // With this you can see the parsed Args structure.
+    // With this you can see the parsed Args struct.
     eprintln!("{:#?}", parsed);
 
-    // Report user about unknown options. No need to panic.
+    // Report user about unknown options.
     for u in &parsed.unknown {
         eprintln!("Unknown option: {}", u);
     }
 
-    // Report user about missing values for options that require them.
-    // Exit the program with error code.
+    // Report user about missing values for options that require them
+    // (i.e. "file"). Exit the program with error code.
     for o in &parsed.required_value_missing() {
         eprintln!("Value is required for option '{}'.", o.name);
         return ExitCode::FAILURE;
@@ -60,7 +60,7 @@ fn main() -> ExitCode {
         println!("Verbose level: {:?}", v);
     }
 
-    // Notice if "-v" or "--verbose" was given (even without value).
+    // Notice if "-v" or "--verbose" was given (even without a value).
     if parsed.options_first("verbose").is_some() {
         println!("Option 'verbose' was given.");
     }
