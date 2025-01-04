@@ -102,10 +102,43 @@ struct OptSpec {
     value_type: OptValueType,
 }
 
+/// Parsed command line in organized form.
+///
+/// Instances of this struct are usually created with `OptSpecs`
+/// struct’s `getopt()` method and an instance represents the parsed
+/// output in organized form. See each field’s documentation for more
+/// information.
+///
+/// A programmer can use the parsed output (`Args` struct) any way they
+/// like. There are some methods for convenience.
+
 #[derive(Debug, PartialEq)]
 pub struct Args {
+    /// A vector of valid command-line options.
+    ///
+    /// Elements of this vector are `Opt` structs which each represents
+    /// a single command-line option. Elements are in the same order as
+    /// given (by program’s user) in the command line. The vector is
+    /// empty if the parser didn’t find any valid command-line options.
     pub options: Vec<Opt>,
+
+    /// A vector of other arguments (non-options).
+    ///
+    /// Each element of the vector is a single non-option argument
+    /// string in the same order as given (by program’s user) in the
+    /// command line. The vector is empty if the parser didn’t find any
+    /// non-option arguments.
     pub other: Vec<String>,
+
+    /// Unknown options.
+    ///
+    /// Command-line arguments that look like options but were not part
+    /// of `OptSpecs` specification are classified as unknown. They are
+    /// listed in this vector. Each element is a name string for the
+    /// option (without `-` or `--` prefix). For unknown short options
+    /// the element is a single-character string. For unknown long
+    /// options the string has more than one character. The whole vector
+    /// is empty if there were no unknown options.
     pub unknown: Vec<String>,
 }
 
