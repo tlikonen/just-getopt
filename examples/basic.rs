@@ -1,4 +1,4 @@
-use just_getopt::{OptSpecs, OptValueType, OptFlags};
+use just_getopt::{OptFlags, OptSpecs, OptValueType};
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
@@ -47,7 +47,7 @@ fn main() -> ExitCode {
         Some(_) => {
             println!("Print friendly help about program's usage.");
             return ExitCode::from(2);
-        },
+        }
     }
 
     // Collect all (required) values for "-f" and "--file". Also collect
@@ -69,6 +69,6 @@ fn main() -> ExitCode {
     for o in &parsed.other {
         println!("Other argument: {:?}", o);
     }
-    
+
     ExitCode::SUCCESS
 }

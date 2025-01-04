@@ -1,4 +1,4 @@
-use crate::{OptSpecs, Args, Opt, OptFlags, OptValueType};
+use crate::{Args, Opt, OptFlags, OptSpecs, OptValueType};
 
 #[cfg(test)]
 mod tests;
@@ -15,7 +15,6 @@ pub fn parse(specs: &OptSpecs, args: &Vec<String>) -> Args {
 
         if is_option_terminator(&opt) {
             break;
-
         } else if is_long_option_prefix(&opt) {
             let name = get_long_option_name(&opt).to_string();
 
@@ -51,13 +50,13 @@ pub fn parse(specs: &OptSpecs, args: &Vec<String>) -> Args {
                                     match iter.next() {
                                         None => {
                                             value = None;
-                                        },
+                                        }
                                         Some(v) => {
                                             value = Some(v.clone());
-                                        },
+                                        }
                                     }
                                 }
-                            },
+                            }
 
                             OptValueType::Optional => {
                                 value_required = false;
@@ -66,35 +65,31 @@ pub fn parse(specs: &OptSpecs, args: &Vec<String>) -> Args {
                                 } else {
                                     value = None;
                                 }
-                            },
+                            }
 
                             OptValueType::None => {
                                 value_required = false;
                                 value = None;
                                 if is_long_option_equal_sign(&opt) {
-                                    parsed.unknown.push(
-                                        format!("{}=", name));
+                                    parsed.unknown.push(format!("{}=", name));
                                     continue;
                                 }
-                            },
+                            }
                         }
 
-                        parsed.options.push(
-                            Opt {
-                                id: spec.id.clone(),
-                                name: name,
-                                value_required: value_required,
-                                value: value,
-                            }
-                        );
+                        parsed.options.push(Opt {
+                            id: spec.id.clone(),
+                            name: name,
+                            value_required: value_required,
+                            value: value,
+                        });
                         continue;
-                    },
+                    }
                 }
             }
 
             parsed.unknown.push(name);
             continue;
-
         } else if is_short_option_prefix(&opt) {
             let mut char_iter = get_short_option_series(&opt).chars();
 
@@ -122,13 +117,13 @@ pub fn parse(specs: &OptSpecs, args: &Vec<String>) -> Args {
                                         match iter.next() {
                                             None => {
                                                 value = None;
-                                            },
+                                            }
                                             Some(v) => {
                                                 value = Some(v.to_string());
-                                            },
+                                            }
                                         }
                                     }
-                                },
+                                }
 
                                 OptValueType::Optional => {
                                     value_required = false;
@@ -139,31 +134,28 @@ pub fn parse(specs: &OptSpecs, args: &Vec<String>) -> Args {
                                     } else {
                                         value = None;
                                     }
-                                },
+                                }
 
                                 OptValueType::None => {
                                     value_required = false;
                                     value = None;
-                                },
+                                }
                             }
 
-                            parsed.options.push(
-                                Opt {
-                                    id: spec.id.clone(),
-                                    name: name,
-                                    value_required: value_required,
-                                    value: value,
-                                }
-                            );
+                            parsed.options.push(Opt {
+                                id: spec.id.clone(),
+                                name: name,
+                                value_required: value_required,
+                                value: value,
+                            });
                             continue;
-                        },
+                        }
                     }
                 }
 
                 parsed.unknown.push(name);
                 continue;
             }
-
         } else if specs.is_flag(OptFlags::OptionsEverywhere) {
             parsed.other.push(opt);
         } else {
@@ -186,7 +178,7 @@ const OPTION_TERMINATOR: &str = "--";
 const LONG_OPTION_PREFIX: &str = "--";
 const SHORT_OPTION_PREFIX: &str = "-";
 const INVALID_SHORT_OPTION_CHARS: &str = " -";
-const INVALID_LONG_OPTION_CHARS: &str  = " =";
+const INVALID_LONG_OPTION_CHARS: &str = " =";
 
 fn is_option_terminator(s: &str) -> bool {
     s == OPTION_TERMINATOR
@@ -194,8 +186,10 @@ fn is_option_terminator(s: &str) -> bool {
 
 fn is_long_option_prefix(s: &str) -> bool {
     let len = LONG_OPTION_PREFIX.len();
-    if s.len() < 1 + len { return false; }
-    s.starts_with(LONG_OPTION_PREFIX) && &s[len..len+1] != "-"
+    if s.len() < 1 + len {
+        return false;
+    }
+    s.starts_with(LONG_OPTION_PREFIX) && &s[len..len + 1] != "-"
 }
 
 fn get_long_option(s: &str) -> &str {
@@ -223,26 +217,35 @@ fn get_long_option_equal_value(s: &str) -> &str {
 }
 
 pub fn is_valid_long_option_name(s: &str) -> bool {
-    if s.starts_with('-') { return false; }
+    if s.starts_with('-') {
+        return false;
+    }
     for c in INVALID_LONG_OPTION_CHARS.chars() {
-        if s.contains(c) { return false; }
+        if s.contains(c) {
+            return false;
+        }
     }
     true
 }
 
 pub fn is_valid_short_option_name(s: &str) -> bool {
-    if s.len() != 1 { return false; }
+    if s.len() != 1 {
+        return false;
+    }
     for c in INVALID_SHORT_OPTION_CHARS.chars() {
-        if s.contains(c) { return false; }
+        if s.contains(c) {
+            return false;
+        }
     }
     true
 }
 
 fn is_short_option_prefix(s: &str) -> bool {
     let len = SHORT_OPTION_PREFIX.len();
-    if s.len() < 1 + len { return false; }
-    s.starts_with(SHORT_OPTION_PREFIX)
-        && is_valid_short_option_name(&s[len..len+1])
+    if s.len() < 1 + len {
+        return false;
+    }
+    s.starts_with(SHORT_OPTION_PREFIX) && is_valid_short_option_name(&s[len..len + 1])
 }
 
 fn get_short_option_series(s: &str) -> &str {

@@ -221,21 +221,30 @@ impl OptSpecs {
     /// modified.
 
     pub fn option(mut self: Self, id: &str, name: &str, value_type: OptValueType) -> Self {
-        assert!(id.len() > 0,
-                "Option's \"id\" must be at least 1 character long.");
+        assert!(
+            id.len() > 0,
+            "Option's \"id\" must be at least 1 character long."
+        );
 
         if name.len() == 1 {
-            assert!(parser::is_valid_short_option_name(name),
-                    "Not a valid short option name.");
+            assert!(
+                parser::is_valid_short_option_name(name),
+                "Not a valid short option name."
+            );
         } else if name.len() >= 2 {
-            assert!(parser::is_valid_long_option_name(name),
-                    "Not a valid long option name.");
+            assert!(
+                parser::is_valid_long_option_name(name),
+                "Not a valid long option name."
+            );
         } else {
             panic!("Option's \"name\" must be at least 1 character long.");
         }
 
         for e in &self.options {
-            assert!(e.name != name, "No duplicates allowed for option's \"name\".");
+            assert!(
+                e.name != name,
+                "No duplicates allowed for option's \"name\"."
+            );
         }
 
         self.options.push(OptSpec {
@@ -304,27 +313,39 @@ impl OptSpecs {
     }
 
     fn get_short_option_match(self: &Self, name: &str) -> Option<&OptSpec> {
-        if name.len() != 1 { return None; }
+        if name.len() != 1 {
+            return None;
+        }
         for e in &self.options {
-            if e.name == name { return Some(e); }
+            if e.name == name {
+                return Some(e);
+            }
         }
         None
     }
 
     fn get_long_option_match(self: &Self, name: &str) -> Option<&OptSpec> {
-        if name.len() < 2 { return None; }
+        if name.len() < 2 {
+            return None;
+        }
         for e in &self.options {
-            if e.name == name { return Some(e); }
+            if e.name == name {
+                return Some(e);
+            }
         }
         None
     }
 
     fn get_long_option_prefix_matches(self: &Self, name: &str) -> Option<Vec<&OptSpec>> {
-        if name.len() < 2 { return None; }
+        if name.len() < 2 {
+            return None;
+        }
 
         let mut v = Vec::new();
         for e in &self.options {
-            if e.name.starts_with(name) { v.push(e); }
+            if e.name.starts_with(name) {
+                v.push(e);
+            }
         }
 
         if v.len() > 0 {
@@ -386,7 +407,9 @@ impl Args {
 
     pub fn options_first(self: &Self, id: &str) -> Option<&Opt> {
         for opt in &self.options {
-            if opt.id == id { return Some(opt); }
+            if opt.id == id {
+                return Some(opt);
+            }
         }
         None
     }
@@ -401,7 +424,9 @@ impl Args {
         let mut pos;
         for i in 0..len {
             pos = len - i - 1;
-            if self.options[pos].id == id { return Some(&self.options[pos]); }
+            if self.options[pos].id == id {
+                return Some(&self.options[pos]);
+            }
         }
         None
     }
@@ -417,7 +442,9 @@ impl Args {
     pub fn options_all(self: &Self, id: &str) -> Vec<&Opt> {
         let mut vec = Vec::new();
         for opt in &self.options {
-            if opt.id == id { vec.push(opt); }
+            if opt.id == id {
+                vec.push(opt);
+            }
         }
         vec
     }

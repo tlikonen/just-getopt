@@ -49,7 +49,9 @@ fn check_is_flag() {
 
 fn test_getopt_vec(o: &OptSpecs, args: Vec<&str>) -> Args {
     let mut vec = Vec::new();
-    for s in &args { vec.push(s.to_string()); }
+    for s in &args {
+        vec.push(s.to_string());
+    }
     crate::parser::parse(o, &vec)
 }
 
@@ -62,7 +64,9 @@ fn parsed_args_1() {
         .option("file", "file", OptValueType::Required);
 
     let parsed = test_getopt_vec(
-        &specs, vec!["-h", "--help", "-f123", "-f", "456", "foo", "bar"]);
+        &specs,
+        vec!["-h", "--help", "-f123", "-f", "456", "foo", "bar"],
+    );
 
     assert_eq!("h", parsed.options_first("help").unwrap().name);
     assert_eq!("help", parsed.options_last("help").unwrap().name);
@@ -72,8 +76,14 @@ fn parsed_args_1() {
     assert_eq!(false, parsed.options_last("help").unwrap().value_required);
 
     assert_eq!("f", parsed.options_first("file").unwrap().name);
-    assert_eq!("123", parsed.options_first("file").unwrap().value.clone().unwrap());
-    assert_eq!("456", parsed.options_last("file").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "123",
+        parsed.options_first("file").unwrap().value.clone().unwrap()
+    );
+    assert_eq!(
+        "456",
+        parsed.options_last("file").unwrap().value.clone().unwrap()
+    );
     assert_eq!(true, parsed.options_first("file").unwrap().value_required);
 
     assert_eq!("foo", parsed.other[0]);
@@ -82,11 +92,9 @@ fn parsed_args_1() {
 
 #[test]
 fn parsed_args_2() {
-    let specs = OptSpecs::new()
-        .option("help", "h", OptValueType::None);
+    let specs = OptSpecs::new().option("help", "h", OptValueType::None);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["-h", "foo", "-h"]);
+    let parsed = test_getopt_vec(&specs, vec!["-h", "foo", "-h"]);
 
     assert_eq!("h", parsed.options_first("help").unwrap().name);
     assert_eq!("foo", parsed.other[0]);
@@ -103,12 +111,20 @@ fn parsed_args_3() {
         .option("file", "file", OptValueType::Required);
 
     let parsed = test_getopt_vec(
-        &specs, vec!["-h", "foo", "--help", "--file=123", "bar", "--file", "456"]);
+        &specs,
+        vec!["-h", "foo", "--help", "--file=123", "bar", "--file", "456"],
+    );
 
     assert_eq!("h", parsed.options_first("help").unwrap().name);
     assert_eq!("help", parsed.options_last("help").unwrap().name);
-    assert_eq!("123", parsed.options_first("file").unwrap().value.clone().unwrap());
-    assert_eq!("456", parsed.options_last("file").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "123",
+        parsed.options_first("file").unwrap().value.clone().unwrap()
+    );
+    assert_eq!(
+        "456",
+        parsed.options_last("file").unwrap().value.clone().unwrap()
+    );
     assert_eq!("foo", parsed.other[0]);
     assert_eq!("bar", parsed.other[1]);
 }
@@ -119,28 +135,50 @@ fn parsed_args_4() {
         .option("debug", "d", OptValueType::Optional)
         .option("verbose", "verbose", OptValueType::Optional);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["-d1", "-d", "--verbose", "--verbose=123"]);
+    let parsed = test_getopt_vec(&specs, vec!["-d1", "-d", "--verbose", "--verbose=123"]);
 
-    assert_eq!("1", parsed.options_first("debug").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "1",
+        parsed
+            .options_first("debug")
+            .unwrap()
+            .value
+            .clone()
+            .unwrap()
+    );
     assert_eq!(true, parsed.options_last("debug").unwrap().value.is_none());
     assert_eq!(false, parsed.options_last("debug").unwrap().value_required);
 
-    assert_eq!(true, parsed.options_first("verbose").unwrap().value.is_none());
-    assert_eq!("123", parsed.options_last("verbose").unwrap().value.clone().unwrap());
-    assert_eq!(false, parsed.options_last("verbose").unwrap().value_required);
+    assert_eq!(
+        true,
+        parsed.options_first("verbose").unwrap().value.is_none()
+    );
+    assert_eq!(
+        "123",
+        parsed
+            .options_last("verbose")
+            .unwrap()
+            .value
+            .clone()
+            .unwrap()
+    );
+    assert_eq!(
+        false,
+        parsed.options_last("verbose").unwrap().value_required
+    );
 }
 
 #[test]
 fn parsed_args_5() {
-    let specs = OptSpecs::new()
-        .option("debug", "d", OptValueType::Optional);
+    let specs = OptSpecs::new().option("debug", "d", OptValueType::Optional);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["-abcd", "-adbc"]);
+    let parsed = test_getopt_vec(&specs, vec!["-abcd", "-adbc"]);
 
     assert_eq!(true, parsed.options_first("debug").unwrap().value.is_none());
-    assert_eq!("bc", parsed.options_last("debug").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "bc",
+        parsed.options_last("debug").unwrap().value.clone().unwrap()
+    );
 
     assert_eq!("a", parsed.unknown[0]);
     assert_eq!("b", parsed.unknown[1]);
@@ -155,13 +193,12 @@ fn parsed_args_6() {
         .option("aaa", "d", OptValueType::None)
         .option("aaa", "eee", OptValueType::None);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["--bbb", "-cd", "--eee"]);
+    let parsed = test_getopt_vec(&specs, vec!["--bbb", "-cd", "--eee"]);
 
     let m = parsed.options_all("aaa");
     assert_eq!("bbb", m[0].name);
-    assert_eq!("c",   m[1].name);
-    assert_eq!("d",   m[2].name);
+    assert_eq!("c", m[1].name);
+    assert_eq!("d", m[2].name);
     assert_eq!("eee", m[3].name);
 }
 
@@ -172,8 +209,7 @@ fn parsed_args_7() {
         .option("version", "version", OptValueType::None)
         .option("verbose", "verbose", OptValueType::None);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["--ver", "--verb", "--versi", "--verbose"]);
+    let parsed = test_getopt_vec(&specs, vec!["--ver", "--verb", "--versi", "--verbose"]);
 
     assert_eq!("ver", parsed.unknown[0]);
     assert_eq!("verb", parsed.options_first("verbose").unwrap().name);
@@ -190,11 +226,16 @@ fn parsed_args_8() {
         .option("file", "file", OptValueType::Required);
 
     let parsed = test_getopt_vec(
-        &specs, vec!["-h", "foo", "--file=123", "--", "bar", "--file", "456"]);
+        &specs,
+        vec!["-h", "foo", "--file=123", "--", "bar", "--file", "456"],
+    );
 
     assert_eq!("h", parsed.options_first("help").unwrap().name);
     assert_eq!("file", parsed.options_first("file").unwrap().name);
-    assert_eq!("123", parsed.options_first("file").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "123",
+        parsed.options_first("file").unwrap().value.clone().unwrap()
+    );
 
     assert_eq!("foo", parsed.other[0]);
     assert_eq!("bar", parsed.other[1]);
@@ -210,7 +251,9 @@ fn parsed_args_9() {
         .option("verbose", "verbose", OptValueType::None);
 
     let parsed = test_getopt_vec(
-        &specs, vec!["--version", "--ver", "--verb", "--versi", "--verbose"]);
+        &specs,
+        vec!["--version", "--ver", "--verb", "--versi", "--verbose"],
+    );
 
     assert_eq!("ver", parsed.unknown[0]);
     assert_eq!("verb", parsed.unknown[1]);
@@ -221,14 +264,15 @@ fn parsed_args_9() {
 
 #[test]
 fn parsed_args_10() {
-    let specs = OptSpecs::new()
-        .option("file", "file", OptValueType::Required);
+    let specs = OptSpecs::new().option("file", "file", OptValueType::Required);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["--file=", "--file"]);
+    let parsed = test_getopt_vec(&specs, vec!["--file=", "--file"]);
 
     assert_eq!(true, parsed.options_first("file").unwrap().value_required);
-    assert_eq!("", parsed.options_first("file").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "",
+        parsed.options_first("file").unwrap().value.clone().unwrap()
+    );
     assert_eq!(true, parsed.options_last("file").unwrap().value.is_none());
 }
 
@@ -238,13 +282,23 @@ fn parsed_args_11() {
         .option("file", "f", OptValueType::Required)
         .option("debug", "d", OptValueType::Required);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["-fx", "-d", "", "-f"]);
+    let parsed = test_getopt_vec(&specs, vec!["-fx", "-d", "", "-f"]);
 
     assert_eq!(true, parsed.options_first("file").unwrap().value_required);
-    assert_eq!("x", parsed.options_first("file").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "x",
+        parsed.options_first("file").unwrap().value.clone().unwrap()
+    );
     assert_eq!(true, parsed.options_last("file").unwrap().value.is_none());
-    assert_eq!("", parsed.options_first("debug").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "",
+        parsed
+            .options_first("debug")
+            .unwrap()
+            .value
+            .clone()
+            .unwrap()
+    );
 }
 
 #[test]
@@ -253,8 +307,7 @@ fn parsed_args_12() {
         .option("file", "f", OptValueType::Required)
         .option("debug", "d", OptValueType::Required);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["-f123", "-d", "", "-f", "456", "-f"]);
+    let parsed = test_getopt_vec(&specs, vec!["-f123", "-d", "", "-f", "456", "-f"]);
 
     let f = parsed.options_value_all("file");
     let d = parsed.options_value_all("debug");
@@ -276,7 +329,9 @@ fn parsed_args_13() {
         .option("debug", "debug", OptValueType::Required);
 
     let parsed = test_getopt_vec(
-        &specs, vec!["--file=123", "--debug", "", "--file", "456", "--file"]);
+        &specs,
+        vec!["--file=123", "--debug", "", "--file", "456", "--file"],
+    );
 
     let f = parsed.options_value_all("file");
     let d = parsed.options_value_all("debug");
@@ -299,7 +354,18 @@ fn parsed_args_14() {
         .option("debug", "debug", OptValueType::Optional);
 
     let parsed = test_getopt_vec(
-        &specs, vec!["-d", "-d123", "-d", "--debug", "--debug=", "foo", "--debug=456", "-d"]);
+        &specs,
+        vec![
+            "-d",
+            "-d123",
+            "-d",
+            "--debug",
+            "--debug=",
+            "foo",
+            "--debug=456",
+            "-d",
+        ],
+    );
 
     let d = parsed.options_all("debug");
     assert_eq!(7, d.len());
@@ -319,7 +385,17 @@ fn parsed_args_14() {
 fn parsed_args_15() {
     let specs = OptSpecs::new();
     let parsed = test_getopt_vec(
-        &specs, vec!["-abcd", "-e", "--debug", "--", "--debug=", "foo", "--debug=456"]);
+        &specs,
+        vec![
+            "-abcd",
+            "-e",
+            "--debug",
+            "--",
+            "--debug=",
+            "foo",
+            "--debug=456",
+        ],
+    );
 
     assert_eq!(0, parsed.options.len());
     assert_eq!(3, parsed.other.len());
@@ -328,13 +404,14 @@ fn parsed_args_15() {
 
 #[test]
 fn parsed_args_16() {
-    let specs = OptSpecs::new()
-        .option("file", "file", OptValueType::Required);
+    let specs = OptSpecs::new().option("file", "file", OptValueType::Required);
 
-    let parsed = test_getopt_vec(
-        &specs, vec!["--file", "--", "--", "--"]);
+    let parsed = test_getopt_vec(&specs, vec!["--file", "--", "--", "--"]);
 
-    assert_eq!("--", parsed.options_first("file").unwrap().value.clone().unwrap());
+    assert_eq!(
+        "--",
+        parsed.options_first("file").unwrap().value.clone().unwrap()
+    );
     assert_eq!(1, parsed.other.len());
     assert_eq!("--", parsed.other[0]);
 }
