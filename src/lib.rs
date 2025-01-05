@@ -176,90 +176,6 @@ struct OptSpec {
     value_type: OptValueType,
 }
 
-/// Parsed command line in organized form.
-///
-/// Instances of this struct are usually created with `OptSpecs`
-/// struct's `getopt()` method and an instance represents the parsed
-/// output in organized form. See each field's documentation for more
-/// information.
-///
-/// Programmers can use the parsed output (`Args` struct) any way they
-/// like. There are some methods for convenience.
-
-#[derive(Debug, PartialEq)]
-pub struct Args {
-    /// A vector of valid command-line options.
-    ///
-    /// Elements of this vector are `Opt` structs which each represents
-    /// a single command-line option. Elements are in the same order as
-    /// given (by program's user) in the command line. The vector is
-    /// empty if the parser didn't find any valid command-line options.
-    pub options: Vec<Opt>,
-
-    /// A vector of other arguments (non-options).
-    ///
-    /// Each element of the vector is a single non-option argument
-    /// string in the same order as given (by program's user) in the
-    /// command line. The vector is empty if the parser didn't find any
-    /// non-option arguments.
-    pub other: Vec<String>,
-
-    /// Unknown options.
-    ///
-    /// Command-line arguments that look like options but were not part
-    /// of `OptSpecs` specification are classified as unknown. They are
-    /// listed in this vector. Each element is the name string for the
-    /// option (without `-` or `--` prefix). For unknown short options
-    /// the element is a single-character string. For unknown long
-    /// options the string has more than one character. The whole vector
-    /// is empty if there were no unknown options.
-    pub unknown: Vec<String>,
-}
-
-/// Structured option information.
-///
-/// This `Opt` struct represents organized information about single
-/// command-line option. Instances of this struct are usually created by
-/// `OptSpecs` struct's `getopt()` method which returns an `Args` struct
-/// which have these `Opt` structs inside.
-///
-/// A programmer may need these when examining parsed command-line
-/// options. See the documentation of individual fields for more
-/// information. Also see `Args` struct and its methods.
-
-#[derive(Debug, PartialEq)]
-pub struct Opt {
-    /// Identifier for the option.
-    ///
-    /// Identifiers are defined with `OptSpecs` struct's `option()`
-    /// method before parsing command-line arguments. After `getopt()`
-    /// parsing the same identifier is copied here and it confirms that
-    /// the option was indeed given in the command line.
-    pub id: String,
-
-    /// Option's name in the parsed command line.
-    ///
-    /// Option's name that was used in the command line. For short
-    /// options this is a single-character string. For long options the
-    /// name has more than one characters.
-    pub name: String,
-
-    /// The option requires a value.
-    ///
-    /// `true` means that the option was defined with value type
-    /// `OptValueType::Required`. See `OptSpecs` struct's `flag()`
-    /// method for more information. This field does not guarantee that
-    /// there actually was a value for the option in the command line.
-    pub value_required: bool,
-
-    /// Option's value.
-    ///
-    /// The value is a variant of enum `Option`. Value `None` means that
-    /// there is no value for the option. Value `Some(string)` provides
-    /// a value.
-    pub value: Option<String>,
-}
-
 /// Option's value type.
 ///
 /// See `OptSpecs` struct's `option()` method for more information.
@@ -458,6 +374,46 @@ impl OptSpecs {
     }
 }
 
+/// Parsed command line in organized form.
+///
+/// Instances of this struct are usually created with `OptSpecs`
+/// struct's `getopt()` method and an instance represents the parsed
+/// output in organized form. See each field's documentation for more
+/// information.
+///
+/// Programmers can use the parsed output (`Args` struct) any way they
+/// like. There are some methods for convenience.
+
+#[derive(Debug, PartialEq)]
+pub struct Args {
+    /// A vector of valid command-line options.
+    ///
+    /// Elements of this vector are `Opt` structs which each represents
+    /// a single command-line option. Elements are in the same order as
+    /// given (by program's user) in the command line. The vector is
+    /// empty if the parser didn't find any valid command-line options.
+    pub options: Vec<Opt>,
+
+    /// A vector of other arguments (non-options).
+    ///
+    /// Each element of the vector is a single non-option argument
+    /// string in the same order as given (by program's user) in the
+    /// command line. The vector is empty if the parser didn't find any
+    /// non-option arguments.
+    pub other: Vec<String>,
+
+    /// Unknown options.
+    ///
+    /// Command-line arguments that look like options but were not part
+    /// of `OptSpecs` specification are classified as unknown. They are
+    /// listed in this vector. Each element is the name string for the
+    /// option (without `-` or `--` prefix). For unknown short options
+    /// the element is a single-character string. For unknown long
+    /// options the string has more than one character. The whole vector
+    /// is empty if there were no unknown options.
+    pub unknown: Vec<String>,
+}
+
 impl Args {
     fn new() -> Self {
         Args {
@@ -617,4 +573,48 @@ impl Args {
             None
         }
     }
+}
+
+/// Structured option information.
+///
+/// This `Opt` struct represents organized information about single
+/// command-line option. Instances of this struct are usually created by
+/// `OptSpecs` struct's `getopt()` method which returns an `Args` struct
+/// which have these `Opt` structs inside.
+///
+/// A programmer may need these when examining parsed command-line
+/// options. See the documentation of individual fields for more
+/// information. Also see `Args` struct and its methods.
+
+#[derive(Debug, PartialEq)]
+pub struct Opt {
+    /// Identifier for the option.
+    ///
+    /// Identifiers are defined with `OptSpecs` struct's `option()`
+    /// method before parsing command-line arguments. After `getopt()`
+    /// parsing the same identifier is copied here and it confirms that
+    /// the option was indeed given in the command line.
+    pub id: String,
+
+    /// Option's name in the parsed command line.
+    ///
+    /// Option's name that was used in the command line. For short
+    /// options this is a single-character string. For long options the
+    /// name has more than one characters.
+    pub name: String,
+
+    /// The option requires a value.
+    ///
+    /// `true` means that the option was defined with value type
+    /// `OptValueType::Required`. See `OptSpecs` struct's `flag()`
+    /// method for more information. This field does not guarantee that
+    /// there actually was a value for the option in the command line.
+    pub value_required: bool,
+
+    /// Option's value.
+    ///
+    /// The value is a variant of enum `Option`. Value `None` means that
+    /// there is no value for the option. Value `Some(string)` provides
+    /// a value.
+    pub value: Option<String>,
 }
