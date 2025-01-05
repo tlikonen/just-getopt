@@ -23,9 +23,10 @@ fn main() -> ExitCode {
         .option("verbose", "v", OptValueType::Optional)
         .option("verbose", "verbose", OptValueType::Optional);
 
-    // Parse program's command-line `std::env::args()` with the given
-    // option specification `specs` which is an `OptSpecs` struct.
-    let parsed = specs.getopt();
+    // Parse program's command-line with the given specification `specs`.
+    let mut args = std::env::args(); // Get arguments iterator from operating system.
+    args.next(); // Consume the first item which is this program's name.
+    let parsed = specs.getopt(args);
 
     // With this you can see the parsed output which is an `Args`
     // struct.
