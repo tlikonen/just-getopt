@@ -146,11 +146,47 @@ pub struct Args {
     pub unknown: Vec<String>,
 }
 
+/// Structured option information.
+///
+/// This `Opt` struct represents organized information about single
+/// command-line option. Instances of this struct are usually created by
+/// `OptSpecs` struct’s `getopt()` method which returns an `Args` struct
+/// which have these `Opt` structs inside.
+///
+/// A programmer may need these when examining parsed command-line
+/// options. See the documentation of individual fields for more
+/// information. Also see `Args` struct and its methods.
+
 #[derive(Debug, PartialEq)]
 pub struct Opt {
+    /// Identifier for the option.
+    ///
+    /// Identifiers are defined with `OptSpecs` struct’s `option()`
+    /// method before parsing command-line arguments. After `getopt()`
+    /// parsing the same identifier is copied here and it confirms that
+    /// the option was indeed given in the command line.
     pub id: String,
+
+    /// Option’s name in the parsed command line.
+    ///
+    /// Option’s name that was used in the command line. For short
+    /// options this is a single-character string. For long options the
+    /// name has more than one characters.
     pub name: String,
+
+    /// The option requires a value.
+    ///
+    /// `true` means that the option was defined with value type
+    /// `OptValueType::Required`. See `OptSpecs` struct’s `flag()`
+    /// method for more information. This field does not guarantee that
+    /// there actually was a value for the option in the command line.
     pub value_required: bool,
+
+    /// Option’s value.
+    ///
+    /// The value is a variant of enum `Option`. Value `None` means that
+    /// there is no value for the option. Value `Some(string)` provides
+    /// a value.
     pub value: Option<String>,
 }
 
@@ -291,9 +327,9 @@ impl OptSpecs {
     /// Getopt-parse an iterable item as command line arguments.
     ///
     /// This method’s argument `args` is of any type that implements
-    /// trait `IntoIterator` and that items’ type implements trait
-    /// `ToString`. For example, argument `args` can be a vector or an
-    /// iterator such as command-line arguments returned by
+    /// trait `IntoIterator` and that has items of type that implements
+    /// trait `ToString`. For example, argument `args` can be a vector
+    /// or an iterator such as command-line arguments returned by
     /// `std::env::args()`.
     ///
     /// The return value is an `Args` struct which represents the
@@ -388,10 +424,11 @@ impl Args {
     /// Find all options with the given `id`.
     ///
     /// Find all options which have the identifier `id`. (Option
-    /// identifiers have been defined in `OptSpecs` structs before
+    /// identifiers have been defined in `OptSpecs` struct before
     /// parsing.) The return value is a vector (possibly empty, if no
     /// matches) and each element is a reference to `Opt` struct in the
-    /// original `Args` struct.
+    /// original `Args` struct. Elements in the vector are in the same
+    /// order as in the parsed command line.
 
     pub fn options_all(self: &Self, id: &str) -> Vec<&Opt> {
         let mut vec = Vec::new();
@@ -445,10 +482,11 @@ impl Args {
 
     /// Find and return all values for options with the given `id`.
     ///
-    /// Find all options which match the identifier `id` and which have
-    /// a value assigned. (Options’ identifiers have been defined in
-    /// `OptSpecs` struct before parsing.) Collect options’ values into
-    /// a new vector. Vector’s elements are references to the value
+    /// Find all options which match the identifier `id` and which also
+    /// have a value assigned. (Options’ identifiers have been defined
+    /// in `OptSpecs` struct before parsing.) Collect options’ values
+    /// into a new vector in the same order as they were given in the
+    /// command line. Vector’s elements are references to the value
     /// strings in the original `Args` struct. The returned vector is
     /// empty if there were no matches.
 
