@@ -290,26 +290,32 @@ impl OptSpecs {
 
     /// Parse program’s command line.
     ///
-    /// This method parses current program’s command line arguments
-    /// (`std::env::args()`). It returns an instance of `Args` struct
-    /// which contains the command line information in organized form.
-    /// See the documentation of `Args` struct for more information.
+    /// This method parses current program’s command line arguments as
+    /// returned by `std::env::args()`. The method returns an instance
+    /// of `Args` struct which contains the command line information in
+    /// organized form. See the documentation of `Args` struct for more
+    /// information.
 
     pub fn getopt(self: &Self) -> Args {
         let mut iter = std::env::args();
         iter.next();
-        let vec = iter.collect();
-        parser::parse(&self, &vec)
+        parser::parse(&self, iter)
     }
 
-    /// Parse a vector as command-line.
+    /// Parse an iterable item as command line.
     ///
-    /// This method is similar to `getopt()` except that this method
-    /// parses the argument `args` which is a vector of strings. Each
-    /// element in the vector is an argument in command line.
+    /// The argument `args` is of any type that implements trait
+    /// `IntoIterator` and that items’ type implements trait `ToString`.
+    /// For example, argument `args` can be an iterator or a vector. The
+    /// return value is an `Args` struct which is the command-line
+    /// information in organized form.
 
-    pub fn getopt_vec(self: &Self, args: &Vec<String>) -> Args {
-        parser::parse(&self, args)
+    pub fn getopt_iter<I, S>(self: &Self, args: I) -> Args
+    where
+        I: IntoIterator<Item = S>,
+        S: ToString,
+    {
+        parser::parse(&self, args.into_iter().map(|i| i.to_string()))
     }
 
     fn get_short_option_match(self: &Self, name: &str) -> Option<&OptSpec> {

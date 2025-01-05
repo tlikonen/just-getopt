@@ -3,9 +3,11 @@ use crate::{Args, Opt, OptFlags, OptSpecs, OptValueType};
 #[cfg(test)]
 mod tests;
 
-pub fn parse(specs: &OptSpecs, args: &Vec<String>) -> Args {
+pub fn parse<I>(specs: &OptSpecs, mut iter: I) -> Args
+where
+    I: Iterator<Item = String>,
+{
     let mut parsed = Args::new();
-    let mut iter = args.iter();
 
     loop {
         let opt = match iter.next() {
