@@ -19,10 +19,10 @@
 //!  2. long options with more than one letter as their name (`--file`).
 //!
 //! Both option types may accept an optional value or they may require a
-//! value. Values are given after the option. See the section [Parsing
-//! rules](#parsing-rules) below for more information.
+//! value. Values are given after the option. See the section **Parsing
+//! rules** below for more information.
 //!
-//! Programming examples are in the [Example](#example) section below.
+//! Programming examples are in the **Examples** section below.
 //!
 //! # Parsing rules
 //!
@@ -75,11 +75,14 @@
 //! accepts an optional value. It means that the value is empty string.
 //! It is not valid format when the option does not accept a value.
 //!
-//! # Example
+//! # Examples
 //!
-//! This example guides through typical usage of this library crate and
-//! command-line parsing. First we bring some important paths into the
-//! scope of our program.
+//! Following examples will guide through a typical usa of this library
+//! crate and command-line parsing.
+//!
+//! ## Prepare
+//!
+//! First we bring some important paths into the scope of our program.
 //!
 //! ```
 //! use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -128,6 +131,8 @@
 //! For better explanation see the documentation of `OptSpecs` struct
 //! and its methods `option()` and `flag()`.
 //!
+//! ## Parse the command line
+//!
 //! We are ready to parse program's command-line arguments. We do this
 //! with `OptSpecs` struct's `getopt()` method. Arguments we get from
 //! `std::env::args()` function which returns an iterator.
@@ -143,8 +148,51 @@
 //! #     .option("verbose", "verbose", OptValueType::Optional)
 //! #     .flag(OptFlags::OptionsEverywhere);
 //! let mut args = std::env::args(); // Get arguments iterator from operating system.
-//! args.next(); // Consume the first item which is this program's name.
-//! let parsed = specs.getopt(args); // Use the "specs" variable defined above.
+//! args.next(); // Consume the first item which is this program's file path.
+//! let parsed = specs.getopt(args); // Getopt! Use the "specs" variable defined above.
+//! ```
+//!
+//! If you want to try `getopt()` method without program's real
+//! command-line arguments you can also run it with other iterator
+//! argument or with a vector or an array as an argument. Like this:
+//!
+//! ```
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new()
+//! #     .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
+//! #     .option("help", "help", OptValueType::None)
+//! #     .option("file", "f", OptValueType::Required)
+//! #     .option("file", "file", OptValueType::Required)
+//! #     .option("verbose", "v", OptValueType::Optional)
+//! #     .option("verbose", "verbose", OptValueType::Optional)
+//! #     .flag(OptFlags::OptionsEverywhere);
+//! let parsed = specs.getopt(["--file=foo", "-f123", "-v", "other"]);
+//! ```
+//!
+//! ## Examine the parsed output
+//!
+//! The command line is now parsed and the variable `parsed` (see above)
+//! points to an `Args` struct which represents the parsed output in
+//! organized form. It is a public struct and it can be examined
+//! manually. There are some methods for convenience, though, and some
+//! of them are shown in the following examples.
+//!
+//! At this stage it is useful to see the returned `Args` struct. One of
+//! its fields may contain some `Opt` structs too if the parser found
+//! valid command-line options. Let's print it:
+//!
+//! ```
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new()
+//! #     .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
+//! #     .option("help", "help", OptValueType::None)
+//! #     .option("file", "f", OptValueType::Required)
+//! #     .option("file", "file", OptValueType::Required)
+//! #     .option("verbose", "v", OptValueType::Optional)
+//! #     .option("verbose", "verbose", OptValueType::Optional)
+//! #     .flag(OptFlags::OptionsEverywhere);
+//! # let parsed = specs.getopt(["--file=foo", "-f123", "-v", "other"]);
+//! eprintln!("{:#?}", parsed);
 //! ```
 //!
 //! (To be continued...)
