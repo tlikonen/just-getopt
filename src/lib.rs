@@ -233,7 +233,7 @@
 //!
 //! ### Required Value Missing
 //!
-//! More serious error is a missing value to option which requires a
+//! More serious error is a missing value to an option which requires a
 //! value (like `file` option in our example, see above). That can be
 //! reason to stop the program altogether.
 //!
