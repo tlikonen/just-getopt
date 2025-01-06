@@ -26,29 +26,37 @@ In getopt logic there are two types of command-line options:
 Both option types may accept an optional value or they may require a
 value. Values are given after the option.
 
-Documentation of this library crate is available in the source file
-[src/lib.rs](src/lib.rs). It can be built and shown in a web browser
-with command `cargo doc --open`. That requires the usual Rust
-development tools.
-
-See file [examples/basic.rs](examples/basic.rs) for basic programming
-examples.
-
 
 [Rust]: https://www.rust-lang.org/
 
 
-License and Source Code
+Usage and Documentation
 -----------------------
+
+The crate is available at [Github][] and [crates.io][] and it can added
+to a Rust project with command `cargo add just-getopt`.
+
+Documentation is available at [docs.rs][]. From the source code
+directory the documentation can be built and shown in a web browser with
+command `cargo doc --open`.
+
+Also see file [examples/basic.rs](examples/basic.rs) for basic
+programming examples.
+
+
+[Github]:    https://github.com/tlikonen/just-getopt
+[crates.io]: https://crates.io/crates/just-getopt
+[docs.rs]:   https://docs.rs/just-getopt/latest/just_getopt/
+
+
+License
+-------
 
 Author: Teemu Likonen <<tlikonen@iki.fi>>
 
 OpenPGP key: [6965F03973F0D4CA22B9410F0F2CAE0E07608462][PGP]
 
 License: [Creative Commons CC0][CC0] (public domain dedication)
-
-The source code repository: <https://github.com/tlikonen/just-getopt>
-
 
 [PGP]: http://www.iki.fi/tlikonen/pgp-key.asc
 [CC0]: https://creativecommons.org/publicdomain/zero/1.0/legalcode
