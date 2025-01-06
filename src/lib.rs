@@ -20,11 +20,12 @@
 //!
 //! Both option types may accept an optional value or they may require a
 //! value. Values are given after the option. See the section **Parsing
-//! rules** below for more information.
+//! Rules** below for more information.
 //!
-//! Programming examples are in the **Examples** section below.
+//! Programming examples are in the **Examples** section below and in
+//! the source code repository's "examples" directory.
 //!
-//! # Parsing rules
+//! # Parsing Rules
 //!
 //! By default, all options are expected to come first in the command
 //! line. Other arguments (non-options) come after options. Therefore
@@ -38,7 +39,7 @@
 //! the option parser. Then the rest of the command line is parsed as
 //! regular arguments (non-options).
 //!
-//! ## Short options
+//! ## Short Options
 //!
 //! Short options in the command line start with the `-` character which
 //! is followed by option's name character (`-c`), usually a letter.
@@ -56,7 +57,7 @@
 //! character (`-abc`) but then only the last option in the series may
 //! have required or optional value.
 //!
-//! ## Long options
+//! ## Long Options
 //!
 //! Long options start with `--` characters and the option name comes
 //! directly after it (`--foo`). The name must be at least two
@@ -131,7 +132,7 @@
 //! For better explanation see the documentation of `OptSpecs` struct
 //! and its methods `option()` and `flag()`.
 //!
-//! ## Parse the command line
+//! ## Parse the Command Line
 //!
 //! We are ready to parse program's command-line arguments. We do this
 //! with `OptSpecs` struct's `getopt()` method. Arguments we get from
@@ -139,14 +140,7 @@
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
-//! # let specs = OptSpecs::new()
-//! #     .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
-//! #     .option("help", "help", OptValueType::None)
-//! #     .option("file", "f", OptValueType::Required)
-//! #     .option("file", "file", OptValueType::Required)
-//! #     .option("verbose", "v", OptValueType::Optional)
-//! #     .option("verbose", "verbose", OptValueType::Optional)
-//! #     .flag(OptFlags::OptionsEverywhere);
+//! # let specs = OptSpecs::new();
 //! let mut args = std::env::args(); // Get arguments iterator from operating system.
 //! args.next(); // Consume the first item which is this program's file path.
 //! let parsed = specs.getopt(args); // Getopt! Use the "specs" variable defined above.
@@ -158,18 +152,11 @@
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
-//! # let specs = OptSpecs::new()
-//! #     .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
-//! #     .option("help", "help", OptValueType::None)
-//! #     .option("file", "f", OptValueType::Required)
-//! #     .option("file", "file", OptValueType::Required)
-//! #     .option("verbose", "v", OptValueType::Optional)
-//! #     .option("verbose", "verbose", OptValueType::Optional)
-//! #     .flag(OptFlags::OptionsEverywhere);
-//! let parsed = specs.getopt(["--file=foo", "-f123", "-v", "other"]);
+//! # let specs = OptSpecs::new();
+//! let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! ```
 //!
-//! ## Examine the parsed output
+//! ## Examine the Parsed Output
 //!
 //! The command line is now parsed and the variable `parsed` (see above)
 //! points to an `Args` struct which represents the parsed output in
@@ -183,19 +170,158 @@
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
-//! # let specs = OptSpecs::new()
-//! #     .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
-//! #     .option("help", "help", OptValueType::None)
-//! #     .option("file", "f", OptValueType::Required)
-//! #     .option("file", "file", OptValueType::Required)
-//! #     .option("verbose", "v", OptValueType::Optional)
-//! #     .option("verbose", "verbose", OptValueType::Optional)
-//! #     .flag(OptFlags::OptionsEverywhere);
-//! # let parsed = specs.getopt(["--file=foo", "-f123", "-v", "other"]);
+//! # let specs = OptSpecs::new();
+//! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! eprintln!("{:#?}", parsed);
 //! ```
 //!
-//! (To be continued...)
+//! That could print something like this:
+//!
+//! ```text
+//! Args {
+//!     options: [
+//!         Opt {
+//!             id: "file",
+//!             name: "file",
+//!             value_required: true,
+//!             value: Some(
+//!                 "123",
+//!             ),
+//!         },
+//!         Opt {
+//!             id: "file",
+//!             name: "f",
+//!             value_required: true,
+//!             value: Some(
+//!                 "456",
+//!             ),
+//!         },
+//!         Opt {
+//!             id: "verbose",
+//!             name: "v",
+//!             value_required: false,
+//!             value: None,
+//!         },
+//!     ],
+//!     other: [
+//!         "foo",
+//!         "bar",
+//!     ],
+//!     unknown: [
+//!         "a",
+//!     ],
+//! }
+//! ```
+//!
+//! The returned `Args` struct above can be examined manually but the
+//! struct has some methods to make things convenient.
+//!
+//! ### Unknown Options
+//!
+//! We probably want to tell program's user if there were unknown
+//! options. An error message to `stderr` stream is usually enough. No
+//! need to panic.
+//!
+//! ```
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new();
+//! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
+//! for u in &parsed.unknown {
+//!     eprintln!("Unknown option: {}", u);
+//! }
+//! ```
+//!
+//! ### Required Value Missing
+//!
+//! More serious error is a missing value to option which requires a
+//! value (like `file` option in our example, see above). That can be
+//! reason to stop the program altogether.
+//!
+//! ```no_run
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new();
+//! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
+//! for o in &parsed.required_value_missing() {
+//!     eprintln!("Value is required for option '{}'.", o.name);
+//!     std::process::exit(1);
+//! }
+//! ```
+//!
+//! ### Print Help Message
+//!
+//! Command-line programs always have `-h` or `--help` option for
+//! printing a friendly help message. The following example shows how to
+//! detect that option.
+//!
+//! ```no_run
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new();
+//! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
+//! match parsed.options_first("help") {
+//!     None => (),
+//!     Some(_) => {
+//!         println!("Print friendly help about program's usage.");
+//!         std::process::exit(2);
+//!     }
+//! }
+//! ```
+//!
+//! The `"help"` string in the first line above is the identifier string
+//! (`id`) for the option. It was defined with `OptSpecs` struct's
+//! `option()` method in the example code earlier. Identifier strings
+//! are used to find if a specific option was given in the command line.
+//!
+//! ### Collect Values and Other Arguments
+//!
+//! The rest depends very much on individual program's needs. Probably
+//! often we would collect what values were given to options. In our
+//! example program there are `-f` and `--file` options that require a
+//! value and `-v` and `--verbose` options that accept an optional value
+//! but can be used without one. We could collect all those values next.
+//!
+//! ```
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new();
+//! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
+//! for f in &parsed.options_value_all("file") {
+//!     println!("File name: {:?}", f);
+//! }
+//!
+//! for v in &parsed.options_value_all("verbose") {
+//!     println!("Verbose level: {:?}", v);
+//! }
+//!
+//! // Notice if "-v" or "--verbose" was given, even without a value.
+//! if parsed.options_first("verbose").is_some() {
+//!     println!("Option 'verbose' was given.");
+//! }
+//! ```
+//!
+//! Finally, our example program will handle all other arguments, that
+//! is, non-option arguments.
+//!
+//! ```
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new();
+//! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
+//! for o in &parsed.other {
+//!     println!("Other argument: {:?}", o);
+//! }
+//! ```
+//!
+//! That's about !
+//!
+//! # More Help
+//!
+//! A complete working example code -- very similar to previous examples
+//! -- is in the source code repository's "examples" directory. It can
+//! be run with command `cargo run --example basic -- your arguments`.
+//! Try it with different command-line arguments.
+//!
+//! Suggested reading:
+//!
+//!   - `OptSpecs` struct and its methods.
+//!   - `Args` struct and its methods.
 
 mod parser;
 
