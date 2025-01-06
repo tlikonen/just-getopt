@@ -12,7 +12,7 @@ specifically the parser is like `getopt`’s GNU extension called
 `getopt_long` which is familiar command-line option format for users of
 Linux-based operating systems.
 
-The name is `just_getopt` because this is *just a getopt parser* and
+The name is *Just Getopt* because this is *just a getopt parser* and
 (almost) nothing more. The intent is to provide just the parsed output
 and methods for examining the output. There will not be anything for
 interpreting the output or for printing messages to program’s user. The
@@ -57,7 +57,7 @@ didn’t like any of them. Actually I like [clap][] quite much and would
 probably use it in a program with complex Git-like sub command
 interface. But other than that it does too much and feels like
 controlling my program. What about *just a getopt parser* with simple
-programming interface and without other magic? “Just Getopt” is my idea
+programming interface and without other magic? *Just Getopt* is my idea
 of good getopt parser interface. I hope you like it. If not, well, there
 are many options.
 
