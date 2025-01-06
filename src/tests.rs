@@ -386,3 +386,11 @@ fn parsed_output_16() {
     assert_eq!(1, parsed.other.len());
     assert_eq!("--", parsed.other[0]);
 }
+
+#[test]
+fn parsed_output_17() {
+    let parsed = OptSpecs::new().getopt(["foo", "bar"]);
+
+    assert_eq!(None, parsed.options_first("not-at-all"));
+    assert_eq!(None, parsed.options_last("not-at-all"));
+}
