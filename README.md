@@ -49,6 +49,22 @@ programming examples.
 [docs.rs]:   https://docs.rs/just-getopt/latest/just_getopt/
 
 
+Why Another Command-line Parser
+-------------------------------
+
+Yes, there are many command-line parsers for the Rust language but I
+didn’t like any of them. Actually I like [clap][] quite much and would
+probably use it in a program with complex Git-like sub command
+interface. But other than that it does too much and feels like
+controlling my program. What about *just a getopt parser* with simple
+programming interface and without other magic? “Just Getopt” is my idea
+of good getopt parser interface. I hope you like it. If not, well, there
+are many options.
+
+
+[clap]: https://crates.io/crates/clap
+
+
 License
 -------
 
