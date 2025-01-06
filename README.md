@@ -1,5 +1,5 @@
-Just Getop
-==========
+Just Getopt
+===========
 
 **A getopt-like command-line parser for the Rust language**
 
