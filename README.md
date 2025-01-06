@@ -46,7 +46,7 @@ programming examples.
 
 [Github]:    https://github.com/tlikonen/just-getopt
 [crates.io]: https://crates.io/crates/just-getopt
-[docs.rs]:   https://docs.rs/just-getopt/latest/just_getopt/
+[docs.rs]:   https://docs.rs/just-getopt/
 
 
 Why Another Command-line Parser
