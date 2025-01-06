@@ -318,7 +318,7 @@
 //! be run with command `cargo run --example basic -- your arguments`.
 //! Try it with different command-line arguments.
 //!
-//! Suggested reading:
+//! Further reading:
 //!
 //!   - `OptSpecs` struct and its methods.
 //!   - `Args` struct and its methods.
