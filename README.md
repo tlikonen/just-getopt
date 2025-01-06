@@ -26,10 +26,10 @@ In getopt logic there are two types of command-line options:
 Both option types may accept an optional value or they may require a
 value. Values are given after the option.
 
-Documentation of this library crate is available in the [source
-files](src/lib.rs). It can be built and shown in a web browser with
-command `cargo doc --open`. That requires the usual Rust development
-tools.
+Documentation of this library crate is available in the source file
+([`src/lib.rs`](src/lib.rs)). It can be built and shown in a web browser
+with command `cargo doc --open`. That requires the usual Rust
+development tools.
 
 See file [`examples/basic.rs`](examples/basic.rs) for basic programming
 examples.
