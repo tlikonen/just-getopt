@@ -670,12 +670,9 @@ impl Args {
     /// last match in command-line arguments' order.
 
     pub fn options_last(self: &Self, id: &str) -> Option<&Opt> {
-        let len = self.options.len();
-        let mut pos;
-        for i in 0..len {
-            pos = len - i - 1;
-            if self.options[pos].id == id {
-                return Some(&self.options[pos]);
+        for opt in self.options.iter().rev() {
+            if opt.id == id {
+                return Some(opt);
             }
         }
         None
