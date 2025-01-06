@@ -394,3 +394,15 @@ fn parsed_output_17() {
     assert_eq!(None, parsed.options_first("not-at-all"));
     assert_eq!(None, parsed.options_last("not-at-all"));
 }
+
+#[test]
+fn parsed_output_18() {
+    let parsed = OptSpecs::new()
+        .option("bar", "bar", OptValueType::None)
+        .getopt(["-aaa", "--foo", "--foo", "--bar=", "--bar="]);
+
+    assert_eq!(3, parsed.unknown.len());
+    assert_eq!("a", parsed.unknown[0]);
+    assert_eq!("foo", parsed.unknown[1]);
+    assert_eq!("bar=", parsed.unknown[2]);
+}

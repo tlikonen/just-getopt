@@ -72,7 +72,10 @@ where
                                 value_required = false;
                                 value = None;
                                 if is_long_option_equal_sign(&opt) {
-                                    parsed.unknown.push(format!("{}=", name));
+                                    let n = format!("{}=", name);
+                                    if !parsed.unknown.contains(&n) {
+                                        parsed.unknown.push(n);
+                                    }
                                     continue;
                                 }
                             }
@@ -89,7 +92,9 @@ where
                 }
             }
 
-            parsed.unknown.push(name);
+            if !parsed.unknown.contains(&name) {
+                parsed.unknown.push(name);
+            }
             continue;
         } else if is_short_option_prefix(&opt) {
             let mut char_iter = get_short_option_series(&opt).chars();
@@ -154,7 +159,9 @@ where
                     }
                 }
 
-                parsed.unknown.push(name);
+                if !parsed.unknown.contains(&name) {
+                    parsed.unknown.push(name);
+                }
                 continue;
             }
         } else if specs.is_flag(OptFlags::OptionsEverywhere) {

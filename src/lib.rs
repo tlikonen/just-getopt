@@ -580,11 +580,19 @@ pub struct Args {
     ///
     /// Command-line arguments that look like options but were not part
     /// of `OptSpecs` specification are classified as unknown. They are
-    /// listed in this vector. Each element is the name string for the
-    /// option (without `-` or `--` prefix). For unknown short options
-    /// the element is a single-character string. For unknown long
-    /// options the string has more than one character. The whole vector
-    /// is empty if there were no unknown options.
+    /// listed in this vector. Possible duplicate unknown options given
+    /// in command line have been filtered.
+    ///
+    /// Each element is the name string for the option (without `-` or
+    /// `--` prefix). For unknown short options the element is a
+    /// single-character string. For unknown long options the string has
+    /// more than one character. The whole vector is empty if there were
+    /// no unknown options.
+    ///
+    /// If a long option does not accept a value (that is, its value
+    /// type is `OptValueType::None`) but user gives it a value with
+    /// equal sign notation (`--foo=`), that option is classified as
+    /// unknown and it will be in this field's vector with name `foo=`.
     pub unknown: Vec<String>,
 }
 
