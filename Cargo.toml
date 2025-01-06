@@ -9,5 +9,6 @@ categories = ["command-line-interface"]
 edition = "2021"
 repository = "https://github.com/tlikonen/just-getopt"
 readme = "README.md"
+documentation = "https://docs.rs/just-getopt/"
 
 [dependencies]
