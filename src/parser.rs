@@ -36,59 +36,52 @@ where
                     specs.get_long_option_match(&name)
                 };
 
-                match spec_test {
-                    None => (),
-                    Some(spec) => {
-                        let value_required: bool;
-                        let value: Option<String>;
+                if let Some(spec) = spec_test {
+                    let value_required: bool;
+                    let value: Option<String>;
 
-                        match spec.value_type {
-                            OptValueType::Required => {
-                                value_required = true;
-                                if is_long_option_equal_sign(&opt) {
-                                    value = Some(get_long_option_equal_value(&opt).to_string());
-                                } else {
-                                    match iter.next() {
-                                        None => {
-                                            value = None;
-                                        }
-                                        Some(v) => {
-                                            value = Some(v.clone());
-                                        }
-                                    }
-                                }
-                            }
-
-                            OptValueType::Optional => {
-                                value_required = false;
-                                if is_long_option_equal_sign(&opt) {
-                                    value = Some(get_long_option_equal_value(&opt).to_string());
-                                } else {
-                                    value = None;
-                                }
-                            }
-
-                            OptValueType::None => {
-                                value_required = false;
-                                value = None;
-                                if is_long_option_equal_sign(&opt) {
-                                    let n = format!("{}=", name);
-                                    if !parsed.unknown.contains(&n) {
-                                        parsed.unknown.push(n);
-                                    }
-                                    continue;
+                    match spec.value_type {
+                        OptValueType::Required => {
+                            value_required = true;
+                            if is_long_option_equal_sign(&opt) {
+                                value = Some(get_long_option_equal_value(&opt).to_string());
+                            } else {
+                                value = match iter.next() {
+                                    None => None,
+                                    Some(v) => Some(v.clone()),
                                 }
                             }
                         }
 
-                        parsed.options.push(Opt {
-                            id: spec.id.clone(),
-                            name: name,
-                            value_required: value_required,
-                            value: value,
-                        });
-                        continue;
+                        OptValueType::Optional => {
+                            value_required = false;
+                            if is_long_option_equal_sign(&opt) {
+                                value = Some(get_long_option_equal_value(&opt).to_string());
+                            } else {
+                                value = None;
+                            }
+                        }
+
+                        OptValueType::None => {
+                            value_required = false;
+                            value = None;
+                            if is_long_option_equal_sign(&opt) {
+                                let n = format!("{}=", name);
+                                if !parsed.unknown.contains(&n) {
+                                    parsed.unknown.push(n);
+                                }
+                                continue;
+                            }
+                        }
                     }
+
+                    parsed.options.push(Opt {
+                        id: spec.id.clone(),
+                        name: name,
+                        value_required: value_required,
+                        value: value,
+                    });
+                    continue;
                 }
             }
 
@@ -106,56 +99,49 @@ where
                 };
 
                 if is_valid_short_option_name(&name) {
-                    match specs.get_short_option_match(&name) {
-                        None => (),
-                        Some(spec) => {
-                            let value_required: bool;
-                            let value: Option<String>;
+                    if let Some(spec) = specs.get_short_option_match(&name) {
+                        let value_required: bool;
+                        let value: Option<String>;
 
-                            match spec.value_type {
-                                OptValueType::Required => {
-                                    value_required = true;
-                                    let chars = char_iter.clone().collect::<String>();
-                                    while char_iter.next().is_some() {}
-                                    if chars.len() > 0 {
-                                        value = Some(chars);
-                                    } else {
-                                        match iter.next() {
-                                            None => {
-                                                value = None;
-                                            }
-                                            Some(v) => {
-                                                value = Some(v.to_string());
-                                            }
-                                        }
+                        match spec.value_type {
+                            OptValueType::Required => {
+                                value_required = true;
+                                let chars = char_iter.clone().collect::<String>();
+                                while char_iter.next().is_some() {}
+                                if chars.len() > 0 {
+                                    value = Some(chars);
+                                } else {
+                                    match iter.next() {
+                                        None => value = None,
+                                        Some(v) => value = Some(v.to_string()),
                                     }
                                 }
+                            }
 
-                                OptValueType::Optional => {
-                                    value_required = false;
-                                    let chars = char_iter.clone().collect::<String>();
-                                    while char_iter.next().is_some() {}
-                                    if chars.len() > 0 {
-                                        value = Some(chars);
-                                    } else {
-                                        value = None;
-                                    }
-                                }
-
-                                OptValueType::None => {
-                                    value_required = false;
+                            OptValueType::Optional => {
+                                value_required = false;
+                                let chars = char_iter.clone().collect::<String>();
+                                while char_iter.next().is_some() {}
+                                if chars.len() > 0 {
+                                    value = Some(chars);
+                                } else {
                                     value = None;
                                 }
                             }
 
-                            parsed.options.push(Opt {
-                                id: spec.id.clone(),
-                                name: name,
-                                value_required: value_required,
-                                value: value,
-                            });
-                            continue;
+                            OptValueType::None => {
+                                value_required = false;
+                                value = None;
+                            }
                         }
+
+                        parsed.options.push(Opt {
+                            id: spec.id.clone(),
+                            name: name,
+                            value_required: value_required,
+                            value: value,
+                        });
+                        continue;
                     }
                 }
 
