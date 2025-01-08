@@ -46,10 +46,7 @@ where
                             if is_long_option_equal_sign(&opt) {
                                 value = Some(get_long_option_equal_value(&opt).to_string());
                             } else {
-                                value = match iter.next() {
-                                    None => None,
-                                    Some(v) => Some(v.clone()),
-                                }
+                                value = iter.next();
                             }
                         }
 
@@ -106,22 +103,23 @@ where
                         match spec.value_type {
                             OptValueType::Required => {
                                 value_required = true;
-                                let chars = char_iter.clone().collect::<String>();
-                                while char_iter.next().is_some() {}
+                                let mut chars = String::new();
+                                while let Some(c) = char_iter.next() {
+                                    chars.push(c);
+                                }
                                 if chars.len() > 0 {
                                     value = Some(chars);
                                 } else {
-                                    match iter.next() {
-                                        None => value = None,
-                                        Some(v) => value = Some(v.to_string()),
-                                    }
+                                    value = iter.next();
                                 }
                             }
 
                             OptValueType::Optional => {
                                 value_required = false;
-                                let chars = char_iter.clone().collect::<String>();
-                                while char_iter.next().is_some() {}
+                                let mut chars = String::new();
+                                while let Some(c) = char_iter.next() {
+                                    chars.push(c);
+                                }
                                 if chars.len() > 0 {
                                     value = Some(chars);
                                 } else {
