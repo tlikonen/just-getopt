@@ -309,8 +309,6 @@
 //! }
 //! ```
 //!
-//! That's about !
-//!
 //! # More Help
 //!
 //! A complete working example code -- very similar to previous examples
