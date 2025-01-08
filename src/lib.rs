@@ -698,9 +698,8 @@ impl Args {
         let mut vec = Vec::new();
         let opt_vec = self.options_all(id);
         for opt in opt_vec {
-            match &opt.value {
-                None => (),
-                Some(s) => vec.push(s),
+            if let Some(s) = &opt.value {
+                vec.push(s);
             }
         }
         vec
