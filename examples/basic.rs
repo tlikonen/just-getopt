@@ -48,27 +48,26 @@ fn main() -> ExitCode {
     // option's identifier string "help" here to find if the correct
     // option was present in the command line. See the `id` argument of
     // `option()` methods above.
-    match parsed.options_first("help") {
-        None => (),
-        Some(_) => {
-            println!("Print friendly help about program's usage.");
-            return ExitCode::from(2);
-        }
+    if let Some(_) = parsed.options_first("help") {
+        println!("Print friendly help about program's usage.");
+        return ExitCode::from(2);
     }
 
-    // Collect all (required) values for "-f" and "--file". Also collect
-    // all (optional) values for "-v" and "--verbose". We use options'
-    // identifier (id) strings "file" and "verbose" here.
+    // Collect all (required) values for "-f" and "--file". We use
+    // option's identifier (id) string "file" to find the option.
     for f in &parsed.options_value_all("file") {
         println!("File name: {:?}", f);
     }
-    for v in &parsed.options_value_all("verbose") {
-        println!("Verbose level: {:?}", v);
-    }
 
     // Notice if "-v" or "--verbose" was given (even without a value).
-    if parsed.options_first("verbose").is_some() {
+    // Then collect all its (optional) values. We use option's
+    // identifier (id) string "verbose".
+    if let Some(_) = parsed.options_first("verbose") {
         println!("Option 'verbose' was given.");
+
+        for v in &parsed.options_value_all("verbose") {
+            println!("Verbose level: {:?}", v);
+        }
     }
 
     // Collect all other (non-option) arguments.

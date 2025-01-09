@@ -257,12 +257,9 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! match parsed.options_first("help") {
-//!     None => (),
-//!     Some(_) => {
-//!         println!("Print friendly help about program's usage.");
-//!         std::process::exit(2);
-//!     }
+//! if let Some(_) = parsed.options_first("help") {
+//!     println!("Print friendly help about program's usage.");
+//!     std::process::exit(2);
 //! }
 //! ```
 //!
@@ -276,8 +273,7 @@
 //! The rest depends very much on individual program's needs. Probably
 //! often we would collect what values were given to options. In our
 //! example program there are `-f` and `--file` options that require a
-//! value and `-v` and `--verbose` options that accept an optional value
-//! but can be used without one. We could collect all those values next.
+//! value. We could collect all those values next.
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -286,14 +282,21 @@
 //! for f in &parsed.options_value_all("file") {
 //!     println!("File name: {:?}", f);
 //! }
+//! ```
 //!
-//! for v in &parsed.options_value_all("verbose") {
-//!     println!("Verbose level: {:?}", v);
-//! }
+//! Notice if `-v` or `--verbose` was given, even without a value. Then
+//! collect all (optional) values for the option.
 //!
-//! // Notice if "-v" or "--verbose" was given, even without a value.
-//! if parsed.options_first("verbose").is_some() {
+//! ```
+//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # let specs = OptSpecs::new();
+//! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
+//! if let Some(_) = parsed.options_first("verbose") {
 //!     println!("Option 'verbose' was given.");
+//!
+//!     for v in &parsed.options_value_all("verbose") {
+//!         println!("Verbose level: {:?}", v);
+//!     }
 //! }
 //! ```
 //!
