@@ -159,7 +159,7 @@
 //! ## Examine the Parsed Output
 //!
 //! The command line is now parsed and the variable `parsed` (see above)
-//! points to an `Args` struct which represents the parsed output in
+//! owns an `Args` struct which represents the parsed output in
 //! organized form. It is a public struct and it can be examined
 //! manually. There are some methods for convenience, though, and some
 //! of them are shown in the following examples.
@@ -234,8 +234,8 @@
 //! ### Required Value Missing
 //!
 //! More serious error is a missing value to an option which requires a
-//! value (like `file` option in our example, see above). That can be
-//! reason to stop the program altogether.
+//! value (like `file` option in our example, see above). That can be a
+//! good reason to exit the program.
 //!
 //! ```no_run
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -793,7 +793,7 @@ pub struct Opt {
     /// Option's value.
     ///
     /// The value is a variant of enum `Option`. Value `None` means that
-    /// there is no value for the option. Value `Some(string)` provides
+    /// there is no value for the option. Value `Some(String)` provides
     /// a value.
     pub value: Option<String>,
 }
