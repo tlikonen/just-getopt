@@ -43,19 +43,19 @@ where
                     match spec.value_type {
                         OptValueType::Required => {
                             value_required = true;
-                            if is_long_option_equal_sign(&opt) {
-                                value = Some(get_long_option_equal_value(&opt).to_string());
+                            value = if is_long_option_equal_sign(&opt) {
+                                Some(get_long_option_equal_value(&opt).to_string())
                             } else {
-                                value = iter.next();
+                                iter.next()
                             }
                         }
 
                         OptValueType::Optional => {
                             value_required = false;
-                            if is_long_option_equal_sign(&opt) {
-                                value = Some(get_long_option_equal_value(&opt).to_string());
+                            value = if is_long_option_equal_sign(&opt) {
+                                Some(get_long_option_equal_value(&opt).to_string())
                             } else {
-                                value = None;
+                                None
                             }
                         }
 
@@ -107,10 +107,10 @@ where
                                 while let Some(c) = char_iter.next() {
                                     chars.push(c);
                                 }
-                                if chars.len() > 0 {
-                                    value = Some(chars);
+                                value = if chars.len() > 0 {
+                                    Some(chars)
                                 } else {
-                                    value = iter.next();
+                                    iter.next()
                                 }
                             }
 
@@ -120,11 +120,7 @@ where
                                 while let Some(c) = char_iter.next() {
                                     chars.push(c);
                                 }
-                                if chars.len() > 0 {
-                                    value = Some(chars);
-                                } else {
-                                    value = None;
-                                }
+                                value = if chars.len() > 0 { Some(chars) } else { None }
                             }
 
                             OptValueType::None => {
