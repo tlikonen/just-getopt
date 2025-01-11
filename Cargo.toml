@@ -1,6 +1,6 @@
 [package]
 name = "just-getopt"
-version = "1.0.1"
+version = "1.1.0"
 description = "Just a getopt-like command-line option parser"
 authors = ["Teemu Likonen <tlikonen@iki.fi>"]
 license = "CC0-1.0"
