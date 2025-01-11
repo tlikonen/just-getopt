@@ -68,6 +68,7 @@ fn check_get_long_option_equal_value() {
     assert_eq!("123=123=", get_long_option_equal_value("--abc=123=123="));
     assert_eq!("!", get_long_option_equal_value("--abc-def=!"));
     assert_eq!("!", get_long_option_equal_value("--abc-ä€=!"));
+    assert_eq!("öOö", get_long_option_equal_value("--abc-ä€=öOö"));
 }
 
 #[test]
@@ -127,6 +128,7 @@ fn check_get_short_option_match() {
         .option("help", "help", OptValueType::None)
         .option("verbose", "verbose", OptValueType::None)
         .option("verbose", "v", OptValueType::None)
+        .option("€uro", "€", OptValueType::None)
         .option("file", "f", OptValueType::None);
 
     {
@@ -148,6 +150,15 @@ fn check_get_short_option_match() {
     }
 
     {
+        let m = &spec.get_short_option_match("€");
+        assert!(m.is_some());
+        let m = m.unwrap();
+        assert_eq!("€uro", m.id);
+        assert_eq!("€", m.name);
+        assert_eq!(OptValueType::None, m.value_type);
+    }
+
+    {
         let m = &spec.get_short_option_match("x");
         assert!(m.is_none());
     }
@@ -159,6 +170,7 @@ fn check_get_long_option_match() {
         .option("help", "help", OptValueType::None)
         .option("verbose", "verbose", OptValueType::None)
         .option("verbose", "v", OptValueType::None)
+        .option("€uro", "€uro", OptValueType::None)
         .option("file", "f", OptValueType::None);
 
     {
@@ -176,6 +188,15 @@ fn check_get_long_option_match() {
         let v = &m.unwrap();
         assert_eq!("help", v.id);
         assert_eq!("help", v.name);
+        assert_eq!(OptValueType::None, v.value_type);
+    }
+
+    {
+        let m = &spec.get_long_option_match("€uro");
+        assert!(m.is_some());
+        let v = &m.unwrap();
+        assert_eq!("€uro", v.id);
+        assert_eq!("€uro", v.name);
         assert_eq!(OptValueType::None, v.value_type);
     }
 
