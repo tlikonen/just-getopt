@@ -121,7 +121,11 @@ where
                                 while let Some(c) = char_iter.next() {
                                     chars.push(c);
                                 }
-                                value = if chars.chars().count() > 0 { Some(chars) } else { None }
+                                value = if chars.chars().count() > 0 {
+                                    Some(chars)
+                                } else {
+                                    None
+                                }
                             }
 
                             OptValueType::None => {
@@ -218,7 +222,8 @@ fn get_long_option_name(s: &str) -> String {
 fn is_long_option_equal_sign(s: &str) -> bool {
     let option = get_long_option(s);
     let chars: Vec<char> = option.chars().collect();
-    for c in &chars[2..] { // Long option name is at least 2 chars long.
+    for c in &chars[2..] {
+        // Long option name is at least 2 chars long.
         if *c == '=' {
             return true;
         }
