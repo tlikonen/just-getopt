@@ -420,16 +420,18 @@ impl OptSpecs {
 
     pub fn option(mut self: Self, id: &str, name: &str, value_type: OptValueType) -> Self {
         assert!(
-            id.len() > 0,
+            id.chars().count() > 0,
             "Option's \"id\" must be at least 1 character long."
         );
 
-        if name.len() == 1 {
+        let name_count = name.chars().count();
+
+        if name_count == 1 {
             assert!(
                 parser::is_valid_short_option_name(name),
                 "Not a valid short option name."
             );
-        } else if name.len() >= 2 {
+        } else if name_count >= 2 {
             assert!(
                 parser::is_valid_long_option_name(name),
                 "Not a valid long option name."
@@ -506,7 +508,7 @@ impl OptSpecs {
     }
 
     fn get_short_option_match(self: &Self, name: &str) -> Option<&OptSpec> {
-        if name.len() != 1 {
+        if name.chars().count() != 1 {
             return None;
         }
         for e in &self.options {
@@ -518,7 +520,7 @@ impl OptSpecs {
     }
 
     fn get_long_option_match(self: &Self, name: &str) -> Option<&OptSpec> {
-        if name.len() < 2 {
+        if name.chars().count() < 2 {
             return None;
         }
         for e in &self.options {
@@ -530,7 +532,7 @@ impl OptSpecs {
     }
 
     fn get_long_option_prefix_matches(self: &Self, name: &str) -> Option<Vec<&OptSpec>> {
-        if name.len() < 2 {
+        if name.chars().count() < 2 {
             return None;
         }
 

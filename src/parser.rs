@@ -87,7 +87,8 @@ where
             }
             continue;
         } else if is_short_option_prefix(&opt) {
-            let mut char_iter = get_short_option_series(&opt).chars();
+            let series = get_short_option_series(&opt);
+            let mut char_iter = series.chars();
 
             loop {
                 let name = match char_iter.next() {
@@ -107,7 +108,7 @@ where
                                 while let Some(c) = char_iter.next() {
                                     chars.push(c);
                                 }
-                                value = if chars.len() > 0 {
+                                value = if chars.chars().count() > 0 {
                                     Some(chars)
                                 } else {
                                     iter.next()
@@ -120,7 +121,7 @@ where
                                 while let Some(c) = char_iter.next() {
                                     chars.push(c);
                                 }
-                                value = if chars.len() > 0 { Some(chars) } else { None }
+                                value = if chars.chars().count() > 0 { Some(chars) } else { None }
                             }
 
                             OptValueType::None => {
@@ -173,34 +174,64 @@ fn is_option_terminator(s: &str) -> bool {
 }
 
 fn is_long_option_prefix(s: &str) -> bool {
-    let len = LONG_OPTION_PREFIX.len();
-    if s.len() < 1 + len {
+    if !s.starts_with(LONG_OPTION_PREFIX) {
         return false;
     }
-    s.starts_with(LONG_OPTION_PREFIX) && &s[len..len + 1] != "-"
+
+    let chars: Vec<char> = s.chars().collect();
+    let prefix_count = LONG_OPTION_PREFIX.chars().count();
+
+    if chars.len() > prefix_count {
+        let next = chars[prefix_count];
+        if next != '-' {
+            true
+        } else {
+            false
+        }
+    } else {
+        false
+    }
 }
 
-fn get_long_option(s: &str) -> &str {
+fn get_long_option(s: &str) -> String {
     if !is_long_option_prefix(s) {
         panic!("Not a valid long option {}.", s);
     }
-    &s[LONG_OPTION_PREFIX.len()..]
+    let chars: Vec<char> = s.chars().collect();
+    let prefix_count = LONG_OPTION_PREFIX.chars().count();
+    let mut string = String::new();
+    for c in &chars[prefix_count..] {
+        string.push(*c);
+    }
+    string
 }
 
-fn get_long_option_name(s: &str) -> &str {
-    let mut iter = get_long_option(&s).split('=');
-    iter.next().expect("Not a valid long option.")
+fn get_long_option_name(s: &str) -> String {
+    let option = get_long_option(s);
+    let mut iter = option.split('=');
+    match iter.next() {
+        None => panic!("Not a valid long option."),
+        Some(n) => n.to_string(),
+    }
 }
 
 fn is_long_option_equal_sign(s: &str) -> bool {
-    get_long_option(s)[2..].contains('=')
+    let option = get_long_option(s);
+    let chars: Vec<char> = option.chars().collect();
+    for c in &chars[2..] { // Long option name is at least 2 chars long.
+        if *c == '=' {
+            return true;
+        }
+    }
+    false
 }
 
-fn get_long_option_equal_value(s: &str) -> &str {
-    let v = get_long_option(s).split_once('=');
+fn get_long_option_equal_value(s: &str) -> String {
+    let option = get_long_option(s);
+    let v = option.split_once('=');
     match v {
-        None => "",
-        Some((_, v)) => v,
+        None => "".to_string(),
+        Some((_, v)) => v.to_string(),
     }
 }
 
@@ -217,7 +248,7 @@ pub fn is_valid_long_option_name(s: &str) -> bool {
 }
 
 pub fn is_valid_short_option_name(s: &str) -> bool {
-    if s.len() != 1 {
+    if s.chars().count() != 1 {
         return false;
     }
     for c in INVALID_SHORT_OPTION_CHARS.chars() {
@@ -229,13 +260,25 @@ pub fn is_valid_short_option_name(s: &str) -> bool {
 }
 
 fn is_short_option_prefix(s: &str) -> bool {
-    let len = SHORT_OPTION_PREFIX.len();
-    if s.len() < 1 + len {
+    if !s.starts_with(SHORT_OPTION_PREFIX) {
         return false;
     }
-    s.starts_with(SHORT_OPTION_PREFIX) && is_valid_short_option_name(&s[len..len + 1])
+
+    let prefix_count = SHORT_OPTION_PREFIX.chars().count();
+    let chars: Vec<char> = s.chars().collect();
+    if chars.len() < 1 + prefix_count {
+        return false;
+    }
+
+    is_valid_short_option_name(&chars[1].to_string())
 }
 
-fn get_short_option_series(s: &str) -> &str {
-    &s[SHORT_OPTION_PREFIX.len()..]
+fn get_short_option_series(s: &str) -> String {
+    let prefix_count = SHORT_OPTION_PREFIX.chars().count();
+    let chars: Vec<char> = s.chars().collect();
+    let mut string = String::new();
+    for c in &chars[prefix_count..] {
+        string.push(*c);
+    }
+    string
 }

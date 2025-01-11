@@ -393,3 +393,23 @@ fn parsed_output_18() {
     assert_eq!("foo", parsed.unknown[1]);
     assert_eq!("bar=", parsed.unknown[2]);
 }
+
+#[test]
+fn parsed_output_19() {
+    let parsed = OptSpecs::new()
+        .option("äiti", "äiti", OptValueType::Required)
+        .option("€uro", "€uro", OptValueType::Required)
+        .getopt(["--äiti=ööö", "--€uro", "€€€", "--äiti", "ää", "--äiti"]);
+
+    let a = parsed.options_value_all("äiti");
+    let e = parsed.options_value_all("€uro");
+
+    assert_eq!(2, a.len());
+    assert_eq!("ööö", a[0]);
+    assert_eq!("ää", a[1]);
+
+    assert_eq!(1, e.len());
+    assert_eq!("€€€", e[0]);
+
+    assert_eq!(true, parsed.options_last("äiti").unwrap().value.is_none());
+}
