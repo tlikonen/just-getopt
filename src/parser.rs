@@ -241,7 +241,7 @@ fn get_long_option_equal_value(s: &str) -> String {
 }
 
 pub fn is_valid_long_option_name(s: &str) -> bool {
-    if s.starts_with('-') {
+    if s.starts_with('-') || s.chars().count() < 2 {
         return false;
     }
     for c in INVALID_LONG_OPTION_CHARS.chars() {

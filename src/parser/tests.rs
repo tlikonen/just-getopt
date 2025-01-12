@@ -77,6 +77,8 @@ fn check_is_valid_long_option_name() {
     assert_eq!(true, is_valid_long_option_name("ab-"));
     assert_eq!(true, is_valid_long_option_name("ab-abc"));
     assert_eq!(true, is_valid_long_option_name("ä€"));
+    assert_eq!(false, is_valid_long_option_name("a"));
+    assert_eq!(false, is_valid_long_option_name("€"));
     assert_eq!(false, is_valid_long_option_name("-abc"));
     assert_eq!(false, is_valid_long_option_name("abc="));
     assert_eq!(false, is_valid_long_option_name("abc "));
