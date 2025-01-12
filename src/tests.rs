@@ -1,7 +1,7 @@
 use super::*;
 
 #[test]
-fn create_optspecs() {
+fn t_create_optspecs() {
     let mut spec;
     let mut expect;
 
@@ -39,7 +39,7 @@ fn create_optspecs() {
 }
 
 #[test]
-fn check_is_flag() {
+fn t_is_flag() {
     let mut spec = OptSpecs::new().flag(OptFlags::OptionsEverywhere);
     assert_eq!(true, spec.is_flag(OptFlags::OptionsEverywhere));
 
@@ -48,7 +48,7 @@ fn check_is_flag() {
 }
 
 #[test]
-fn parsed_output_01() {
+fn t_parsed_output_010() {
     let parsed = OptSpecs::new()
         .option("help", "h", OptValueType::None)
         .option("help", "help", OptValueType::None)
@@ -79,7 +79,7 @@ fn parsed_output_01() {
 }
 
 #[test]
-fn parsed_output_02() {
+fn t_parsed_output_020() {
     let parsed = OptSpecs::new()
         .option("help", "h", OptValueType::None)
         .getopt(["-h", "foo", "-h"]);
@@ -89,7 +89,7 @@ fn parsed_output_02() {
 }
 
 #[test]
-fn parsed_output_03() {
+fn t_parsed_output_030() {
     let parsed = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere)
         .option("help", "h", OptValueType::None)
@@ -113,7 +113,7 @@ fn parsed_output_03() {
 }
 
 #[test]
-fn parsed_output_04() {
+fn t_parsed_output_040() {
     let parsed = OptSpecs::new()
         .option("debug", "d", OptValueType::Optional)
         .option("verbose", "verbose", OptValueType::Optional)
@@ -151,7 +151,7 @@ fn parsed_output_04() {
 }
 
 #[test]
-fn parsed_output_05() {
+fn t_parsed_output_050() {
     let parsed = OptSpecs::new()
         .option("debug", "d", OptValueType::Optional)
         .getopt(["-abcd", "-adbc"]);
@@ -168,7 +168,7 @@ fn parsed_output_05() {
 }
 
 #[test]
-fn parsed_output_06() {
+fn t_parsed_output_060() {
     let parsed = OptSpecs::new()
         .option("aaa", "bbb", OptValueType::None)
         .option("aaa", "c", OptValueType::None)
@@ -184,7 +184,7 @@ fn parsed_output_06() {
 }
 
 #[test]
-fn parsed_output_07() {
+fn t_parsed_output_070() {
     let parsed = OptSpecs::new()
         .flag(OptFlags::PrefixMatchLongOptions)
         .option("version", "version", OptValueType::None)
@@ -199,7 +199,7 @@ fn parsed_output_07() {
 }
 
 #[test]
-fn parsed_output_08() {
+fn t_parsed_output_080() {
     let parsed = OptSpecs::new()
         // .flag(OptFlags::PrefixMatchLongOptions) Must be commented!
         .option("version", "version", OptValueType::None)
@@ -214,7 +214,7 @@ fn parsed_output_08() {
 }
 
 #[test]
-fn parsed_output_09() {
+fn t_parsed_output_090() {
     let parsed = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere)
         .option("help", "h", OptValueType::None)
@@ -235,7 +235,7 @@ fn parsed_output_09() {
 }
 
 #[test]
-fn parsed_output_10() {
+fn t_parsed_output_100() {
     let parsed = OptSpecs::new()
         .option("file", "file", OptValueType::Required)
         .getopt(["--file=", "--file"]);
@@ -249,7 +249,7 @@ fn parsed_output_10() {
 }
 
 #[test]
-fn parsed_output_11() {
+fn t_parsed_output_110() {
     let parsed = OptSpecs::new()
         .option("file", "f", OptValueType::Required)
         .option("debug", "d", OptValueType::Required)
@@ -273,7 +273,7 @@ fn parsed_output_11() {
 }
 
 #[test]
-fn parsed_output_12() {
+fn t_parsed_output_120() {
     let parsed = OptSpecs::new()
         .option("file", "f", OptValueType::Required)
         .option("debug", "d", OptValueType::Required)
@@ -293,7 +293,7 @@ fn parsed_output_12() {
 }
 
 #[test]
-fn parsed_output_13() {
+fn t_parsed_output_130() {
     let parsed = OptSpecs::new()
         .option("file", "file", OptValueType::Required)
         .option("debug", "debug", OptValueType::Required)
@@ -313,7 +313,7 @@ fn parsed_output_13() {
 }
 
 #[test]
-fn parsed_output_14() {
+fn t_parsed_output_140() {
     let parsed = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere)
         .option("debug", "d", OptValueType::Optional)
@@ -344,7 +344,7 @@ fn parsed_output_14() {
 }
 
 #[test]
-fn parsed_output_15() {
+fn t_parsed_output_150() {
     let parsed = OptSpecs::new().getopt([
         "-abcd",
         "-e",
@@ -361,7 +361,7 @@ fn parsed_output_15() {
 }
 
 #[test]
-fn parsed_output_16() {
+fn t_parsed_output_160() {
     let parsed = OptSpecs::new()
         .option("file", "file", OptValueType::Required)
         .getopt(["--file", "--", "--", "--"]);
@@ -375,7 +375,7 @@ fn parsed_output_16() {
 }
 
 #[test]
-fn parsed_output_17() {
+fn t_parsed_output_170() {
     let parsed = OptSpecs::new().getopt(["foo", "bar"]);
 
     assert_eq!(None, parsed.options_first("not-at-all"));
@@ -383,7 +383,7 @@ fn parsed_output_17() {
 }
 
 #[test]
-fn parsed_output_18() {
+fn t_parsed_output_180() {
     let parsed = OptSpecs::new()
         .option("bar", "bar", OptValueType::None)
         .getopt(["-aaa", "--foo", "--foo", "--bar=", "--bar="]);
@@ -395,7 +395,7 @@ fn parsed_output_18() {
 }
 
 #[test]
-fn parsed_output_19() {
+fn t_parsed_output_190() {
     let parsed = OptSpecs::new()
         .option("äiti", "äiti", OptValueType::Required)
         .option("€uro", "€uro", OptValueType::Required)
