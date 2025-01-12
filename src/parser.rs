@@ -275,7 +275,7 @@ fn is_short_option_prefix(s: &str) -> bool {
         return false;
     }
 
-    is_valid_short_option_name(&chars[1].to_string())
+    is_valid_short_option_name(&chars[prefix_count].to_string())
 }
 
 fn get_short_option_series(s: &str) -> String {

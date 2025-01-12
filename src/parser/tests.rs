@@ -102,8 +102,11 @@ fn check_is_short_option_prefix() {
     assert_eq!(true, is_short_option_prefix("-a"));
     assert_eq!(true, is_short_option_prefix("-ä"));
     assert_eq!(true, is_short_option_prefix("-€"));
+    assert_eq!(true, is_short_option_prefix("-="));
+    assert_eq!(true, is_short_option_prefix("-?"));
     assert_eq!(true, is_short_option_prefix("-abcd"));
     assert_eq!(false, is_short_option_prefix("-"));
+    assert_eq!(false, is_short_option_prefix("--"));
     assert_eq!(false, is_short_option_prefix("a"));
     assert_eq!(false, is_short_option_prefix("aa"));
     assert_eq!(false, is_short_option_prefix("aaa"));
