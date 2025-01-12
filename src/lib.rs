@@ -32,8 +32,8 @@
 //! the first argument that does not look like an option stops option
 //! parsing and the rest of the command line is parsed as non-options.
 //! This default can be changed, so that options and non-options can be
-//! mixed in their order in the command line. See `OptSpecs` struct's
-//! `flag()` method for more information.
+//! mixed in their order in the command line. See [`OptSpecs::flag`]
+//! method for more information.
 //!
 //! In command line the "pseudo option" `--` (two dashes) always stops
 //! the option parser. Then the rest of the command line is parsed as
@@ -90,9 +90,9 @@
 //! ```
 //!
 //! Then we define which command-line options are valid for the program.
-//! We do this by creating an instance of `OptSpecs` struct by calling
-//! function `OptSpecs::new()`. Then we modify the struct instance with
-//! `option()` and `flag()` methods.
+//! We do this by creating an instance of [`OptSpecs`] struct by calling
+//! function [`OptSpecs::new`]. Then we modify the struct instance with
+//! [`option`](OptSpecs::option) and [`flag`](OptSpecs::flag) methods.
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -106,8 +106,8 @@
 //!     .flag(OptFlags::OptionsEverywhere);
 //! ```
 //!
-//! The `option()` methods above add a single option information to
-//! the option specification. Method's arguments are:
+//! The [`option`](OptSpecs::option) methods above add a single option
+//! information to the option specification. Method's arguments are:
 //!
 //!  1. `id`: Programmer's identifier string for the option. The same
 //!     identifier is used later to check if this particular option was
@@ -121,22 +121,24 @@
 //!
 //!  3. `value_type`: Whether or not this option accepts a value and is
 //!     the value optional or required. The argument is a variant of
-//!     enum `OptValueType`.
+//!     enum [`OptValueType`].
 //!
-//! The `flag()` method above adds a configuration flag for the
-//! command-line parser. It is a variant of enum `OptFlags`. This
-//! variant `OptionsEverywhere` changes the command-line parser to
-//! accept options and other arguments in mixed order in the command
-//! line. That is, options can come after non-option arguments.
+//! The [`flag`](OptSpecs::flag) method above adds a configuration flag
+//! for the command-line parser. It is a variant of enum [`OptFlags`].
+//! This variant [`OptionsEverywhere`](OptFlags::OptionsEverywhere)
+//! changes the command-line parser to accept options and other
+//! arguments in mixed order in the command line. That is, options can
+//! come after non-option arguments.
 //!
-//! For better explanation see the documentation of `OptSpecs` struct
-//! and its methods `option()` and `flag()`.
+//! For better explanation see the documentation of [`OptSpecs`] struct
+//! and its methods [`option`](OptSpecs::option) and
+//! [`flag`](OptSpecs::flag).
 //!
 //! ## Parse the Command Line
 //!
 //! We are ready to parse program's command-line arguments. We do this
-//! with `OptSpecs` struct's `getopt()` method. Arguments we get from
-//! `std::env::args()` function which returns an iterator.
+//! with [`OptSpecs::getopt`] method. Arguments we get from
+//! [`std::env::args`] function which returns an iterator.
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -146,9 +148,10 @@
 //! let parsed = specs.getopt(args); // Getopt! Use the "specs" variable defined above.
 //! ```
 //!
-//! If you want to try `getopt()` method without program's real
-//! command-line arguments you can also run it with other iterator
-//! argument or with a vector or an array as an argument. Like this:
+//! If you want to try [`getopt`](OptSpecs::getopt) method without
+//! program's real command-line arguments you can also run it with other
+//! iterator argument or with a vector or an array as an argument. Like
+//! this:
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -159,14 +162,14 @@
 //! ## Examine the Parsed Output
 //!
 //! The command line is now parsed and the variable `parsed` (see above)
-//! owns an `Args` struct which represents the parsed output in
+//! owns an [`Args`] struct which represents the parsed output in
 //! organized form. It is a public struct and it can be examined
 //! manually. There are some methods for convenience, though, and some
 //! of them are shown in the following examples.
 //!
-//! At this stage it is useful to see the returned `Args` struct. One of
-//! its fields may contain some `Opt` structs too if the parser found
-//! valid command-line options. Let's print it:
+//! At this stage it is useful to see the returned [`Args`] struct. One
+//! of its fields may contain some [`Opt`] structs too if the parser
+//! found valid command-line options. Let's print it:
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -213,14 +216,14 @@
 //! }
 //! ```
 //!
-//! The returned `Args` struct above can be examined manually but the
+//! The returned [`Args`] struct above can be examined manually but the
 //! struct has some methods to make things convenient.
 //!
 //! ### Unknown Options
 //!
 //! We probably want to tell program's user if there were unknown
-//! options. An error message to `stderr` stream is usually enough. No
-//! need to panic.
+//! options. An error message to [`std::io::stderr`] stream is usually
+//! enough. No need to panic.
 //!
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
@@ -264,9 +267,9 @@
 //! ```
 //!
 //! The `"help"` string in the first line above is the identifier string
-//! (`id`) for the option. It was defined with `OptSpecs` struct's
-//! `option()` method in the example code earlier. Identifier strings
-//! are used to find if a specific option was given in the command line.
+//! (`id`) for the option. It was defined with [`OptSpecs::option`]
+//! method in the example code earlier. Identifier strings are used to
+//! find if a specific option was given in the command line.
 //!
 //! ### Collect Values and Other Arguments
 //!
@@ -321,8 +324,8 @@
 //!
 //! Further reading:
 //!
-//!   - `OptSpecs` struct and its methods.
-//!   - `Args` struct and its methods.
+//!   - [`OptSpecs`] struct and its methods.
+//!   - [`Args`] struct and its methods.
 
 mod parser;
 
@@ -332,11 +335,12 @@ mod tests;
 /// Specification for program's valid command-line options.
 ///
 /// An instance of this struct is needed before command-line options can
-/// be parsed. Instances are created with function `OptSpecs::new()` and
-/// they are modified with methods `option()` and `flag()`.
+/// be parsed. Instances are created with function [`OptSpecs::new`] and
+/// they are modified with methods [`option`](OptSpecs::option) and
+/// [`flag`](OptSpecs::flag).
 ///
 /// The struct instance is used when parsing the command line given by
-/// program's user. The parser methods is `getopt()`.
+/// program's user. The parser methods is [`getopt`](OptSpecs::getopt).
 
 #[derive(Debug, PartialEq)]
 pub struct OptSpecs {
@@ -353,7 +357,7 @@ struct OptSpec {
 
 /// Option's value type.
 ///
-/// See `OptSpecs` struct's `option()` method for more information.
+/// See [`OptSpecs::option`] method for more information.
 
 #[derive(Debug, PartialEq)]
 pub enum OptValueType {
@@ -364,7 +368,7 @@ pub enum OptValueType {
 
 /// Flags for changing command-line parser's behavior.
 ///
-/// See `OptSpecs` struct's `flag()` method for more information.
+/// See [`OptSpecs::flag`] method for more information.
 
 #[derive(Debug, PartialEq)]
 pub enum OptFlags {
@@ -373,7 +377,7 @@ pub enum OptFlags {
 }
 
 impl OptSpecs {
-    /// Create and return a new instance of `OptSpecs` struct.
+    /// Create and return a new instance of [`OptSpecs`] struct.
     pub fn new() -> Self {
         Self {
             options: Vec::new(),
@@ -381,7 +385,7 @@ impl OptSpecs {
         }
     }
 
-    /// Add an option specification for `OptSpecs`.
+    /// Add an option specification for [`OptSpecs`].
     ///
     /// The method requires three arguments:
     ///
@@ -409,13 +413,13 @@ impl OptSpecs {
     ///     option name can't be `-` and long option names can't have
     ///     any `=` characters nor `-` as their first character.
     ///
-    ///  3. `value_type`: A variant of enum `OptValueType` which defines
-    ///     if this option accepts a value. If not, use
-    ///     `OptValueType::None` as method's argument. If an optional
-    ///     value is accepted, use `OptValueType::Optional`. If the
-    ///     option requires a value, use `OptValueType::Required`.
+    ///  3. `value_type`: A variant of enum [`OptValueType`] which
+    ///     defines if this option accepts a value. If not, use
+    ///     [`OptValueType::None`] as method's argument. If an optional
+    ///     value is accepted, use [`OptValueType::Optional`]. If the
+    ///     option requires a value, use [`OptValueType::Required`].
     ///
-    /// Method returns the same `OptSpecs` struct instance which was
+    /// Method returns the same [`OptSpecs`] struct instance which was
     /// modified.
 
     pub fn option(mut self: Self, id: &str, name: &str, value_type: OptValueType) -> Self {
@@ -457,10 +461,10 @@ impl OptSpecs {
 
     /// Add a flag that changes parser's behavior.
     ///
-    /// Method's only argument `flag` is a variant of enum `OptFlags`.
+    /// Method's only argument `flag` is a variant of enum [`OptFlags`].
     /// Their names and meanings are:
     ///
-    ///   - `OptFlags::OptionsEverywhere`: Accept command-line options
+    ///   - [`OptFlags::OptionsEverywhere`]: Accept command-line options
     ///     and other arguments in mixed order in the command line. That
     ///     is, options can come after non-option arguments.
     ///
@@ -469,14 +473,14 @@ impl OptSpecs {
     ///     and the rest of the command line is parsed as non-options
     ///     (other arguments), even if they look like options.
     ///
-    ///   - `OptFlags::PrefixMatchLongOptions`: With this flag long
-    ///      options don't need to be written in full in the command
-    ///      line. They can be shortened as long as there are enough
-    ///      characters to find a unique prefix match. If there are more
-    ///      than one match the option given in the command line is
-    ///      classified as unknown.
+    ///   - [`OptFlags::PrefixMatchLongOptions`]: With this flag long
+    ///     options don't need to be written in full in the command
+    ///     line. They can be shortened as long as there are enough
+    ///     characters to find a unique prefix match. If there are more
+    ///     than one match the option given in the command line is
+    ///     classified as unknown.
     ///
-    /// Method returns the same `OptSpecs` struct instance which was
+    /// Method returns the same [`OptSpecs`] struct instance which was
     /// modified.
 
     pub fn flag(mut self: Self, flag: OptFlags) -> Self {
@@ -491,12 +495,12 @@ impl OptSpecs {
     /// Getopt-parse an iterable item as command line arguments.
     ///
     /// This method's argument `args` is of any type that implements
-    /// trait `IntoIterator` and that has items of type that implements
-    /// trait `ToString`. For example, argument `args` can be a vector
-    /// or an iterator such as command-line arguments returned by
-    /// `std::env::args()`.
+    /// trait [`IntoIterator`] and that has items of type that
+    /// implements trait [`ToString`]. For example, argument `args` can
+    /// be a vector or an iterator such as command-line arguments
+    /// returned by [`std::env::args`].
     ///
-    /// The return value is an `Args` struct which represents the
+    /// The return value is an [`Args`] struct which represents the
     /// command-line information in organized form.
 
     pub fn getopt<I, S>(self: &Self, args: I) -> Args
@@ -553,22 +557,23 @@ impl OptSpecs {
 
 /// Parsed command line in organized form.
 ///
-/// Instances of this struct are usually created with `OptSpecs`
-/// struct's `getopt()` method and an instance represents the parsed
+/// Instances of this struct are usually created with
+/// [`OptSpecs::getopt`] method and an instance represents the parsed
 /// output in organized form. See each field's documentation for more
 /// information.
 ///
-/// Programmers can use the parsed output (`Args` struct) any way they
+/// Programmers can use the parsed output ([`Args`] struct) any way they
 /// like. There are some methods for convenience.
 
 #[derive(Debug, PartialEq)]
 pub struct Args {
     /// A vector of valid command-line options.
     ///
-    /// Elements of this vector are `Opt` structs which each represents
-    /// a single command-line option. Elements are in the same order as
-    /// given (by program's user) in the command line. The vector is
-    /// empty if the parser didn't find any valid command-line options.
+    /// Elements of this vector are [`Opt`] structs which each
+    /// represents a single command-line option. Elements are in the
+    /// same order as given (by program's user) in the command line. The
+    /// vector is empty if the parser didn't find any valid command-line
+    /// options.
     pub options: Vec<Opt>,
 
     /// A vector of other arguments (non-options).
@@ -582,9 +587,9 @@ pub struct Args {
     /// Unknown options.
     ///
     /// Command-line arguments that look like options but were not part
-    /// of `OptSpecs` specification are classified as unknown. They are
-    /// listed in this vector. Possible duplicate unknown options given
-    /// in command line have been filtered.
+    /// of [`OptSpecs`] specification are classified as unknown. They
+    /// are listed in this vector. Possible duplicate unknown options
+    /// given in command line have been filtered.
     ///
     /// Each element is the name string for the option (without `-` or
     /// `--` prefix). For unknown short options the element is a
@@ -593,7 +598,7 @@ pub struct Args {
     /// no unknown options.
     ///
     /// If a long option does not accept a value (that is, its value
-    /// type is `OptValueType::None`) but user gives it a value with
+    /// type is [`OptValueType::None`]) but user gives it a value with
     /// equal sign notation (`--foo=`), that option is classified as
     /// unknown and it will be in this field's vector with name `foo=`.
     pub unknown: Vec<String>,
@@ -611,7 +616,7 @@ impl Args {
     /// Find options with missing required value.
     ///
     /// This method finds all (otherwise valid) options which require a
-    /// value but the value is missing. That is, `OptSpecs` struct
+    /// value but the value is missing. That is, [`OptSpecs`] struct
     /// specification defined that an option requires a value but
     /// program's user didn't give one in the command line. Such thing
     /// can happen if an option like `--file` is the last argument in
@@ -620,8 +625,8 @@ impl Args {
     /// user input in many situations.
     ///
     /// This method returns a vector (possibly empty) and each element
-    /// is a reference to an `Opt` struct in the original `Args`
-    /// struct's `options` field contents.
+    /// is a reference to an [`Opt`] struct in the original
+    /// [`Args::options`] field contents.
 
     pub fn required_value_missing(self: &Self) -> Vec<&Opt> {
         let mut vec = Vec::new();
@@ -636,11 +641,11 @@ impl Args {
     /// Find all options with the given `id`.
     ///
     /// Find all options which have the identifier `id`. (Option
-    /// identifiers have been defined in `OptSpecs` struct before
+    /// identifiers have been defined in [`OptSpecs`] struct before
     /// parsing.) The return value is a vector (possibly empty, if no
-    /// matches) and each element is a reference to `Opt` struct in the
-    /// original `Args` struct. Elements in the vector are in the same
-    /// order as in the parsed command line.
+    /// matches) and each element is a reference to [`Opt`] struct in
+    /// the original [`Args`] struct. Elements in the vector are in the
+    /// same order as in the parsed command line.
 
     pub fn options_all(self: &Self, id: &str) -> Vec<&Opt> {
         let mut vec = Vec::new();
@@ -656,15 +661,16 @@ impl Args {
     ///
     /// Find and return the first match for option `id` in command-line
     /// arguments' order. (Options' identifiers have been defined in
-    /// `OptSpecs` struct before parsing.)
+    /// [`OptSpecs`] struct before parsing.)
     ///
-    /// The return value is a variant of enum `Option`. Their meanings:
+    /// The return value is a variant of enum [`Option`]. Their
+    /// meanings:
     ///
     ///   - `None`: No options found with the given `id`.
     ///
     ///   - `Some(&Opt)`: An option was found with the given `id` and a
-    ///     reference to its `Opt` struct in the original `Args` struct
-    ///     is provided.
+    ///     reference to its [`Opt`] struct in the original [`Args`]
+    ///     struct is provided.
 
     pub fn options_first(self: &Self, id: &str) -> Option<&Opt> {
         for opt in &self.options {
@@ -677,8 +683,9 @@ impl Args {
 
     /// Find the last option with the given `id`.
     ///
-    /// This is similar to `options_first()` method but this returns the
-    /// last match in command-line arguments' order.
+    /// This is similar to [`options_first`](Args::options_first) method
+    /// but this returns the last match in command-line arguments'
+    /// order.
 
     pub fn options_last(self: &Self, id: &str) -> Option<&Opt> {
         for opt in self.options.iter().rev() {
@@ -693,10 +700,10 @@ impl Args {
     ///
     /// Find all options which match the identifier `id` and which also
     /// have a value assigned. (Options' identifiers have been defined
-    /// in `OptSpecs` struct before parsing.) Collect options' values
+    /// in [`OptSpecs`] struct before parsing.) Collect options' values
     /// into a new vector in the same order as they were given in the
     /// command line. Vector's elements are references to the value
-    /// strings in the original `Args` struct. The returned vector is
+    /// strings in the original [`Args`] struct. The returned vector is
     /// empty if there were no matches.
 
     pub fn options_value_all(self: &Self, id: &str) -> Vec<&String> {
@@ -714,8 +721,8 @@ impl Args {
     ///
     /// Find the first option which match the identifier `id` and which
     /// has a value assigned. (Options' identifiers have been defined in
-    /// `OptSpecs` struct before parsing.) Method's return value is a
-    /// variant of enum `Option` which are:
+    /// [`OptSpecs`] struct before parsing.) Method's return value is a
+    /// variant of enum [`Option`] which are:
     ///
     ///   - `None`: No options found with the given `id`, an option
     ///     which also has a value assigned. There could be options for
@@ -723,7 +730,7 @@ impl Args {
     ///
     ///   - `Some(&String)`: An option was found with the given `id` and
     ///     the option has a value assigned. A reference to the string
-    ///     value in the original `Args` struct is provided.
+    ///     value in the original [`Args`] struct is provided.
 
     pub fn options_value_first(self: &Self, id: &str) -> Option<&String> {
         let all = self.options_value_all(id);
@@ -736,8 +743,9 @@ impl Args {
 
     /// Find the last option with a value for given option `id`.
     ///
-    /// This is similar to `options_value_first()` method but this
-    /// method finds and returns the last option's value.
+    /// This is similar to
+    /// [`options_value_first`](Args::options_value_first) method but
+    /// this method finds and returns the last option's value.
     ///
     /// Note: Program's user may give the same option several times in
     /// the command line. If the option accepts a value it may be
@@ -758,21 +766,21 @@ impl Args {
 
 /// Structured option information.
 ///
-/// This `Opt` struct represents organized information about single
+/// This [`Opt`] struct represents organized information about single
 /// command-line option. Instances of this struct are usually created by
-/// `OptSpecs` struct's `getopt()` method which returns an `Args` struct
-/// which have these `Opt` structs inside.
+/// [`OptSpecs::getopt`] method which returns an [`Args`] struct which
+/// have these [`Opt`] structs inside.
 ///
 /// A programmer may need these when examining parsed command-line
 /// options. See the documentation of individual fields for more
-/// information. Also see `Args` struct and its methods.
+/// information. Also see [`Args`] struct and its methods.
 
 #[derive(Debug, PartialEq)]
 pub struct Opt {
     /// Identifier for the option.
     ///
-    /// Identifiers are defined with `OptSpecs` struct's `option()`
-    /// method before parsing command-line arguments. After `getopt()`
+    /// Identifiers are defined with [`OptSpecs::option`] method before
+    /// parsing command-line arguments. After [`OptSpecs::getopt`]
     /// parsing the same identifier is copied here and it confirms that
     /// the option was indeed given in the command line.
     pub id: String,
@@ -787,15 +795,15 @@ pub struct Opt {
     /// The option requires a value.
     ///
     /// `true` means that the option was defined with value type
-    /// `OptValueType::Required`. See `OptSpecs` struct's `flag()`
-    /// method for more information. This field does not guarantee that
-    /// there actually was a value for the option in the command line.
+    /// [`OptValueType::Required`]. See [`OptSpecs::flag`] method for
+    /// more information. This field does not guarantee that there
+    /// actually was a value for the option in the command line.
     pub value_required: bool,
 
     /// Option's value.
     ///
-    /// The value is a variant of enum `Option`. Value `None` means that
-    /// there is no value for the option. Value `Some(String)` provides
-    /// a value.
+    /// The value is a variant of enum [`Option`]. Value `None` means
+    /// that there is no value for the option. Value `Some(String)`
+    /// provides a value.
     pub value: Option<String>,
 }
