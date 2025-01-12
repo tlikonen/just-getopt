@@ -1,3 +1,5 @@
+#![warn(missing_docs)]
+
 //! # Introduction
 //!
 //! This library crate implements a Posix `getopt`-like command-line
@@ -361,8 +363,11 @@ struct OptSpec {
 
 #[derive(Debug, PartialEq)]
 pub enum OptValueType {
+    /// Option does not accept a value.
     None,
+    /// Option accepts an optional value.
     Optional,
+    /// Option requires a value.
     Required,
 }
 
@@ -372,7 +377,21 @@ pub enum OptValueType {
 
 #[derive(Debug, PartialEq)]
 pub enum OptFlags {
+    /// Accept command-line options and other arguments in mixed order
+    /// in the command line. That is, options can come after non-option
+    /// arguments.
+    ///
+    /// This is not the default behavior. By default the first
+    /// non-option argument in the command line stops option parsing and
+    /// the rest of the command line is parsed as non-options (other
+    /// arguments), even if they look like options.
     OptionsEverywhere,
+
+    /// Long options don't need to be written in full in the command
+    /// line. They can be shortened as long as there are enough
+    /// characters to find a unique prefix match. If there are more than
+    /// one match the option given in the command line is classified as
+    /// unknown.
     PrefixMatchLongOptions,
 }
 
