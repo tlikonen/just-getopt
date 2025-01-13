@@ -9,7 +9,7 @@ categories = ["command-line-interface"]
 repository = "https://github.com/tlikonen/just-getopt"
 documentation = "https://docs.rs/just-getopt/"
 readme = "README.md"
-rust-version = "1.63.0"
+rust-version = "1.56.1"
 edition = "2021"
 
 [dependencies]
