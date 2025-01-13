@@ -1,15 +1,15 @@
 [package]
 name = "just-getopt"
 version = "1.1.0"
-description = "Just a getopt-like command-line option parser"
 authors = ["Teemu Likonen <tlikonen@iki.fi>"]
 license = "CC0-1.0"
+description = "Just a getopt-like command-line option parser"
 keywords = ["command-line", "options", "parser", "getopt_long"]
 categories = ["command-line-interface"]
-edition = "2021"
-rust-version = "1.63.0"
 repository = "https://github.com/tlikonen/just-getopt"
-readme = "README.md"
 documentation = "https://docs.rs/just-getopt/"
+readme = "README.md"
+rust-version = "1.63.0"
+edition = "2021"
 
 [dependencies]
