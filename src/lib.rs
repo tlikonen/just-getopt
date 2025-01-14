@@ -437,8 +437,7 @@ impl OptSpecs {
     ///
     /// Method returns the same [`OptSpecs`] struct instance which was
     /// modified.
-
-    pub fn option(mut self: Self, id: &str, name: &str, value_type: OptValueType) -> Self {
+    pub fn option(mut self, id: &str, name: &str, value_type: OptValueType) -> Self {
         assert!(
             id.chars().count() > 0,
             "Option's \"id\" must be at least 1 character long."
@@ -470,7 +469,7 @@ impl OptSpecs {
         self.options.push(OptSpec {
             id: id.to_string(),
             name: name.to_string(),
-            value_type: value_type,
+            value_type,
         });
         self
     }
@@ -498,13 +497,12 @@ impl OptSpecs {
     ///
     /// Method returns the same [`OptSpecs`] struct instance which was
     /// modified.
-
-    pub fn flag(mut self: Self, flag: OptFlags) -> Self {
+    pub fn flag(mut self, flag: OptFlags) -> Self {
         self.flags.push(flag);
         self
     }
 
-    fn is_flag(self: &Self, flag: OptFlags) -> bool {
+    fn is_flag(&self, flag: OptFlags) -> bool {
         self.flags.contains(&flag)
     }
 
@@ -518,40 +516,29 @@ impl OptSpecs {
     ///
     /// The return value is an [`Args`] struct which represents the
     /// command-line information in organized form.
-
-    pub fn getopt<I, S>(self: &Self, args: I) -> Args
+    pub fn getopt<I, S>(&self, args: I) -> Args
     where
         I: IntoIterator<Item = S>,
         S: ToString,
     {
-        parser::parse(&self, args.into_iter().map(|i| i.to_string()))
+        parser::parse(self, args.into_iter().map(|i| i.to_string()))
     }
 
-    fn get_short_option_match(self: &Self, name: &str) -> Option<&OptSpec> {
+    fn get_short_option_match(&self, name: &str) -> Option<&OptSpec> {
         if name.chars().count() != 1 {
             return None;
         }
-        for e in &self.options {
-            if e.name == name {
-                return Some(e);
-            }
-        }
-        None
+        self.options.iter().find(|&e| e.name == name)
     }
 
-    fn get_long_option_match(self: &Self, name: &str) -> Option<&OptSpec> {
+    fn get_long_option_match(&self, name: &str) -> Option<&OptSpec> {
         if name.chars().count() < 2 {
             return None;
         }
-        for e in &self.options {
-            if e.name == name {
-                return Some(e);
-            }
-        }
-        None
+        self.options.iter().find(|&e| e.name == name)
     }
 
-    fn get_long_option_prefix_matches(self: &Self, name: &str) -> Option<Vec<&OptSpec>> {
+    fn get_long_option_prefix_matches(&self, name: &str) -> Option<Vec<&OptSpec>> {
         if name.chars().count() < 2 {
             return None;
         }
@@ -563,11 +550,17 @@ impl OptSpecs {
             }
         }
 
-        if v.len() > 0 {
-            Some(v)
-        } else {
+        if v.is_empty() {
             None
+        } else {
+            Some(v)
         }
+    }
+}
+
+impl Default for OptSpecs {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -643,8 +636,7 @@ impl Args {
     /// This method returns a vector (possibly empty) and each element
     /// is a reference to an [`Opt`] struct in the original
     /// [`Args::options`] field contents.
-
-    pub fn required_value_missing(self: &Self) -> Vec<&Opt> {
+    pub fn required_value_missing(&self) -> Vec<&Opt> {
         let mut vec = Vec::new();
         for opt in &self.options {
             if opt.value_required && opt.value.is_none() {
@@ -662,8 +654,7 @@ impl Args {
     /// matches) and each element is a reference to [`Opt`] struct in
     /// the original [`Args`] struct. Elements in the vector are in the
     /// same order as in the parsed command line.
-
-    pub fn options_all(self: &Self, id: &str) -> Vec<&Opt> {
+    pub fn options_all(&self, id: &str) -> Vec<&Opt> {
         let mut vec = Vec::new();
         for opt in &self.options {
             if opt.id == id {
@@ -687,14 +678,8 @@ impl Args {
     ///   - `Some(&Opt)`: An option was found with the given `id` and a
     ///     reference to its [`Opt`] struct in the original [`Args`]
     ///     struct is provided.
-
-    pub fn options_first(self: &Self, id: &str) -> Option<&Opt> {
-        for opt in &self.options {
-            if opt.id == id {
-                return Some(opt);
-            }
-        }
-        None
+    pub fn options_first(&self, id: &str) -> Option<&Opt> {
+        self.options.iter().find(|&opt| opt.id == id)
     }
 
     /// Find the last option with the given `id`.
@@ -702,14 +687,8 @@ impl Args {
     /// This is similar to [`options_first`](Args::options_first) method
     /// but this returns the last match in command-line arguments'
     /// order.
-
-    pub fn options_last(self: &Self, id: &str) -> Option<&Opt> {
-        for opt in self.options.iter().rev() {
-            if opt.id == id {
-                return Some(opt);
-            }
-        }
-        None
+    pub fn options_last(&self, id: &str) -> Option<&Opt> {
+        self.options.iter().rev().find(|&opt| opt.id == id)
     }
 
     /// Find and return all values for options with the given `id`.
@@ -721,8 +700,7 @@ impl Args {
     /// command line. Vector's elements are references to the value
     /// strings in the original [`Args`] struct. The returned vector is
     /// empty if there were no matches.
-
-    pub fn options_value_all(self: &Self, id: &str) -> Vec<&String> {
+    pub fn options_value_all(&self, id: &str) -> Vec<&String> {
         let mut vec = Vec::new();
         let opt_vec = self.options_all(id);
         for opt in opt_vec {
@@ -747,13 +725,12 @@ impl Args {
     ///   - `Some(&String)`: An option was found with the given `id` and
     ///     the option has a value assigned. A reference to the string
     ///     value in the original [`Args`] struct is provided.
-
-    pub fn options_value_first(self: &Self, id: &str) -> Option<&String> {
+    pub fn options_value_first(&self, id: &str) -> Option<&String> {
         let all = self.options_value_all(id);
-        if all.len() > 0 {
-            Some(all[0])
-        } else {
+        if all.is_empty() {
             None
+        } else {
+            Some(all[0])
         }
     }
 
@@ -768,8 +745,7 @@ impl Args {
     /// suitable to consider only the last value relevant. (Or the
     /// first, or maybe print an error message for providing several,
     /// possibly conflicting, values.)
-
-    pub fn options_value_last(self: &Self, id: &str) -> Option<&String> {
+    pub fn options_value_last(&self, id: &str) -> Option<&String> {
         let all = self.options_value_all(id);
         let len = all.len();
         if len > 0 {

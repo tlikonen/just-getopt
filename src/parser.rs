@@ -71,9 +71,9 @@ where
 
                     parsed.options.push(Opt {
                         id: spec.id.clone(),
-                        name: name,
-                        value_required: value_required,
-                        value: value,
+                        name,
+                        value_required,
+                        value,
                     });
                     continue;
                 }
@@ -102,7 +102,7 @@ where
                             OptValueType::Required => {
                                 value_required = true;
                                 let mut chars = String::new();
-                                while let Some(c) = char_iter.next() {
+                                for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
                                 value = if chars.chars().count() > 0 {
@@ -115,7 +115,7 @@ where
                             OptValueType::Optional => {
                                 value_required = false;
                                 let mut chars = String::new();
-                                while let Some(c) = char_iter.next() {
+                                for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
                                 value = if chars.chars().count() > 0 {
@@ -133,9 +133,9 @@ where
 
                         parsed.options.push(Opt {
                             id: spec.id.clone(),
-                            name: name,
-                            value_required: value_required,
-                            value: value,
+                            name,
+                            value_required,
+                            value,
                         });
                         continue;
                     }
@@ -184,11 +184,7 @@ fn is_long_option_prefix(s: &str) -> bool {
 
     if chars.len() > prefix_count {
         let next = chars[prefix_count];
-        if next != '-' {
-            true
-        } else {
-            false
-        }
+        next != '-'
     } else {
         false
     }
