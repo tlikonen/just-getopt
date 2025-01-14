@@ -394,6 +394,11 @@ pub enum OptFlags {
 
 impl OptSpecs {
     /// Create and return a new instance of [`OptSpecs`] struct.
+    ///
+    /// The created instance is "empty" and does not contain any
+    /// specifications for command-line options. Apply methods
+    /// [`option`](OptSpecs::option) and [`flag`](OptSpecs::flag) to
+    /// make it useful for parsing command-line.
     pub fn new() -> Self {
         Self {
             options: Vec::new(),
