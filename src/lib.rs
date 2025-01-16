@@ -731,11 +731,13 @@ impl Args {
     ///     the option has a value assigned. A reference to the string
     ///     value in the original [`Args`] struct is provided.
     pub fn options_value_first(&self, id: &str) -> Option<&String> {
-        let all = self.options_value_all(id);
-        if all.is_empty() {
-            None
-        } else {
-            Some(all[0])
+        match self
+            .options
+            .iter()
+            .find(|&opt| opt.id == id && opt.value.is_some())
+        {
+            Some(o) => o.value.as_ref(),
+            None => None,
         }
     }
 
@@ -751,12 +753,14 @@ impl Args {
     /// first, or maybe print an error message for providing several,
     /// possibly conflicting, values.)
     pub fn options_value_last(&self, id: &str) -> Option<&String> {
-        let all = self.options_value_all(id);
-        let len = all.len();
-        if len > 0 {
-            Some(all[len - 1])
-        } else {
-            None
+        match self
+            .options
+            .iter()
+            .rev()
+            .find(|&opt| opt.id == id && opt.value.is_some())
+        {
+            Some(o) => o.value.as_ref(),
+            None => None,
         }
     }
 }
