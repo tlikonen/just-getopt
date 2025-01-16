@@ -941,13 +941,10 @@ mod tests {
                 .clone()
                 .unwrap()
         );
-        assert_eq!(true, parsed.options_last("debug").unwrap().value.is_none());
+        assert_eq!(None, parsed.options_last("debug").unwrap().value);
         assert_eq!(false, parsed.options_last("debug").unwrap().value_required);
 
-        assert_eq!(
-            true,
-            parsed.options_first("verbose").unwrap().value.is_none()
-        );
+        assert_eq!(None, parsed.options_first("verbose").unwrap().value);
         assert_eq!(
             "123",
             parsed
@@ -969,7 +966,7 @@ mod tests {
             .option("debug", "d", OptValueType::Optional)
             .getopt(["-abcd", "-adbc"]);
 
-        assert_eq!(true, parsed.options_first("debug").unwrap().value.is_none());
+        assert_eq!(None, parsed.options_first("debug").unwrap().value);
         assert_eq!(
             "bc",
             parsed.options_last("debug").unwrap().value.clone().unwrap()
@@ -1058,7 +1055,7 @@ mod tests {
             "",
             parsed.options_first("file").unwrap().value.clone().unwrap()
         );
-        assert_eq!(true, parsed.options_last("file").unwrap().value.is_none());
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
     }
 
     #[test]
@@ -1073,7 +1070,7 @@ mod tests {
             "x",
             parsed.options_first("file").unwrap().value.clone().unwrap()
         );
-        assert_eq!(true, parsed.options_last("file").unwrap().value.is_none());
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
         assert_eq!(
             "",
             parsed
