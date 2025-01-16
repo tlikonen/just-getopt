@@ -1102,7 +1102,10 @@ mod tests {
         assert_eq!(1, d.len());
         assert_eq!("", d[0]);
 
-        assert_eq!(true, parsed.options_last("file").unwrap().value.is_none());
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
+        let m = parsed.required_value_missing();
+        assert_eq!(1, m.len());
+        assert_eq!("f", m[0].name);
     }
 
     #[test]
@@ -1122,7 +1125,10 @@ mod tests {
         assert_eq!(1, d.len());
         assert_eq!("", d[0]);
 
-        assert_eq!(true, parsed.options_last("file").unwrap().value.is_none());
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
+        let m = parsed.required_value_missing();
+        assert_eq!(1, m.len());
+        assert_eq!("file", m[0].name);
     }
 
     #[test]
@@ -1188,6 +1194,8 @@ mod tests {
         );
         assert_eq!(1, parsed.other.len());
         assert_eq!("--", parsed.other[0]);
+
+        assert_eq!(0, parsed.required_value_missing().len());
     }
 
     #[test]
@@ -1232,5 +1240,10 @@ mod tests {
         assert_eq!("€€€", parsed.options_value_last("€uro").unwrap());
 
         assert_eq!(None, parsed.options_last("äiti").unwrap().value);
+
+        let m = parsed.required_value_missing();
+        assert_eq!(1, m.len());
+        assert_eq!("äiti", m[0].name);
+        assert_eq!(None, m[0].value);
     }
 }
