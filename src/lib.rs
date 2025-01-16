@@ -1153,6 +1153,9 @@ mod tests {
         assert_eq!("123", parsed.options_value_first("debug").unwrap());
         assert_eq!("456", parsed.options_value_last("debug").unwrap());
 
+        assert_eq!(None, parsed.options_value_first("not-at-all"));
+        assert_eq!(None, parsed.options_value_last("not-at-all"));
+
         assert_eq!("foo", parsed.other[0]);
     }
 
@@ -1220,10 +1223,14 @@ mod tests {
         assert_eq!(2, a.len());
         assert_eq!("ööö", a[0]);
         assert_eq!("ää", a[1]);
+        assert_eq!("ööö", parsed.options_value_first("äiti").unwrap());
+        assert_eq!("ää", parsed.options_value_last("äiti").unwrap());
 
         assert_eq!(1, e.len());
         assert_eq!("€€€", e[0]);
+        assert_eq!("€€€", parsed.options_value_first("€uro").unwrap());
+        assert_eq!("€€€", parsed.options_value_last("€uro").unwrap());
 
-        assert_eq!(true, parsed.options_last("äiti").unwrap().value.is_none());
+        assert_eq!(None, parsed.options_last("äiti").unwrap().value);
     }
 }
