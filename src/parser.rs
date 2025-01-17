@@ -18,7 +18,7 @@ where
             let name = get_long_option_name(&opt).to_string();
 
             if is_valid_long_option_name(&name) {
-                let spec_test = if specs.is_flag(OptFlags::PrefixMatchLongOptions) {
+                let opt_match = if specs.is_flag(OptFlags::PrefixMatchLongOptions) {
                     match specs.get_long_option_prefix_matches(&name) {
                         None => None,
                         Some(vec) => {
@@ -33,7 +33,7 @@ where
                     specs.get_long_option_match(&name)
                 };
 
-                if let Some(spec) = spec_test {
+                if let Some(spec) = opt_match {
                     let value_required: bool;
                     let value: Option<String>;
 
