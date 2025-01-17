@@ -5,11 +5,19 @@ where
     I: Iterator<Item = String>,
 {
     let mut parsed = Args::new();
+    let mut args_count: u32 = 0;
 
     loop {
+        if !specs.is_under_limit(args_count) {
+            break;
+        }
+
         let opt = match iter.next() {
             None => break,
-            Some(v) => v.clone(),
+            Some(v) => {
+                args_count += 1;
+                v.clone()
+            }
         };
 
         if is_option_terminator(&opt) {
@@ -42,8 +50,16 @@ where
                             value_required = true;
                             value = if is_long_option_equal_sign(&opt) {
                                 Some(get_long_option_equal_value(&opt).to_string())
+                            } else if specs.is_under_limit(args_count) {
+                                match iter.next() {
+                                    Some(v) => {
+                                        args_count += 1;
+                                        Some(v)
+                                    }
+                                    None => None,
+                                }
                             } else {
-                                iter.next()
+                                None
                             }
                         }
 
@@ -107,8 +123,16 @@ where
                                 }
                                 value = if chars.chars().count() > 0 {
                                     Some(chars)
+                                } else if specs.is_under_limit(args_count) {
+                                    match iter.next() {
+                                        Some(v) => {
+                                            args_count += 1;
+                                            Some(v)
+                                        }
+                                        None => None,
+                                    }
                                 } else {
-                                    iter.next()
+                                    None
                                 }
                             }
 
@@ -155,9 +179,19 @@ where
     }
 
     loop {
+        if !specs.is_under_limit(args_count) {
+            if iter.next().is_some() {
+                parsed.arg_limit_exceeded = true;
+            }
+            break;
+        }
+
         match iter.next() {
             None => break,
-            Some(v) => parsed.other.push(v.clone()),
+            Some(v) => {
+                args_count += 1;
+                parsed.other.push(v.clone());
+            }
         }
     }
 

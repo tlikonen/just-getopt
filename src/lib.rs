@@ -134,7 +134,8 @@
 //!
 //! For better explanation see the documentation of [`OptSpecs`] struct
 //! and its methods [`option`](OptSpecs::option) and
-//! [`flag`](OptSpecs::flag).
+//! [`flag`](OptSpecs::flag). Also see method
+//! [`arg_limit`](OptSpecs::arg_limit).
 //!
 //! ## Parse the Command Line
 //!
@@ -215,6 +216,7 @@
 //!     unknown: [
 //!         "a",
 //!     ],
+//!     arg_limit_exceeded: false,
 //! }
 //! ```
 //!
@@ -335,8 +337,8 @@ mod parser;
 ///
 /// An instance of this struct is needed before command-line options can
 /// be parsed. Instances are created with function [`OptSpecs::new`] and
-/// they are modified with methods [`option`](OptSpecs::option) and
-/// [`flag`](OptSpecs::flag).
+/// they are modified with methods [`option`](OptSpecs::option),
+/// [`flag`](OptSpecs::flag) and [`arg_limit`](OptSpecs::arg_limit).
 ///
 /// The struct instance is used when parsing the command line given by
 /// program's user. The parser methods is [`getopt`](OptSpecs::getopt).
@@ -345,7 +347,10 @@ mod parser;
 pub struct OptSpecs {
     options: Vec<OptSpec>,
     flags: Vec<OptFlags>,
+    arg_limit: u32,
 }
+
+const ARG_LIMIT: u32 = u32::MAX;
 
 #[derive(Debug, PartialEq)]
 struct OptSpec {
@@ -403,6 +408,7 @@ impl OptSpecs {
         Self {
             options: Vec::new(),
             flags: Vec::new(),
+            arg_limit: ARG_LIMIT,
         }
     }
 
@@ -511,6 +517,25 @@ impl OptSpecs {
         self.flags.contains(&flag)
     }
 
+    /// Maximum number of command-line arguments.
+    ///
+    /// Method's argument `limit` sets the maximum number of
+    /// command-line arguments to be processed. The
+    /// [`getopt`](OptSpecs::getopt) parser keeps count how many
+    /// command-line arguments it has processed and this method can be
+    /// used to set the maximum.
+    ///
+    /// There is already a non-panicing Rust-level limit [`u32::MAX`]
+    /// but computer's operating system may limit it to a much smaller
+    /// value before a Rust program even sees the arguments.
+    ///
+    /// Method returns the same [`OptSpecs`] struct instance which was
+    /// modified.
+    pub fn arg_limit(mut self, limit: u32) -> Self {
+        self.arg_limit = limit;
+        self
+    }
+
     /// Getopt-parse an iterable item as command line arguments.
     ///
     /// This method's argument `args` is of any type that implements
@@ -560,6 +585,10 @@ impl OptSpecs {
         } else {
             Some(v)
         }
+    }
+
+    fn is_under_limit(&self, n: u32) -> bool {
+        n < self.arg_limit && n < ARG_LIMIT
     }
 }
 
@@ -616,6 +645,12 @@ pub struct Args {
     /// equal sign notation (`--foo=`), that option is classified as
     /// unknown and it will be in this field's vector with name `foo=`.
     pub unknown: Vec<String>,
+
+    /// Maximum number of command-line arguments exceeded.
+    ///
+    /// The value is `true` if there were command-line arguments
+    /// available beyond the limit.
+    pub arg_limit_exceeded: bool,
 }
 
 impl Args {
@@ -624,6 +659,7 @@ impl Args {
             options: Vec::new(),
             other: Vec::new(),
             unknown: Vec::new(),
+            arg_limit_exceeded: false,
         }
     }
 
