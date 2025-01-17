@@ -862,6 +862,7 @@ mod tests {
         };
         assert_eq!(1, spec.options.len());
         assert_eq!(&expect, &spec.options[0]);
+        assert_eq!(ARG_LIMIT, spec.arg_limit);
 
         spec = spec.option("file", "f", OptValueType::Optional);
         expect = OptSpec {
@@ -885,6 +886,9 @@ mod tests {
         assert_eq!(true, spec.is_flag(OptFlags::OptionsEverywhere));
         spec = spec.flag(OptFlags::PrefixMatchLongOptions);
         assert_eq!(true, spec.is_flag(OptFlags::PrefixMatchLongOptions));
+
+        spec = spec.arg_limit(10);
+        assert_eq!(10, spec.arg_limit);
     }
 
     #[test]
@@ -904,6 +908,8 @@ mod tests {
             .option("file", "f", OptValueType::Required)
             .option("file", "file", OptValueType::Required)
             .getopt(["-h", "--help", "-f123", "-f", "456", "foo", "bar"]);
+
+        assert_eq!(false, parsed.arg_limit_exceeded);
 
         assert_eq!("h", parsed.options_first("help").unwrap().name);
         assert_eq!("help", parsed.options_last("help").unwrap().name);
@@ -930,8 +936,12 @@ mod tests {
     #[test]
     fn t_parsed_output_020() {
         let parsed = OptSpecs::new()
+            .arg_limit(3)
             .option("help", "h", OptValueType::None)
             .getopt(["-h", "foo", "-h"]);
+
+        assert_eq!(false, parsed.arg_limit_exceeded);
+
         assert_eq!("h", parsed.options_first("help").unwrap().name);
         assert_eq!("foo", parsed.other[0]);
         assert_eq!("-h", parsed.other[1]);
@@ -1278,5 +1288,75 @@ mod tests {
         assert_eq!(1, m.len());
         assert_eq!("äiti", m[0].name);
         assert_eq!(None, m[0].value);
+    }
+
+    #[test]
+    fn t_parsed_output_200() {
+        let parsed = OptSpecs::new().arg_limit(5).getopt(1..);
+        assert_eq!(5, parsed.other.len());
+        assert_eq!(vec!["1", "2", "3", "4", "5"], parsed.other);
+        assert_eq!(true, parsed.arg_limit_exceeded);
+    }
+
+    #[test]
+    fn t_parsed_output_210() {
+        let parsed = OptSpecs::new().arg_limit(0).getopt(1..);
+        assert_eq!(0, parsed.other.len());
+        assert_eq!(true, parsed.arg_limit_exceeded);
+    }
+
+    #[test]
+    fn t_parsed_output_220() {
+        let parsed = OptSpecs::new()
+            .option("file", "f", OptValueType::Required)
+            .option("file", "file", OptValueType::Required)
+            .arg_limit(5)
+            .getopt(["-f", "one", "-ftwo", "--file", "three", "four", "five"]);
+
+        assert_eq!(
+            vec!["one", "two", "three"],
+            parsed.options_value_all("file")
+        );
+        assert_eq!(0, parsed.other.len());
+        assert_eq!(0, parsed.unknown.len());
+        assert_eq!(true, parsed.arg_limit_exceeded);
+    }
+
+    #[test]
+    fn t_parsed_output_230() {
+        let parsed = OptSpecs::new()
+            .option("file", "f", OptValueType::Required)
+            .option("file", "file", OptValueType::Required)
+            .arg_limit(4)
+            .getopt(["-f", "one", "-ftwo", "--file", "outside"]);
+
+        assert_eq!(vec!["one", "two"], parsed.options_value_all("file"));
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
+        assert_eq!(true, parsed.arg_limit_exceeded);
+    }
+
+    #[test]
+    fn t_parsed_output_240() {
+        let parsed = OptSpecs::new()
+            .option("file", "f", OptValueType::Required)
+            .option("file", "file", OptValueType::Required)
+            .arg_limit(4)
+            .getopt(["-f", "one", "-ftwo", "-f", "outside"]);
+
+        assert_eq!(vec!["one", "two"], parsed.options_value_all("file"));
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
+        assert_eq!(true, parsed.arg_limit_exceeded);
+    }
+
+    #[test]
+    fn t_parsed_output_250() {
+        let parsed = OptSpecs::new()
+            .option("help", "h", OptValueType::None)
+            .arg_limit(4)
+            .getopt(["-h", "-h", "-h", "-h", "-h"]);
+
+        assert_eq!(4, parsed.options.len());
+        assert_eq!(true, parsed.options_first("help").is_some());
+        assert_eq!(true, parsed.arg_limit_exceeded);
     }
 }
