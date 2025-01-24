@@ -220,9 +220,6 @@
 //! }
 //! ```
 //!
-//! The returned [`Args`] struct above can be examined manually but the
-//! struct has some methods to make things convenient.
-//!
 //! ### Unknown Options
 //!
 //! We probably want to tell program's user if there were unknown
@@ -632,7 +629,7 @@ pub struct Args {
     /// Command-line arguments that look like options but were not part
     /// of [`OptSpecs`] specification are classified as unknown. They
     /// are listed in this vector. Possible duplicate unknown options
-    /// given in command line have been filtered.
+    /// have been filtered out.
     ///
     /// Each element is the name string for the option (without `-` or
     /// `--` prefix). For unknown short options the element is a
@@ -649,7 +646,7 @@ pub struct Args {
     /// Maximum number of command-line arguments exceeded.
     ///
     /// The value is `true` if there were command-line arguments
-    /// available beyond the limit.
+    /// available beyond the limit. See [`OptSpecs::arg_limit`] method.
     pub arg_limit_exceeded: bool,
 }
 
@@ -754,14 +751,14 @@ impl Args {
 
     /// Find the first option with a value for given option `id`.
     ///
-    /// Find the first option which match the identifier `id` and which
-    /// has a value assigned. (Options' identifiers have been defined in
+    /// Find the first option with the identifier `id` and which has a
+    /// value assigned. (Options' identifiers have been defined in
     /// [`OptSpecs`] struct before parsing.) Method's return value is a
     /// variant of enum [`Option`] which are:
     ///
-    ///   - `None`: No options found with the given `id`, an option
-    ///     which also has a value assigned. There could be options for
-    ///     the same `id` but they don't have a value.
+    ///   - `None`: No options found with the given `id` and a value
+    ///     assigned. Note that there could be options for the same `id`
+    ///     but they don't have a value.
     ///
     ///   - `Some(&String)`: An option was found with the given `id` and
     ///     the option has a value assigned. A reference to the string
