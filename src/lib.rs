@@ -847,7 +847,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn t_create_optspecs() {
+    fn t_create_optspecs_01() {
         let mut spec;
         let mut expect;
 
@@ -886,6 +886,28 @@ mod tests {
 
         spec = spec.arg_limit(10);
         assert_eq!(10, spec.arg_limit);
+    }
+
+    #[test]
+    #[should_panic]
+    fn t_create_optspecs_02() {
+        let _spec = OptSpecs::new().option("", "h", OptValueType::None);
+    }
+
+    #[test]
+    #[should_panic]
+    fn t_create_optspecs_03() {
+        let _spec = OptSpecs::new().option("h", "h", OptValueType::None).option(
+            "h",
+            "h",
+            OptValueType::None,
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn t_create_optspecs_04() {
+        let _spec = OptSpecs::new().option("h", "", OptValueType::None);
     }
 
     #[test]
