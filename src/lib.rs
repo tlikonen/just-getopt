@@ -1288,6 +1288,20 @@ mod tests {
     }
 
     #[test]
+    fn t_parsed_output_195() {
+        let parsed = OptSpecs::new().getopt(["-ä€", "--€uro", "äää", "€€€"]);
+
+        assert_eq!(2, parsed.other.len());
+        assert_eq!("äää", parsed.other[0]);
+        assert_eq!("€€€", parsed.other[1]);
+
+        assert_eq!(3, parsed.unknown.len());
+        assert_eq!("ä", parsed.unknown[0]);
+        assert_eq!("€", parsed.unknown[1]);
+        assert_eq!("€uro", parsed.unknown[2]);
+    }
+
+    #[test]
     fn t_parsed_output_200() {
         let parsed = OptSpecs::new().arg_limit(5).getopt(1..);
         assert_eq!(5, parsed.other.len());
