@@ -80,7 +80,7 @@
 //!
 //! # Examples
 //!
-//! Following examples will guide through a typical usa of this library
+//! Following examples will guide through a typical use of this library
 //! crate and command-line parsing.
 //!
 //! ## Prepare
@@ -398,9 +398,9 @@ impl OptSpecs {
     /// Create and return a new instance of [`OptSpecs`] struct.
     ///
     /// The created instance is "empty" and does not contain any
-    /// specifications for command-line options. Apply methods
-    /// [`option`](OptSpecs::option) and [`flag`](OptSpecs::flag) to
-    /// make it useful for parsing command-line.
+    /// specifications for command-line options. Apply method
+    /// [`option`](OptSpecs::option) to make it useful for parsing
+    /// command-line.
     pub fn new() -> Self {
         Self {
             options: Vec::new(),
