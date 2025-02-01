@@ -506,7 +506,9 @@ impl OptSpecs {
     /// Method returns the same [`OptSpecs`] struct instance which was
     /// modified.
     pub fn flag(mut self, flag: OptFlags) -> Self {
-        self.flags.push(flag);
+        if !self.flags.contains(&flag) {
+            self.flags.push(flag);
+        }
         self
     }
 
@@ -880,9 +882,15 @@ mod tests {
         assert_eq!(&expect, &spec.options[2]);
 
         spec = spec.flag(OptFlags::OptionsEverywhere);
+        assert_eq!(1, spec.flags.len()); // Length 1
         assert_eq!(true, spec.is_flag(OptFlags::OptionsEverywhere));
         spec = spec.flag(OptFlags::PrefixMatchLongOptions);
+        assert_eq!(2, spec.flags.len()); // Length 2
         assert_eq!(true, spec.is_flag(OptFlags::PrefixMatchLongOptions));
+        // Don't add duplicates.
+        spec = spec.flag(OptFlags::OptionsEverywhere);
+        spec = spec.flag(OptFlags::PrefixMatchLongOptions);
+        assert_eq!(2, spec.flags.len()); // Length still 2
 
         spec = spec.arg_limit(10);
         assert_eq!(10, spec.arg_limit);
