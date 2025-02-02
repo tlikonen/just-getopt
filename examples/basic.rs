@@ -16,7 +16,6 @@ fn main() -> ExitCode {
     // the command-line is parsed as non-options.
     let specs = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere) // Argument: (flag)
-        .arg_limit(30) // Maximum number of args to process.
         .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
         .option("help", "help", OptValueType::None)
         .option("file", "f", OptValueType::Required)

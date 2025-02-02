@@ -5,37 +5,36 @@ where
     I: Iterator<Item = String>,
 {
     let mut parsed = Args::new();
-    let mut args_count: u32 = 0;
+    let mut option_count: u32 = 0;
+    let mut other_count: u32 = 0;
+    let mut unknown_count: u32 = 0;
 
     loop {
-        if !specs.is_under_limit(args_count) {
+        if option_count >= specs.option_limit
+            && other_count >= specs.other_limit
+            && unknown_count >= specs.unknown_limit
+        {
             break;
         }
 
-        let opt = match iter.next() {
+        let arg = match iter.next() {
             None => break,
-            Some(v) => {
-                args_count += 1;
-                v.clone()
-            }
+            Some(s) => s.to_clone(),
         };
 
-        if is_option_terminator(&opt) {
+        if is_option_terminator(&arg) {
             break;
-        } else if is_long_option_prefix(&opt) {
-            let name = get_long_option_name(&opt).to_string();
+        } else if is_long_option_prefix(&arg) {
+            let name = get_long_option_name(&arg).to_string();
 
             if is_valid_long_option_name(&name) {
                 let opt_match = if specs.is_flag(OptFlags::PrefixMatchLongOptions) {
                     match specs.get_long_option_prefix_matches(&name) {
                         None => None,
-                        Some(vec) => {
-                            if vec.len() == 1 {
-                                Some(vec[0])
-                            } else {
-                                None
-                            }
-                        }
+                        Some(vec) => match vec.len() {
+                            1 => Some(vec[0]),
+                            _ => None,
+                        },
                     }
                 } else {
                     specs.get_long_option_match(&name)
@@ -48,25 +47,17 @@ where
                     match spec.value_type {
                         OptValueType::Required => {
                             value_required = true;
-                            value = if is_long_option_equal_sign(&opt) {
-                                Some(get_long_option_equal_value(&opt).to_string())
-                            } else if specs.is_under_limit(args_count) {
-                                match iter.next() {
-                                    Some(v) => {
-                                        args_count += 1;
-                                        Some(v)
-                                    }
-                                    None => None,
-                                }
+                            value = if is_long_option_equal_sign(&arg) {
+                                Some(get_long_option_equal_value(&arg).to_string())
                             } else {
-                                None
+                                iter.next()
                             }
                         }
 
                         OptValueType::Optional => {
                             value_required = false;
-                            value = if is_long_option_equal_sign(&opt) {
-                                Some(get_long_option_equal_value(&opt).to_string())
+                            value = if is_long_option_equal_sign(&arg) {
+                                Some(get_long_option_equal_value(&arg).to_string())
                             } else {
                                 None
                             }
@@ -75,38 +66,45 @@ where
                         OptValueType::None => {
                             value_required = false;
                             value = None;
-                            if is_long_option_equal_sign(&opt) {
+                            if is_long_option_equal_sign(&arg) {
                                 let n = format!("{}=", name);
-                                if !parsed.unknown.contains(&n) {
+                                if unknown_count < specs.unknown_limit
+                                    && !parsed.unknown.contains(&n)
+                                {
                                     parsed.unknown.push(n);
+                                    unknown_count += 1;
                                 }
                                 continue;
                             }
                         }
                     }
 
-                    parsed.options.push(Opt {
-                        id: spec.id.clone(),
-                        name,
-                        value_required,
-                        value,
-                    });
+                    if option_count < specs.option_limit {
+                        parsed.options.push(Opt {
+                            id: spec.id.clone(),
+                            name,
+                            value_required,
+                            value,
+                        });
+                        option_count += 1;
+                    }
                     continue;
                 }
             }
 
-            if !parsed.unknown.contains(&name) {
+            if unknown_count < specs.unknown_limit && !parsed.unknown.contains(&name) {
                 parsed.unknown.push(name);
+                unknown_count += 1;
             }
             continue;
-        } else if is_short_option_prefix(&opt) {
-            let series = get_short_option_series(&opt);
+        } else if is_short_option_prefix(&arg) {
+            let series = get_short_option_series(&arg);
             let mut char_iter = series.chars();
 
             loop {
                 let name = match char_iter.next() {
                     None => break,
-                    Some(v) => v.to_string(),
+                    Some(c) => c.to_string(),
                 };
 
                 if is_valid_short_option_name(&name) {
@@ -121,18 +119,9 @@ where
                                 for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
-                                value = if chars.chars().count() > 0 {
-                                    Some(chars)
-                                } else if specs.is_under_limit(args_count) {
-                                    match iter.next() {
-                                        Some(v) => {
-                                            args_count += 1;
-                                            Some(v)
-                                        }
-                                        None => None,
-                                    }
-                                } else {
-                                    None
+                                value = match chars.chars().count() {
+                                    0 => iter.next(),
+                                    _ => Some(chars),
                                 }
                             }
 
@@ -142,10 +131,9 @@ where
                                 for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
-                                value = if chars.chars().count() > 0 {
-                                    Some(chars)
-                                } else {
-                                    None
+                                value = match chars.chars().count() {
+                                    0 => None,
+                                    _ => Some(chars),
                                 }
                             }
 
@@ -155,42 +143,48 @@ where
                             }
                         }
 
-                        parsed.options.push(Opt {
-                            id: spec.id.clone(),
-                            name,
-                            value_required,
-                            value,
-                        });
+                        if option_count < specs.option_limit {
+                            parsed.options.push(Opt {
+                                id: spec.id.clone(),
+                                name,
+                                value_required,
+                                value,
+                            });
+                            option_count += 1;
+                        }
                         continue;
                     }
                 }
 
-                if !parsed.unknown.contains(&name) {
+                if unknown_count < specs.unknown_limit && !parsed.unknown.contains(&name) {
                     parsed.unknown.push(name);
+                    unknown_count += 1;
                 }
                 continue;
             }
-        } else if specs.is_flag(OptFlags::OptionsEverywhere) {
-            parsed.other.push(opt);
         } else {
-            parsed.other.push(opt);
-            break;
+            if other_count < specs.other_limit {
+                parsed.other.push(arg);
+                other_count += 1;
+            }
+            if !specs.is_flag(OptFlags::OptionsEverywhere) {
+                break;
+            }
         }
     }
 
     loop {
-        if !specs.is_under_limit(args_count) {
-            if iter.next().is_some() {
-                parsed.arg_limit_exceeded = true;
-            }
+        if other_count >= specs.other_limit {
             break;
         }
 
         match iter.next() {
             None => break,
-            Some(v) => {
-                args_count += 1;
-                parsed.other.push(v.clone());
+            Some(s) => {
+                if other_count < specs.other_limit {
+                    parsed.other.push(s.clone());
+                    other_count += 1;
+                }
             }
         }
     }

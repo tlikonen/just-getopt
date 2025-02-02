@@ -134,8 +134,10 @@
 //!
 //! For better explanation see the documentation of [`OptSpecs`] struct
 //! and its methods [`option`](OptSpecs::option) and
-//! [`flag`](OptSpecs::flag). Also see method
-//! [`arg_limit`](OptSpecs::arg_limit).
+//! [`flag`](OptSpecs::flag). Also see methods
+//! [`limit_options`](OptSpecs::limit_options),
+//! [`limit_other_args`](OptSpecs::limit_other_args) and
+//! [`limit_unknown_options`](OptSpecs::limit_unknown_options).
 //!
 //! ## Parse the Command Line
 //!
@@ -216,7 +218,6 @@
 //!     unknown: [
 //!         "a",
 //!     ],
-//!     arg_limit_exceeded: false,
 //! }
 //! ```
 //!
@@ -334,8 +335,8 @@ mod parser;
 ///
 /// An instance of this struct is needed before command-line options can
 /// be parsed. Instances are created with function [`OptSpecs::new`] and
-/// they are modified with methods [`option`](OptSpecs::option),
-/// [`flag`](OptSpecs::flag) and [`arg_limit`](OptSpecs::arg_limit).
+/// they are modified with [`option`](OptSpecs::option) and other
+/// methods
 ///
 /// The struct instance is used when parsing the command line given by
 /// program's user. The parser methods is [`getopt`](OptSpecs::getopt).
@@ -344,10 +345,12 @@ mod parser;
 pub struct OptSpecs {
     options: Vec<OptSpec>,
     flags: Vec<OptFlags>,
-    arg_limit: u32,
+    option_limit: u32,
+    other_limit: u32,
+    unknown_limit: u32,
 }
 
-const ARG_LIMIT: u32 = u32::MAX;
+const COUNTER_LIMIT: u32 = u32::MAX;
 
 #[derive(Debug, PartialEq)]
 struct OptSpec {
@@ -398,14 +401,16 @@ impl OptSpecs {
     /// Create and return a new instance of [`OptSpecs`] struct.
     ///
     /// The created instance is "empty" and does not contain any
-    /// specifications for command-line options. Apply method
-    /// [`option`](OptSpecs::option) to make it useful for parsing
-    /// command-line.
+    /// specifications for command-line options. Apply
+    /// [`option`](OptSpecs::option) or other methods to make it useful
+    /// for parsing command-line.
     pub fn new() -> Self {
         Self {
             options: Vec::new(),
             flags: Vec::new(),
-            arg_limit: ARG_LIMIT,
+            option_limit: COUNTER_LIMIT,
+            other_limit: COUNTER_LIMIT,
+            unknown_limit: COUNTER_LIMIT,
         }
     }
 
@@ -443,8 +448,7 @@ impl OptSpecs {
     ///     value is accepted, use [`OptValueType::Optional`]. If the
     ///     option requires a value, use [`OptValueType::Required`].
     ///
-    /// Method returns the same [`OptSpecs`] struct instance which was
-    /// modified.
+    /// The return value is the same struct instance which was modified.
     pub fn option(mut self, id: &str, name: &str, value_type: OptValueType) -> Self {
         assert!(
             id.chars().count() > 0,
@@ -500,11 +504,10 @@ impl OptSpecs {
     ///     options don't need to be written in full in the command
     ///     line. They can be shortened as long as there are enough
     ///     characters to find a unique prefix match. If there are more
-    ///     than one match the option given in the command line is
-    ///     classified as unknown.
+    ///     than one match the option which was given in the command
+    ///     line is classified as unknown.
     ///
-    /// Method returns the same [`OptSpecs`] struct instance which was
-    /// modified.
+    /// The return value is the same struct instance which was modified.
     pub fn flag(mut self, flag: OptFlags) -> Self {
         if !self.flags.contains(&flag) {
             self.flags.push(flag);
@@ -516,22 +519,50 @@ impl OptSpecs {
         self.flags.contains(&flag)
     }
 
-    /// Maximum number of command-line arguments.
+    /// Maximum number of valid options.
     ///
-    /// Method's argument `limit` sets the maximum number of
-    /// command-line arguments to be processed. The
-    /// [`getopt`](OptSpecs::getopt) parser keeps count how many
-    /// command-line arguments it has processed and this method can be
-    /// used to set the maximum.
+    /// Method's argument `limit` sets the maximum number of valid
+    /// options to collect from the command line. The rest is ignored.
+    /// This doesn't include unknown options (see
+    /// [`limit_unknown_options`](OptSpecs::limit_unknown_options)).
     ///
-    /// There is already a non-panicing Rust-level limit [`u32::MAX`]
-    /// but computer's operating system may limit it to a much smaller
-    /// value before a Rust program even sees the arguments.
+    /// The return value is the same struct instance which was modified.
+    pub fn limit_options(mut self, limit: u32) -> Self {
+        self.option_limit = limit;
+        self
+    }
+
+    /// Maximum number of other command-line arguments.
     ///
-    /// Method returns the same [`OptSpecs`] struct instance which was
-    /// modified.
-    pub fn arg_limit(mut self, limit: u32) -> Self {
-        self.arg_limit = limit;
+    /// Method's argument `limit` sets the maximum number of other
+    /// (non-option) arguments to collect from the command line. The
+    /// rest is ignored.
+    ///
+    /// Note: If your program accepts *n* number of command-line
+    /// argument (apart from options) you could set this limit to *n +
+    /// 1*. This way you know if there were more arguments than needed
+    /// and can inform program's user about that. There is no need to
+    /// collect more arguments.
+    ///
+    /// The return value is the same struct instance which was modified.
+    pub fn limit_other_args(mut self, limit: u32) -> Self {
+        self.other_limit = limit;
+        self
+    }
+
+    /// Maximum number of unknown options.
+    ///
+    /// Method's argument `limit` sets the maximum number of unique
+    /// unknown options to collect from the command line. Duplicates are
+    /// not collected.
+    ///
+    /// Note: If you want to stop your program if it notices just one
+    /// unknown option you can set this limit to 1. There is probably no
+    /// need to collect more of them.
+    ///
+    /// The return value is the same struct instance which was modified.
+    pub fn limit_unknown_options(mut self, limit: u32) -> Self {
+        self.unknown_limit = limit;
         self
     }
 
@@ -584,10 +615,6 @@ impl OptSpecs {
         } else {
             Some(v)
         }
-    }
-
-    fn is_under_limit(&self, n: u32) -> bool {
-        n < self.arg_limit && n < ARG_LIMIT
     }
 }
 
@@ -644,12 +671,6 @@ pub struct Args {
     /// equal sign notation (`--foo=`), that option is classified as
     /// unknown and it will be in this field's vector with name `foo=`.
     pub unknown: Vec<String>,
-
-    /// Maximum number of command-line arguments exceeded.
-    ///
-    /// The value is `true` if there were command-line arguments
-    /// available beyond the limit. See [`OptSpecs::arg_limit`] method.
-    pub arg_limit_exceeded: bool,
 }
 
 impl Args {
@@ -658,7 +679,6 @@ impl Args {
             options: Vec::new(),
             other: Vec::new(),
             unknown: Vec::new(),
-            arg_limit_exceeded: false,
         }
     }
 
@@ -861,7 +881,9 @@ mod tests {
         };
         assert_eq!(1, spec.options.len());
         assert_eq!(&expect, &spec.options[0]);
-        assert_eq!(ARG_LIMIT, spec.arg_limit);
+        assert_eq!(COUNTER_LIMIT, spec.option_limit);
+        assert_eq!(COUNTER_LIMIT, spec.other_limit);
+        assert_eq!(COUNTER_LIMIT, spec.unknown_limit);
 
         spec = spec.option("file", "f", OptValueType::Optional);
         expect = OptSpec {
@@ -887,13 +909,16 @@ mod tests {
         spec = spec.flag(OptFlags::PrefixMatchLongOptions);
         assert_eq!(2, spec.flags.len()); // Length 2
         assert_eq!(true, spec.is_flag(OptFlags::PrefixMatchLongOptions));
-        // Don't add duplicates.
         spec = spec.flag(OptFlags::OptionsEverywhere);
         spec = spec.flag(OptFlags::PrefixMatchLongOptions);
         assert_eq!(2, spec.flags.len()); // Length still 2
 
-        spec = spec.arg_limit(10);
-        assert_eq!(10, spec.arg_limit);
+        spec = spec.limit_options(9);
+        spec = spec.limit_other_args(10);
+        spec = spec.limit_unknown_options(3);
+        assert_eq!(9, spec.option_limit);
+        assert_eq!(10, spec.other_limit);
+        assert_eq!(3, spec.unknown_limit);
     }
 
     #[test]
@@ -936,8 +961,6 @@ mod tests {
             .option("file", "file", OptValueType::Required)
             .getopt(["-h", "--help", "-f123", "-f", "456", "foo", "bar"]);
 
-        assert_eq!(false, parsed.arg_limit_exceeded);
-
         assert_eq!("h", parsed.options_first("help").unwrap().name);
         assert_eq!("help", parsed.options_last("help").unwrap().name);
         assert_eq!("help", parsed.options_first("help").unwrap().id);
@@ -963,13 +986,13 @@ mod tests {
     #[test]
     fn t_parsed_output_020() {
         let parsed = OptSpecs::new()
-            .arg_limit(3)
+            .limit_options(1)
+            .limit_other_args(2)
             .option("help", "h", OptValueType::None)
             .getopt(["-h", "foo", "-h"]);
 
-        assert_eq!(false, parsed.arg_limit_exceeded);
-
         assert_eq!("h", parsed.options_first("help").unwrap().name);
+        assert_eq!(2, parsed.other.len());
         assert_eq!("foo", parsed.other[0]);
         assert_eq!("-h", parsed.other[1]);
     }
@@ -1045,6 +1068,7 @@ mod tests {
             parsed.options_last("debug").unwrap().value.clone().unwrap()
         );
 
+        assert_eq!(3, parsed.unknown.len());
         assert_eq!("a", parsed.unknown[0]);
         assert_eq!("b", parsed.unknown[1]);
         assert_eq!("c", parsed.unknown[2]);
@@ -1111,6 +1135,7 @@ mod tests {
             parsed.options_first("file").unwrap().value.clone().unwrap()
         );
 
+        assert_eq!(4, parsed.other.len());
         assert_eq!("foo", parsed.other[0]);
         assert_eq!("bar", parsed.other[1]);
         assert_eq!("--file", parsed.other[2]);
@@ -1237,10 +1262,11 @@ mod tests {
 
     #[test]
     fn t_parsed_output_150() {
-        let parsed = OptSpecs::new().getopt([
+        let parsed = OptSpecs::new().limit_unknown_options(6).getopt([
             "-abcd",
             "-e",
             "--debug",
+            "-x", // Won't be listed in unknown because of limit.
             "--",
             "--debug=",
             "foo",
@@ -1250,6 +1276,7 @@ mod tests {
         assert_eq!(0, parsed.options.len());
         assert_eq!(3, parsed.other.len());
         assert_eq!(6, parsed.unknown.len());
+        assert_eq!(vec!["a", "b", "c", "d", "e", "debug"], parsed.unknown);
     }
 
     #[test]
@@ -1279,8 +1306,9 @@ mod tests {
     #[test]
     fn t_parsed_output_180() {
         let parsed = OptSpecs::new()
+            .limit_unknown_options(3)
             .option("bar", "bar", OptValueType::None)
-            .getopt(["-aaa", "--foo", "--foo", "--bar=", "--bar="]);
+            .getopt(["-aaa", "--foo", "--foo", "--bar=", "--bar=", "-x"]);
 
         assert_eq!(3, parsed.unknown.len());
         assert_eq!("a", parsed.unknown[0]);
@@ -1333,17 +1361,15 @@ mod tests {
 
     #[test]
     fn t_parsed_output_200() {
-        let parsed = OptSpecs::new().arg_limit(5).getopt(1..);
+        let parsed = OptSpecs::new().limit_other_args(5).getopt(1..10);
         assert_eq!(5, parsed.other.len());
         assert_eq!(vec!["1", "2", "3", "4", "5"], parsed.other);
-        assert_eq!(true, parsed.arg_limit_exceeded);
     }
 
     #[test]
     fn t_parsed_output_210() {
-        let parsed = OptSpecs::new().arg_limit(0).getopt(1..);
+        let parsed = OptSpecs::new().limit_other_args(0).getopt(1..10);
         assert_eq!(0, parsed.other.len());
-        assert_eq!(true, parsed.arg_limit_exceeded);
     }
 
     #[test]
@@ -1351,16 +1377,36 @@ mod tests {
         let parsed = OptSpecs::new()
             .option("file", "f", OptValueType::Required)
             .option("file", "file", OptValueType::Required)
-            .arg_limit(5)
-            .getopt(["-f", "one", "-ftwo", "--file", "three", "four", "five"]);
+            .option("help", "help", OptValueType::None)
+            .limit_options(3)
+            .limit_other_args(1)
+            .limit_unknown_options(3)
+            .getopt([
+                "--unknown",
+                "--help=",
+                "-ab",
+                "-f",
+                "one",
+                "-ftwo",
+                "--file",
+                "three",
+                "--file",
+                "four",
+                "other1",
+                "other2",
+            ]);
 
+        assert_eq!(3, parsed.options.len());
         assert_eq!(
             vec!["one", "two", "three"],
             parsed.options_value_all("file")
         );
-        assert_eq!(0, parsed.other.len());
-        assert_eq!(0, parsed.unknown.len());
-        assert_eq!(true, parsed.arg_limit_exceeded);
+
+        assert_eq!(1, parsed.other.len());
+        assert_eq!("other1", parsed.other[0]);
+
+        assert_eq!(3, parsed.unknown.len());
+        assert_eq!(vec!["unknown", "help=", "a"], parsed.unknown);
     }
 
     #[test]
@@ -1368,36 +1414,99 @@ mod tests {
         let parsed = OptSpecs::new()
             .option("file", "f", OptValueType::Required)
             .option("file", "file", OptValueType::Required)
-            .arg_limit(4)
-            .getopt(["-f", "one", "-ftwo", "--file", "outside"]);
+            .limit_options(3)
+            .getopt(["-f", "one", "-ftwo", "--file=three", "--unknown"]);
 
-        assert_eq!(vec!["one", "two"], parsed.options_value_all("file"));
-        assert_eq!(None, parsed.options_last("file").unwrap().value);
-        assert_eq!(true, parsed.arg_limit_exceeded);
+        assert_eq!(
+            vec!["one", "two", "three"],
+            parsed.options_value_all("file")
+        );
+        assert_eq!(1, parsed.unknown.len());
+        assert_eq!("unknown", parsed.unknown[0]);
     }
 
     #[test]
     fn t_parsed_output_240() {
         let parsed = OptSpecs::new()
-            .option("file", "f", OptValueType::Required)
-            .option("file", "file", OptValueType::Required)
-            .arg_limit(4)
-            .getopt(["-f", "one", "-ftwo", "-f", "outside"]);
+            .option("help", "h", OptValueType::None)
+            .limit_options(3)
+            .getopt(["-xhhhh"]);
 
-        assert_eq!(vec!["one", "two"], parsed.options_value_all("file"));
-        assert_eq!(None, parsed.options_last("file").unwrap().value);
-        assert_eq!(true, parsed.arg_limit_exceeded);
+        assert_eq!(3, parsed.options.len());
+        assert_eq!(true, parsed.options_first("help").is_some());
+        assert_eq!(1, parsed.unknown.len());
+        assert_eq!("x", parsed.unknown[0]);
     }
 
     #[test]
     fn t_parsed_output_250() {
         let parsed = OptSpecs::new()
             .option("help", "h", OptValueType::None)
-            .arg_limit(4)
-            .getopt(["-h", "-h", "-h", "-h", "-h"]);
+            .limit_options(3)
+            .getopt(["-x", "-h", "-h", "-h", "-h"]);
 
-        assert_eq!(4, parsed.options.len());
+        assert_eq!(3, parsed.options.len());
         assert_eq!(true, parsed.options_first("help").is_some());
-        assert_eq!(true, parsed.arg_limit_exceeded);
+        assert_eq!(1, parsed.unknown.len());
+        assert_eq!("x", parsed.unknown[0]);
+    }
+
+    #[test]
+    fn t_parsed_output_260() {
+        let parsed = OptSpecs::new()
+            .option("help", "h", OptValueType::None)
+            .limit_options(3)
+            .getopt(["-x", "-h", "-h", "--", "-h", "-h"]);
+
+        assert_eq!(2, parsed.options.len());
+        assert_eq!(true, parsed.options_first("help").is_some());
+        assert_eq!(2, parsed.other.len());
+        assert_eq!(vec!["-h", "-h"], parsed.other);
+        assert_eq!(1, parsed.unknown.len());
+        assert_eq!("x", parsed.unknown[0]);
+    }
+
+    #[test]
+    fn t_parsed_output_270() {
+        let parsed = OptSpecs::new()
+            .flag(OptFlags::OptionsEverywhere)
+            .option("help", "h", OptValueType::None)
+            .option("file", "f", OptValueType::Required)
+            .limit_options(1)
+            .limit_other_args(2)
+            .limit_unknown_options(1)
+            .getopt(["bar", "-habf", "123", "foo"]);
+
+        // "123" must be parsed as "f" option's value even though it is
+        // beyond limit_options.
+        assert_eq!(true, parsed.options_first("help").is_some());
+        assert_eq!(false, parsed.options_first("file").is_some());
+        assert_eq!(2, parsed.other.len());
+        assert_eq!("bar", parsed.other[0]);
+        assert_eq!("foo", parsed.other[1]);
+        assert_eq!(1, parsed.unknown.len());
+        assert_eq!("a", parsed.unknown[0]);
+    }
+
+    #[test]
+    fn t_parsed_output_280() {
+        let parsed = OptSpecs::new()
+            .flag(OptFlags::OptionsEverywhere)
+            .option("help", "help", OptValueType::None)
+            .option("file", "file", OptValueType::Required)
+            .limit_options(1)
+            .limit_other_args(2)
+            .limit_unknown_options(1)
+            .getopt(["bar", "--help", "-ab", "--file", "123", "foo"]);
+
+        // "123" must be parsed as "--file" option's value even though
+        // it is beyond limit_options.
+        assert_eq!(true, parsed.options_first("help").is_some());
+        assert_eq!(false, parsed.options_first("file").is_some());
+        assert_eq!(2, parsed.other.len());
+        assert_eq!("bar", parsed.other[0]);
+        assert_eq!("foo", parsed.other[1]);
+        assert_eq!(1, parsed.unknown.len());
+        assert_eq!("a", parsed.unknown[0]);
     }
 }
