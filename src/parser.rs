@@ -382,6 +382,7 @@ mod tests {
         assert_eq!("", get_long_option_equal_value("--abc="));
         assert_eq!("1", get_long_option_equal_value("--abc=1"));
         assert_eq!("=", get_long_option_equal_value("--abc=="));
+        assert_eq!("--", get_long_option_equal_value("--abc=--"));
         assert_eq!("123", get_long_option_equal_value("--abc=123"));
         assert_eq!(" 12 3 ", get_long_option_equal_value("--abc= 12 3 "));
         assert_eq!("123=123=", get_long_option_equal_value("--abc=123=123="));
