@@ -19,13 +19,13 @@ where
 
         let arg = match iter.next() {
             None => break,
-            Some(s) => s.to_clone(),
+            Some(s) => s,
         };
 
         if is_option_terminator(&arg) {
             break;
         } else if is_long_option_prefix(&arg) {
-            let name = get_long_option_name(&arg).to_string();
+            let name = get_long_option_name(&arg);
 
             if is_valid_long_option_name(&name) {
                 let opt_match = if specs.is_flag(OptFlags::PrefixMatchLongOptions) {
@@ -48,7 +48,7 @@ where
                         OptValueType::Required => {
                             value_required = true;
                             value = if is_long_option_equal_sign(&arg) {
-                                Some(get_long_option_equal_value(&arg).to_string())
+                                Some(get_long_option_equal_value(&arg))
                             } else {
                                 iter.next()
                             }
@@ -57,7 +57,7 @@ where
                         OptValueType::Optional => {
                             value_required = false;
                             value = if is_long_option_equal_sign(&arg) {
-                                Some(get_long_option_equal_value(&arg).to_string())
+                                Some(get_long_option_equal_value(&arg))
                             } else {
                                 None
                             }
@@ -182,7 +182,7 @@ where
             None => break,
             Some(s) => {
                 if other_count < specs.other_limit {
-                    parsed.other.push(s.clone());
+                    parsed.other.push(s);
                     other_count += 1;
                 }
             }
