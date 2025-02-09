@@ -378,6 +378,7 @@ pub enum OptValueType {
 /// See [`OptSpecs::flag`] method for more information.
 
 #[derive(Debug, PartialEq)]
+#[non_exhaustive]
 pub enum OptFlags {
     /// Accept command-line options and other arguments in mixed order
     /// in the command line. That is, options can come after non-option
