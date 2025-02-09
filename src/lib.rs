@@ -169,8 +169,8 @@
 //! The command line is now parsed and the variable `parsed` (see above)
 //! owns an [`Args`] struct which represents the parsed output in
 //! organized form. It is a public struct and it can be examined
-//! manually. There are some methods for convenience, though, and some
-//! of them are shown in the following examples.
+//! manually. There are some methods for convenience, and some of them
+//! are shown in the following examples.
 //!
 //! At this stage it is useful to see the returned [`Args`] struct. One
 //! of its fields may contain some [`Opt`] structs too if the parser
