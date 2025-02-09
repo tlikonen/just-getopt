@@ -29,13 +29,7 @@ where
 
             if is_valid_long_option_name(&name) {
                 let opt_match = if specs.is_flag(OptFlags::PrefixMatchLongOptions) {
-                    match specs.get_long_option_prefix_matches(&name) {
-                        None => None,
-                        Some(vec) => match vec.len() {
-                            1 => Some(vec[0]),
-                            _ => None,
-                        },
-                    }
+                    specs.get_long_option_prefix_match(&name)
                 } else {
                     specs.get_long_option_match(&name)
                 };
@@ -526,56 +520,64 @@ mod tests {
     }
 
     #[test]
-    fn t_get_long_option_prefix_matches() {
+    fn t_get_long_option_prefix_match() {
+        use crate::OptSpec;
+
         let spec = OptSpecs::new()
             .option("foo", "foo-option", OptValueType::None)
             .option("bar", "foo-€ö-option", OptValueType::None)
             .option("verbose", "verbose", OptValueType::None)
             .option("version", "version", OptValueType::None);
 
+        assert_eq!(true, spec.get_long_option_prefix_match("ver").is_none());
+        assert_eq!(true, spec.get_long_option_prefix_match("foo-").is_none());
+        assert_eq!(
+            true,
+            spec.get_long_option_prefix_match("not-at-all").is_none()
+        );
+
         {
-            let m = &spec.get_long_option_prefix_matches("ver");
+            let m = &spec.get_long_option_prefix_match("verb");
             match m {
-                Some(n) => assert_eq!(2, n.len()),
+                Some(OptSpec { id: i, name: n, .. }) => {
+                    assert_eq!("verbose", i);
+                    assert_eq!("verbose", n);
+                }
                 None => panic!("Should not panic!"),
             };
         }
 
         {
-            let m = &spec.get_long_option_prefix_matches("verb");
+            let m = &spec.get_long_option_prefix_match("foo-o");
             match m {
-                Some(n) => assert_eq!(1, n.len()),
+                Some(OptSpec { id: i, name: n, .. }) => {
+                    assert_eq!("foo", i);
+                    assert_eq!("foo-option", n);
+                }
                 None => panic!("Should not panic!"),
             };
         }
 
         {
-            let m = &spec.get_long_option_prefix_matches("foo-");
+            let m = &spec.get_long_option_prefix_match("foo-€");
             match m {
-                Some(n) => assert_eq!(2, n.len()),
+                Some(OptSpec { id: i, name: n, .. }) => {
+                    assert_eq!("bar", i);
+                    assert_eq!("foo-€ö-option", n);
+                }
                 None => panic!("Should not panic!"),
             };
         }
 
         {
-            let m = &spec.get_long_option_prefix_matches("foo-€");
+            let m = &spec.get_long_option_prefix_match("version");
             match m {
-                Some(n) => assert_eq!(1, n.len()),
+                Some(OptSpec { id: i, name: n, .. }) => {
+                    assert_eq!("version", i);
+                    assert_eq!("version", n);
+                }
                 None => panic!("Should not panic!"),
             };
-        }
-
-        {
-            let m = &spec.get_long_option_prefix_matches("version");
-            match m {
-                Some(n) => assert_eq!(1, n.len()),
-                None => panic!("Should not panic!"),
-            };
-        }
-
-        {
-            let m = &spec.get_long_option_prefix_matches("not-at-all");
-            assert!(m.is_none());
         }
     }
 }

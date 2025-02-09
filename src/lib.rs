@@ -599,23 +599,23 @@ impl OptSpecs {
         self.options.iter().find(|e| e.name == name)
     }
 
-    fn get_long_option_prefix_matches(&self, name: &str) -> Option<Vec<&OptSpec>> {
+    fn get_long_option_prefix_match(&self, name: &str) -> Option<&OptSpec> {
         if name.chars().count() < 2 {
             return None;
         }
 
-        let mut v = Vec::new();
+        let mut result = None;
+
         for e in &self.options {
             if e.name.starts_with(name) {
-                v.push(e);
+                if result.is_none() {
+                    result = Some(e);
+                } else {
+                    return None;
+                }
             }
         }
-
-        if v.is_empty() {
-            None
-        } else {
-            Some(v)
-        }
+        result
     }
 }
 
