@@ -747,7 +747,7 @@ impl Args {
     ///     reference to its [`Opt`] struct in the original [`Args`]
     ///     struct is provided.
     pub fn options_first(&self, id: &str) -> Option<&Opt> {
-        self.options.iter().find(|&opt| opt.id == id)
+        self.options.iter().find(|opt| opt.id == id)
     }
 
     /// Find the last option with the given `id`.
@@ -756,7 +756,7 @@ impl Args {
     /// but this returns the last match in command-line arguments'
     /// order.
     pub fn options_last(&self, id: &str) -> Option<&Opt> {
-        self.options.iter().rev().find(|&opt| opt.id == id)
+        self.options.iter().rev().find(|opt| opt.id == id)
     }
 
     /// Find and return all values for options with the given `id`.
@@ -797,7 +797,7 @@ impl Args {
         match self
             .options
             .iter()
-            .find(|&opt| opt.id == id && opt.value.is_some())
+            .find(|opt| opt.id == id && opt.value.is_some())
         {
             Some(o) => o.value.as_ref(),
             None => None,
@@ -820,7 +820,7 @@ impl Args {
             .options
             .iter()
             .rev()
-            .find(|&opt| opt.id == id && opt.value.is_some())
+            .find(|opt| opt.id == id && opt.value.is_some())
         {
             Some(o) => o.value.as_ref(),
             None => None,
