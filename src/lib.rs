@@ -589,14 +589,14 @@ impl OptSpecs {
         if name.chars().count() != 1 {
             return None;
         }
-        self.options.iter().find(|&e| e.name == name)
+        self.options.iter().find(|e| e.name == name)
     }
 
     fn get_long_option_match(&self, name: &str) -> Option<&OptSpec> {
         if name.chars().count() < 2 {
             return None;
         }
-        self.options.iter().find(|&e| e.name == name)
+        self.options.iter().find(|e| e.name == name)
     }
 
     fn get_long_option_prefix_matches(&self, name: &str) -> Option<Vec<&OptSpec>> {
