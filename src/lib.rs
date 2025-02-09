@@ -262,7 +262,7 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! if let Some(_) = parsed.options_first("help") {
+//! if parsed.option_exists("help") {
 //!     println!("Print friendly help about program's usage.");
 //!     std::process::exit(2);
 //! }
@@ -296,7 +296,7 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! if let Some(_) = parsed.options_first("verbose") {
+//! if parsed.option_exists("verbose") {
 //!     println!("Option 'verbose' was given.");
 //!
 //!     for v in &parsed.options_value_all("verbose") {
@@ -706,6 +706,14 @@ impl Args {
         vec
     }
 
+    /// Return boolean whether option with the given `id` exists.
+    ///
+    /// This is functionally the same as
+    /// [`options_first`](Args::options_first)`(id).is_some()`.
+    pub fn option_exists(&self, id: &str) -> bool {
+        self.options.iter().any(|opt| opt.id == id)
+    }
+
     /// Find all options with the given `id`.
     ///
     /// Find all options which have the identifier `id`. (Option
@@ -960,6 +968,10 @@ mod tests {
             .option("file", "f", OptValueType::Required)
             .option("file", "file", OptValueType::Required)
             .getopt(["-h", "--help", "-f123", "-f", "456", "foo", "bar"]);
+
+        assert_eq!(true, parsed.option_exists("help"));
+        assert_eq!(true, parsed.option_exists("file"));
+        assert_eq!(false, parsed.option_exists("x"));
 
         assert_eq!("h", parsed.options_first("help").unwrap().name);
         assert_eq!("help", parsed.options_last("help").unwrap().name);

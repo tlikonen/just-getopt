@@ -48,7 +48,7 @@ fn main() -> ExitCode {
     // option's identifier string "help" here to find if the correct
     // option was present in the command line. See the `id` argument of
     // `option()` methods above.
-    if let Some(_) = parsed.options_first("help") {
+    if parsed.option_exists("help") {
         println!("Print friendly help about program's usage.");
         return ExitCode::from(2);
     }
@@ -62,7 +62,7 @@ fn main() -> ExitCode {
     // Notice if "-v" or "--verbose" was given (even without a value).
     // Then collect all its (optional) values. We use option's
     // identifier (id) string "verbose".
-    if let Some(_) = parsed.options_first("verbose") {
+    if parsed.option_exists("verbose") {
         println!("Option 'verbose' was given.");
 
         for v in &parsed.options_value_all("verbose") {
