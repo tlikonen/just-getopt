@@ -724,13 +724,7 @@ impl Args {
     /// the original [`Args`] struct. Elements in the vector are in the
     /// same order as in the parsed command line.
     pub fn options_all(&self, id: &str) -> Vec<&Opt> {
-        let mut vec = Vec::new();
-        for opt in &self.options {
-            if opt.id == id {
-                vec.push(opt);
-            }
-        }
-        vec
+        self.options.iter().filter(|opt| opt.id == id).collect()
     }
 
     /// Find the first option with the given `id`.
