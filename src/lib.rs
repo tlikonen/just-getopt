@@ -698,13 +698,10 @@ impl Args {
     /// is a reference to an [`Opt`] struct in the original
     /// [`Args::options`] field contents.
     pub fn required_value_missing(&self) -> Vec<&Opt> {
-        let mut vec = Vec::new();
-        for opt in &self.options {
-            if opt.value_required && opt.value.is_none() {
-                vec.push(opt);
-            }
-        }
-        vec
+        self.options
+            .iter()
+            .filter(|opt| opt.value_required && opt.value.is_none())
+            .collect()
     }
 
     /// Return boolean whether option with the given `id` exists.
