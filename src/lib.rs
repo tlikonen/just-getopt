@@ -764,14 +764,16 @@ impl Args {
     /// strings in the original [`Args`] struct. The returned vector is
     /// empty if there were no matches.
     pub fn options_value_all(&self, id: &str) -> Vec<&String> {
-        let mut vec = Vec::new();
-        let opt_vec = self.options_all(id);
-        for opt in opt_vec {
-            if let Some(s) = &opt.value {
-                vec.push(s);
-            }
-        }
-        vec
+        self.options
+            .iter()
+            .filter_map(|opt| {
+                if opt.id == id {
+                    opt.value.as_ref()
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 
     /// Find the first option with a value for given option `id`.
