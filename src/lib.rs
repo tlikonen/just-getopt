@@ -9,8 +9,8 @@
 //! Linux-based operating systems.
 //!
 //! The name is `just_getopt` because this is *just a getopt parser* and
-//! (almost) nothing more. The intent is to provide just the parsed
-//! output and methods for examining the output. There will not be
+//! (almost) nothing more. The intent is to provide the parsed output
+//! and basic methods for examining the output. There will not be
 //! anything for interpreting the output or for printing messages to
 //! program's user. The responsibility of interpretation is left to your
 //! program.

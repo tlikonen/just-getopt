@@ -13,8 +13,8 @@ specifically the parser is like `getopt`’s GNU extension called
 Linux-based operating systems.
 
 The name is *Just Getopt* because this is *just a getopt parser* and
-(almost) nothing more. The intent is to provide just the parsed output
-and methods for examining the output. There will not be anything for
+(almost) nothing more. The intent is to provide the parsed output and
+basic methods for examining the output. There will not be anything for
 interpreting the output or for printing messages to program’s user. The
 responsibility of interpretation is left to your program.
 
@@ -30,12 +30,12 @@ value. Values are given after the option.
 [Rust]: https://www.rust-lang.org/
 
 
-Usage and Documentation
------------------------
+Availability
+------------
 
 The crate is available at [Github][] and [crates.io][] and it can added
-to a Rust project with command `cargo add just-getopt`. Github site has
-some information about [releases][] and [issues][].
+to a Rust project with command `cargo add just-getopt`. The Github site
+has information about [releases][] and [issues][].
 
 Documentation is available at [docs.rs][]. From the source code
 directory the documentation can be built and shown in a web browser with
