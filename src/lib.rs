@@ -694,9 +694,12 @@ impl Args {
     /// `""` is not classified as missing value because it can be valid
     /// user input in many situations.
     ///
-    /// This method returns a vector (possibly empty) and each element
-    /// is a reference to an [`Opt`] struct in the original
-    /// [`Args::options`] field contents.
+    /// The return value implements the [`Iterator`] trait (possibly
+    /// empty, if no matches) and each item is a reference to [`Opt`]
+    /// struct in the original [`Args::options`] field. Items are in the
+    /// same order as in the parsed command line. You can collect the
+    /// iterator to a vector by applying method
+    /// [`collect`](core::iter::Iterator::collect)`::<Vec<&Opt>>()`.
     pub fn required_value_missing(&self) -> impl Iterator<Item = &Opt> {
         self.options
             .iter()
@@ -715,10 +718,14 @@ impl Args {
     ///
     /// Find all options which have the identifier `id`. (Option
     /// identifiers have been defined in [`OptSpecs`] struct before
-    /// parsing.) The return value is a vector (possibly empty, if no
-    /// matches) and each element is a reference to [`Opt`] struct in
-    /// the original [`Args`] struct. Elements in the vector are in the
-    /// same order as in the parsed command line.
+    /// parsing.)
+    ///
+    /// The return value implements the [`Iterator`] trait (possibly
+    /// empty, if no matches) and each item is a reference to [`Opt`]
+    /// struct in the original [`Args::options`] field. Items are in the
+    /// same order as in the parsed command line. You can collect the
+    /// iterator to a vector by applying method
+    /// [`collect`](core::iter::Iterator::collect)`::<Vec<&Opt>>()`.
     pub fn options_all<'a>(&'a self, id: &'a str) -> impl Iterator<Item = &'a Opt> {
         self.options.iter().filter(move |opt| opt.id == id)
     }
@@ -750,15 +757,18 @@ impl Args {
         self.options.iter().rev().find(|opt| opt.id == id)
     }
 
-    /// Find and return all values for options with the given `id`.
+    /// Find all values for options with the given `id`.
     ///
     /// Find all options which match the identifier `id` and which also
     /// have a value assigned. (Options' identifiers have been defined
-    /// in [`OptSpecs`] struct before parsing.) Collect options' values
-    /// into a new vector in the same order as they were given in the
-    /// command line. Vector's elements are references to the value
-    /// strings in the original [`Args`] struct. The returned vector is
-    /// empty if there were no matches.
+    /// in [`OptSpecs`] struct before parsing.)
+    ///
+    /// The return value implements the [`Iterator`] trait (possibly
+    /// empty, if no matches) and each item is a reference to string in
+    /// [`Opt::value`] field in the original [`Args::options`] field.
+    /// Items are in the same order as in the parsed command line. You
+    /// can collect the iterator to a vector by applying method
+    /// [`collect`](core::iter::Iterator::collect)`::<Vec<&String>>()`.
     pub fn options_value_all<'a>(&'a self, id: &'a str) -> impl Iterator<Item = &'a String> {
         self.options.iter().filter_map(move |opt| {
             if opt.id == id {
