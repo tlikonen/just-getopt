@@ -39,7 +39,7 @@ fn main() -> ExitCode {
 
     // Report user about missing values for options that require them
     // (i.e. "file"). Exit the program with error code.
-    for o in &parsed.required_value_missing() {
+    for o in parsed.required_value_missing() {
         eprintln!("Value is required for option '{}'.", o.name);
         return ExitCode::FAILURE;
     }
@@ -55,7 +55,7 @@ fn main() -> ExitCode {
 
     // Collect all (required) values for "-f" and "--file". We use
     // option's identifier (id) string "file" to find the option.
-    for f in &parsed.options_value_all("file") {
+    for f in parsed.options_value_all("file") {
         println!("File name: {:?}", f);
     }
 
@@ -65,7 +65,7 @@ fn main() -> ExitCode {
     if parsed.option_exists("verbose") {
         println!("Option 'verbose' was given.");
 
-        for v in &parsed.options_value_all("verbose") {
+        for v in parsed.options_value_all("verbose") {
             println!("Verbose level: {:?}", v);
         }
     }

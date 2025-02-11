@@ -246,7 +246,7 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! for o in &parsed.required_value_missing() {
+//! for o in parsed.required_value_missing() {
 //!     eprintln!("Value is required for option '{}'.", o.name);
 //!     std::process::exit(1);
 //! }
@@ -284,7 +284,7 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! for f in &parsed.options_value_all("file") {
+//! for f in parsed.options_value_all("file") {
 //!     println!("File name: {:?}", f);
 //! }
 //! ```
@@ -299,7 +299,7 @@
 //! if parsed.option_exists("verbose") {
 //!     println!("Option 'verbose' was given.");
 //!
-//!     for v in &parsed.options_value_all("verbose") {
+//!     for v in parsed.options_value_all("verbose") {
 //!         println!("Verbose level: {:?}", v);
 //!     }
 //! }
@@ -697,11 +697,10 @@ impl Args {
     /// This method returns a vector (possibly empty) and each element
     /// is a reference to an [`Opt`] struct in the original
     /// [`Args::options`] field contents.
-    pub fn required_value_missing(&self) -> Vec<&Opt> {
+    pub fn required_value_missing(&self) -> impl Iterator<Item = &Opt> {
         self.options
             .iter()
             .filter(|opt| opt.value_required && opt.value.is_none())
-            .collect()
     }
 
     /// Return boolean whether option with the given `id` exists.
@@ -720,8 +719,8 @@ impl Args {
     /// matches) and each element is a reference to [`Opt`] struct in
     /// the original [`Args`] struct. Elements in the vector are in the
     /// same order as in the parsed command line.
-    pub fn options_all(&self, id: &str) -> Vec<&Opt> {
-        self.options.iter().filter(|opt| opt.id == id).collect()
+    pub fn options_all<'a>(&'a self, id: &'a str) -> impl Iterator<Item = &'a Opt> {
+        self.options.iter().filter(move |opt| opt.id == id)
     }
 
     /// Find the first option with the given `id`.
@@ -760,17 +759,14 @@ impl Args {
     /// command line. Vector's elements are references to the value
     /// strings in the original [`Args`] struct. The returned vector is
     /// empty if there were no matches.
-    pub fn options_value_all(&self, id: &str) -> Vec<&String> {
-        self.options
-            .iter()
-            .filter_map(|opt| {
-                if opt.id == id {
-                    opt.value.as_ref()
-                } else {
-                    None
-                }
-            })
-            .collect()
+    pub fn options_value_all<'a>(&'a self, id: &'a str) -> impl Iterator<Item = &'a String> {
+        self.options.iter().filter_map(move |opt| {
+            if opt.id == id {
+                opt.value.as_ref()
+            } else {
+                None
+            }
+        })
     }
 
     /// Find the first option with a value for given option `id`.
@@ -1089,7 +1085,7 @@ mod tests {
             .option("aaa", "eee", OptValueType::None)
             .getopt(["--bbb", "-cd", "--eee"]);
 
-        let m = parsed.options_all("aaa");
+        let m: Vec<&Opt> = parsed.options_all("aaa").collect();
         assert_eq!("bbb", m[0].name);
         assert_eq!("c", m[1].name);
         assert_eq!("d", m[2].name);
@@ -1193,8 +1189,8 @@ mod tests {
             .option("debug", "d", OptValueType::Required)
             .getopt(["-f123", "-d", "", "-f", "456", "-f"]);
 
-        let f = parsed.options_value_all("file");
-        let d = parsed.options_value_all("debug");
+        let f: Vec<&String> = parsed.options_value_all("file").collect();
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
 
         assert_eq!(2, f.len());
         assert_eq!("123", f[0]);
@@ -1204,7 +1200,7 @@ mod tests {
         assert_eq!("", d[0]);
 
         assert_eq!(None, parsed.options_last("file").unwrap().value);
-        let m = parsed.required_value_missing();
+        let m: Vec<&Opt> = parsed.required_value_missing().collect();
         assert_eq!(1, m.len());
         assert_eq!("f", m[0].name);
     }
@@ -1216,8 +1212,8 @@ mod tests {
             .option("debug", "debug", OptValueType::Required)
             .getopt(["--file=123", "--debug", "", "--file", "456", "--file"]);
 
-        let f = parsed.options_value_all("file");
-        let d = parsed.options_value_all("debug");
+        let f: Vec<&String> = parsed.options_value_all("file").collect();
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
 
         assert_eq!(2, f.len());
         assert_eq!("123", f[0]);
@@ -1227,7 +1223,7 @@ mod tests {
         assert_eq!("", d[0]);
 
         assert_eq!(None, parsed.options_last("file").unwrap().value);
-        let m = parsed.required_value_missing();
+        let m: Vec<&Opt> = parsed.required_value_missing().collect();
         assert_eq!(1, m.len());
         assert_eq!("file", m[0].name);
     }
@@ -1249,10 +1245,10 @@ mod tests {
                 "-d",
             ]);
 
-        let d = parsed.options_all("debug");
+        let d: Vec<&Opt> = parsed.options_all("debug").collect();
         assert_eq!(7, d.len());
 
-        let d = parsed.options_value_all("debug");
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
         assert_eq!(3, d.len());
         assert_eq!("123", d[0]);
         assert_eq!("", d[1]);
@@ -1298,7 +1294,7 @@ mod tests {
         assert_eq!(1, parsed.other.len());
         assert_eq!("--", parsed.other[0]);
 
-        assert_eq!(0, parsed.required_value_missing().len());
+        assert_eq!(0, parsed.required_value_missing().count());
     }
 
     #[test]
@@ -1329,8 +1325,8 @@ mod tests {
             .option("€uro", "€uro", OptValueType::Required)
             .getopt(["--äiti=ööö", "--€uro", "€€€", "--äiti", "ää", "--äiti"]);
 
-        let a = parsed.options_value_all("äiti");
-        let e = parsed.options_value_all("€uro");
+        let a: Vec<&String> = parsed.options_value_all("äiti").collect();
+        let e: Vec<&String> = parsed.options_value_all("€uro").collect();
 
         assert_eq!(2, a.len());
         assert_eq!("ööö", a[0]);
@@ -1345,7 +1341,7 @@ mod tests {
 
         assert_eq!(None, parsed.options_last("äiti").unwrap().value);
 
-        let m = parsed.required_value_missing();
+        let m: Vec<&Opt> = parsed.required_value_missing().collect();
         assert_eq!(1, m.len());
         assert_eq!("äiti", m[0].name);
         assert_eq!(None, m[0].value);
@@ -1405,7 +1401,7 @@ mod tests {
         assert_eq!(3, parsed.options.len());
         assert_eq!(
             vec!["one", "two", "three"],
-            parsed.options_value_all("file")
+            parsed.options_value_all("file").collect::<Vec<&String>>()
         );
 
         assert_eq!(1, parsed.other.len());
@@ -1425,7 +1421,7 @@ mod tests {
 
         assert_eq!(
             vec!["one", "two", "three"],
-            parsed.options_value_all("file")
+            parsed.options_value_all("file").collect::<Vec<&String>>()
         );
         assert_eq!(1, parsed.unknown.len());
         assert_eq!("unknown", parsed.unknown[0]);
