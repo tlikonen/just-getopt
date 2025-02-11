@@ -34,7 +34,8 @@ Usage and Documentation
 -----------------------
 
 The crate is available at [Github][] and [crates.io][] and it can added
-to a Rust project with command `cargo add just-getopt`.
+to a Rust project with command `cargo add just-getopt`. Github site has
+some information about [releases][] and [issues][].
 
 Documentation is available at [docs.rs][]. From the source code
 directory the documentation can be built and shown in a web browser with
@@ -46,6 +47,8 @@ programming examples.
 
 [Github]:    https://github.com/tlikonen/just-getopt
 [crates.io]: https://crates.io/crates/just-getopt
+[releases]:  https://github.com/tlikonen/just-getopt/releases
+[issues]:    https://github.com/tlikonen/just-getopt/issues
 [docs.rs]:   https://docs.rs/just-getopt/
 
 
