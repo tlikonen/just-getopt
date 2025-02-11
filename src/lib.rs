@@ -736,8 +736,8 @@ impl Args {
     ///   - `None`: No options found with the given `id`.
     ///
     ///   - `Some(&Opt)`: An option was found with the given `id` and a
-    ///     reference to its [`Opt`] struct in the original [`Args`]
-    ///     struct is provided.
+    ///     reference is provided to its [`Opt`] struct in the original
+    ///     [`Args::options`] field.
     pub fn options_first(&self, id: &str) -> Option<&Opt> {
         self.options.iter().find(|opt| opt.id == id)
     }
@@ -785,8 +785,9 @@ impl Args {
     ///     but they don't have a value.
     ///
     ///   - `Some(&String)`: An option was found with the given `id` and
-    ///     the option has a value assigned. A reference to the string
-    ///     value in the original [`Args`] struct is provided.
+    ///     the option has a value assigned. A reference is provided to
+    ///     the string value in the [`Opt::value`] field in the original
+    ///     [`Args::options`] field.
     pub fn options_value_first(&self, id: &str) -> Option<&String> {
         match self
             .options
