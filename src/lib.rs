@@ -694,13 +694,13 @@ impl Args {
     /// `""` is not classified as missing value because it can be valid
     /// user input in many situations.
     ///
-    /// The return value implements the [`Iterator`] trait (possibly
-    /// empty, if no matches) and each item is a reference to [`Opt`]
-    /// struct in the original [`Args::options`] field. Items are in the
-    /// same order as in the parsed command line. You can collect the
-    /// iterator to a vector by applying method
+    /// The return value implements the [`DoubleEndedIterator`] trait
+    /// (possibly empty, if no matches) and each item is a reference to
+    /// [`Opt`] struct in the original [`Args::options`] field. Items
+    /// are in the same order as in the parsed command line. You can
+    /// collect the iterator to a vector by applying method
     /// [`collect`](core::iter::Iterator::collect)`::<Vec<&Opt>>()`.
-    pub fn required_value_missing(&self) -> impl Iterator<Item = &Opt> {
+    pub fn required_value_missing(&self) -> impl DoubleEndedIterator<Item = &Opt> {
         self.options
             .iter()
             .filter(|opt| opt.value_required && opt.value.is_none())
@@ -720,13 +720,13 @@ impl Args {
     /// identifiers have been defined in [`OptSpecs`] struct before
     /// parsing.)
     ///
-    /// The return value implements the [`Iterator`] trait (possibly
-    /// empty, if no matches) and each item is a reference to [`Opt`]
-    /// struct in the original [`Args::options`] field. Items are in the
-    /// same order as in the parsed command line. You can collect the
-    /// iterator to a vector by applying method
+    /// The return value implements the [`DoubleEndedIterator`] trait
+    /// (possibly empty, if no matches) and each item is a reference to
+    /// [`Opt`] struct in the original [`Args::options`] field. Items
+    /// are in the same order as in the parsed command line. You can
+    /// collect the iterator to a vector by applying method
     /// [`collect`](core::iter::Iterator::collect)`::<Vec<&Opt>>()`.
-    pub fn options_all<'a>(&'a self, id: &'a str) -> impl Iterator<Item = &'a Opt> {
+    pub fn options_all<'a>(&'a self, id: &'a str) -> impl DoubleEndedIterator<Item = &'a Opt> {
         self.options.iter().filter(move |opt| opt.id == id)
     }
 
@@ -763,13 +763,17 @@ impl Args {
     /// have a value assigned. (Options' identifiers have been defined
     /// in [`OptSpecs`] struct before parsing.)
     ///
-    /// The return value implements the [`Iterator`] trait (possibly
-    /// empty, if no matches) and each item is a reference to string in
-    /// [`Opt::value`] field in the original [`Args::options`] field.
-    /// Items are in the same order as in the parsed command line. You
-    /// can collect the iterator to a vector by applying method
+    /// The return value implements the [`DoubleEndedIterator`] trait
+    /// (possibly empty, if no matches) and each item is a reference to
+    /// string in [`Opt::value`] field in the original [`Args::options`]
+    /// field. Items are in the same order as in the parsed command
+    /// line. You can collect the iterator to a vector by applying
+    /// method
     /// [`collect`](core::iter::Iterator::collect)`::<Vec<&String>>()`.
-    pub fn options_value_all<'a>(&'a self, id: &'a str) -> impl Iterator<Item = &'a String> {
+    pub fn options_value_all<'a>(
+        &'a self,
+        id: &'a str,
+    ) -> impl DoubleEndedIterator<Item = &'a String> {
         self.options.iter().filter_map(move |opt| {
             if opt.id == id {
                 opt.value.as_ref()
