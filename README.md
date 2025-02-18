@@ -35,10 +35,7 @@ Availability
 
 The crate is available at [Github][] and [crates.io][] and it can added
 to a Rust project with command `cargo add just-getopt`. The Github site
-has information about [releases][] and [issues][]. See possible
-[backward-incompatible
-changes](https://github.com/tlikonen/just-getopt/milestone/1) for the
-future 2.0.0 release.
+has information about [releases][] and [issues][].
 
 Documentation is available at [docs.rs][]. From the source code
 directory the documentation can be built and shown in a web browser with
@@ -53,6 +50,20 @@ programming examples.
 [releases]:  https://github.com/tlikonen/just-getopt/releases
 [issues]:    https://github.com/tlikonen/just-getopt/issues
 [docs.rs]:   https://docs.rs/just-getopt/
+
+
+Plans
+-----
+
+Possible [backward-incompatible changes][2.0.0] for the future 2.0.0
+release.
+
+  - Some methods of `Args` struct will return an iterator, instead of
+    vector.
+  - Enum `OptValueType` could be renamed to `OptValue`.
+
+
+[2.0.0]: https://github.com/tlikonen/just-getopt/milestone/1
 
 
 License
