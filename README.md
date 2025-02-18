@@ -35,7 +35,10 @@ Availability
 
 The crate is available at [Github][] and [crates.io][] and it can added
 to a Rust project with command `cargo add just-getopt`. The Github site
-has information about [releases][] and [issues][].
+has information about [releases][] and [issues][]. See possible
+[backward-incompatible
+changes](https://github.com/tlikonen/just-getopt/milestone/1) for the
+future 2.0.0 release.
 
 Documentation is available at [docs.rs][]. From the source code
 directory the documentation can be built and shown in a web browser with
