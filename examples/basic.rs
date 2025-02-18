@@ -23,9 +23,10 @@ fn main() -> ExitCode {
         .option("verbose", "v", OptValueType::Optional)
         .option("verbose", "verbose", OptValueType::Optional);
 
+    // Get arguments iterator from operating system and skip the first item
+    let args = std::env::args().skip(1); // which is this program's file path.
+
     // Parse program's command-line with the given specification `specs`.
-    let mut args = std::env::args(); // Get arguments iterator from operating system.
-    args.next(); // Consume the first item which is this program's name.
     let parsed = specs.getopt(args);
 
     // With this you can see the parsed output which is an `Args`

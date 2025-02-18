@@ -13,8 +13,8 @@ specifically the parser is like `getopt`’s GNU extension called
 Linux-based operating systems.
 
 The name is *Just Getopt* because this is *just a getopt parser* and
-(almost) nothing more. The intent is to provide just the parsed output
-and methods for examining the output. There will not be anything for
+(almost) nothing more. The intent is to provide the parsed output and
+basic methods for examining the output. There will not be anything for
 interpreting the output or for printing messages to program’s user. The
 responsibility of interpretation is left to your program.
 
@@ -30,12 +30,12 @@ value. Values are given after the option.
 [Rust]: https://www.rust-lang.org/
 
 
-Usage and Documentation
------------------------
+Availability
+------------
 
 The crate is available at [Github][] and [crates.io][] and it can added
-to a Rust project with command `cargo add just-getopt`. Github site has
-some information about [releases][] and [issues][].
+to a Rust project with command `cargo add just-getopt`. The Github site
+has information about [releases][] and [issues][].
 
 Documentation is available at [docs.rs][]. From the source code
 directory the documentation can be built and shown in a web browser with
@@ -50,6 +50,22 @@ programming examples.
 [releases]:  https://github.com/tlikonen/just-getopt/releases
 [issues]:    https://github.com/tlikonen/just-getopt/issues
 [docs.rs]:   https://docs.rs/just-getopt/
+
+
+Incompatible Changes in 2.0
+---------------------------
+
+Version 2.0.0 introduced some incompatible changes. When updating the
+crate from 1.x versions the following changes needs to be addressed.
+
+  - Some methods of `Args` struct no longer return a vector. They return
+    a type which implements the trait `DoubleEndedIterator`. The methods
+    are: `required_value_missing`, `options_all` and
+    `options_value_all`.
+  - Enum `OptValueType` is renamed to `OptValue`.
+
+
+[2.0.0]: https://github.com/tlikonen/just-getopt/milestone/1
 
 
 License

@@ -9,8 +9,8 @@
 //! Linux-based operating systems.
 //!
 //! The name is `just_getopt` because this is *just a getopt parser* and
-//! (almost) nothing more. The intent is to provide just the parsed
-//! output and methods for examining the output. There will not be
+//! (almost) nothing more. The intent is to provide the parsed output
+//! and basic methods for examining the output. There will not be
 //! anything for interpreting the output or for printing messages to
 //! program's user. The responsibility of interpretation is left to your
 //! program.
@@ -148,8 +148,8 @@
 //! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
 //! # let specs = OptSpecs::new();
-//! let mut args = std::env::args(); // Get arguments iterator from operating system.
-//! args.next(); // Consume the first item which is this program's file path.
+//! // Get arguments iterator from operating system and skip the first item
+//! let args = std::env::args().skip(1); // which is this program's file path.
 //! let parsed = specs.getopt(args); // Getopt! Use the "specs" variable defined above.
 //! ```
 //!
