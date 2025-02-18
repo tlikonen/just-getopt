@@ -88,7 +88,7 @@
 //! First we bring some important paths into the scope of our program.
 //!
 //! ```
-//! use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! ```
 //!
 //! Then we define which command-line options are valid for the program.
@@ -97,14 +97,14 @@
 //! [`option`](OptSpecs::option) and [`flag`](OptSpecs::flag) methods.
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! let specs = OptSpecs::new()
-//!     .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
-//!     .option("help", "help", OptValueType::None)
-//!     .option("file", "f", OptValueType::Required)
-//!     .option("file", "file", OptValueType::Required)
-//!     .option("verbose", "v", OptValueType::Optional)
-//!     .option("verbose", "verbose", OptValueType::Optional)
+//!     .option("help", "h", OptValue::None) // Arguments: (id, name, value_type)
+//!     .option("help", "help", OptValue::None)
+//!     .option("file", "f", OptValue::Required)
+//!     .option("file", "file", OptValue::Required)
+//!     .option("verbose", "v", OptValue::Optional)
+//!     .option("verbose", "verbose", OptValue::Optional)
 //!     .flag(OptFlags::OptionsEverywhere);
 //! ```
 //!
@@ -123,7 +123,7 @@
 //!
 //!  3. `value_type`: Whether or not this option accepts a value and is
 //!     the value optional or required. The argument is a variant of
-//!     enum [`OptValueType`].
+//!     enum [`OptValue`].
 //!
 //! The [`flag`](OptSpecs::flag) method above adds a configuration flag
 //! for the command-line parser. It is a variant of enum [`OptFlags`].
@@ -146,7 +146,7 @@
 //! [`std::env::args`] function which returns an iterator.
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! // Get arguments iterator from operating system and skip the first item
 //! let args = std::env::args().skip(1); // which is this program's file path.
@@ -159,7 +159,7 @@
 //! this:
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! ```
@@ -177,7 +177,7 @@
 //! found valid command-line options. Let's print it:
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! eprintln!("{:#?}", parsed);
@@ -228,7 +228,7 @@
 //! enough. No need to panic.
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! for u in &parsed.unknown {
@@ -243,7 +243,7 @@
 //! good reason to exit the program.
 //!
 //! ```no_run
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! for o in parsed.required_value_missing() {
@@ -259,7 +259,7 @@
 //! detect that option.
 //!
 //! ```no_run
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! if parsed.option_exists("help") {
@@ -281,7 +281,7 @@
 //! value. We could collect all those values next.
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! for f in parsed.options_value_all("file") {
@@ -293,7 +293,7 @@
 //! collect all (optional) values for the option.
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! if parsed.option_exists("verbose") {
@@ -309,7 +309,7 @@
 //! is, non-option arguments.
 //!
 //! ```
-//! # use just_getopt::{OptFlags, OptSpecs, OptValueType};
+//! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! for o in &parsed.other {
@@ -356,7 +356,7 @@ const COUNTER_LIMIT: u32 = u32::MAX;
 struct OptSpec {
     id: String,
     name: String,
-    value_type: OptValueType,
+    value_type: OptValue,
 }
 
 /// Option's value type.
@@ -364,7 +364,7 @@ struct OptSpec {
 /// See [`OptSpecs::option`] method for more information.
 
 #[derive(Debug, PartialEq)]
-pub enum OptValueType {
+pub enum OptValue {
     /// Option does not accept a value.
     None,
     /// Option accepts an optional value.
@@ -443,14 +443,14 @@ impl OptSpecs {
     ///     option name can't be `-` and long option names can't have
     ///     any `=` characters nor `-` as their first character.
     ///
-    ///  3. `value_type`: A variant of enum [`OptValueType`] which
-    ///     defines if this option accepts a value. If not, use
-    ///     [`OptValueType::None`] as method's argument. If an optional
-    ///     value is accepted, use [`OptValueType::Optional`]. If the
-    ///     option requires a value, use [`OptValueType::Required`].
+    ///  3. `value_type`: A variant of enum [`OptValue`] which defines
+    ///     if this option accepts a value. If not, use
+    ///     [`OptValue::None`] as method's argument. If an optional
+    ///     value is accepted, use [`OptValue::Optional`]. If the option
+    ///     requires a value, use [`OptValue::Required`].
     ///
     /// The return value is the same struct instance which was modified.
-    pub fn option(mut self, id: &str, name: &str, value_type: OptValueType) -> Self {
+    pub fn option(mut self, id: &str, name: &str, value_type: OptValue) -> Self {
         assert!(
             id.chars().count() > 0,
             "Option's \"id\" must be at least 1 character long."
@@ -668,7 +668,7 @@ pub struct Args {
     /// no unknown options.
     ///
     /// If a long option does not accept a value (that is, its value
-    /// type is [`OptValueType::None`]) but user gives it a value with
+    /// type is [`OptValue::None`]) but user gives it a value with
     /// equal sign notation (`--foo=`), that option is classified as
     /// unknown and it will be in this field's vector with name `foo=`.
     pub unknown: Vec<String>,
@@ -864,7 +864,7 @@ pub struct Opt {
     /// The option requires a value.
     ///
     /// `true` means that the option was defined with value type
-    /// [`OptValueType::Required`]. See [`OptSpecs::flag`] method for
+    /// [`OptValue::Required`]. See [`OptSpecs::flag`] method for
     /// more information. This field does not guarantee that there
     /// actually was a value for the option in the command line.
     pub value_required: bool,
@@ -886,11 +886,11 @@ mod tests {
         let mut spec;
         let mut expect;
 
-        spec = OptSpecs::new().option("help", "help", OptValueType::None);
+        spec = OptSpecs::new().option("help", "help", OptValue::None);
         expect = OptSpec {
             id: String::from("help"),
             name: String::from("help"),
-            value_type: OptValueType::None,
+            value_type: OptValue::None,
         };
         assert_eq!(1, spec.options.len());
         assert_eq!(&expect, &spec.options[0]);
@@ -898,20 +898,20 @@ mod tests {
         assert_eq!(COUNTER_LIMIT, spec.other_limit);
         assert_eq!(COUNTER_LIMIT, spec.unknown_limit);
 
-        spec = spec.option("file", "f", OptValueType::Optional);
+        spec = spec.option("file", "f", OptValue::Optional);
         expect = OptSpec {
             id: String::from("file"),
             name: String::from("f"),
-            value_type: OptValueType::Optional,
+            value_type: OptValue::Optional,
         };
         assert_eq!(2, spec.options.len());
         assert_eq!(&expect, &spec.options[1]);
 
-        spec = spec.option("file", "file", OptValueType::Required);
+        spec = spec.option("file", "file", OptValue::Required);
         expect = OptSpec {
             id: String::from("file"),
             name: String::from("file"),
-            value_type: OptValueType::Required,
+            value_type: OptValue::Required,
         };
         assert_eq!(3, spec.options.len());
         assert_eq!(&expect, &spec.options[2]);
@@ -937,23 +937,22 @@ mod tests {
     #[test]
     #[should_panic]
     fn t_create_optspecs_02() {
-        let _spec = OptSpecs::new().option("", "h", OptValueType::None);
+        let _spec = OptSpecs::new().option("", "h", OptValue::None);
     }
 
     #[test]
     #[should_panic]
     fn t_create_optspecs_03() {
-        let _spec = OptSpecs::new().option("h", "h", OptValueType::None).option(
-            "h",
-            "h",
-            OptValueType::None,
-        );
+        let _spec =
+            OptSpecs::new()
+                .option("h", "h", OptValue::None)
+                .option("h", "h", OptValue::None);
     }
 
     #[test]
     #[should_panic]
     fn t_create_optspecs_04() {
-        let _spec = OptSpecs::new().option("h", "", OptValueType::None);
+        let _spec = OptSpecs::new().option("h", "", OptValue::None);
     }
 
     #[test]
@@ -968,10 +967,10 @@ mod tests {
     #[test]
     fn t_parsed_output_010() {
         let parsed = OptSpecs::new()
-            .option("help", "h", OptValueType::None)
-            .option("help", "help", OptValueType::None)
-            .option("file", "f", OptValueType::Required)
-            .option("file", "file", OptValueType::Required)
+            .option("help", "h", OptValue::None)
+            .option("help", "help", OptValue::None)
+            .option("file", "f", OptValue::Required)
+            .option("file", "file", OptValue::Required)
             .getopt(["-h", "--help", "-f123", "-f", "456", "foo", "bar"]);
 
         assert_eq!(true, parsed.option_exists("help"));
@@ -1005,7 +1004,7 @@ mod tests {
         let parsed = OptSpecs::new()
             .limit_options(1)
             .limit_other_args(2)
-            .option("help", "h", OptValueType::None)
+            .option("help", "h", OptValue::None)
             .getopt(["-h", "foo", "-h"]);
 
         assert_eq!("h", parsed.options_first("help").unwrap().name);
@@ -1018,10 +1017,10 @@ mod tests {
     fn t_parsed_output_030() {
         let parsed = OptSpecs::new()
             .flag(OptFlags::OptionsEverywhere)
-            .option("help", "h", OptValueType::None)
-            .option("help", "help", OptValueType::None)
-            .option("file", "f", OptValueType::Required)
-            .option("file", "file", OptValueType::Required)
+            .option("help", "h", OptValue::None)
+            .option("help", "help", OptValue::None)
+            .option("file", "f", OptValue::Required)
+            .option("file", "file", OptValue::Required)
             .getopt(["-h", "foo", "--help", "--file=123", "bar", "--file", "456"]);
 
         assert_eq!("h", parsed.options_first("help").unwrap().name);
@@ -1041,8 +1040,8 @@ mod tests {
     #[test]
     fn t_parsed_output_040() {
         let parsed = OptSpecs::new()
-            .option("debug", "d", OptValueType::Optional)
-            .option("verbose", "verbose", OptValueType::Optional)
+            .option("debug", "d", OptValue::Optional)
+            .option("verbose", "verbose", OptValue::Optional)
             .getopt(["-d1", "-d", "--verbose", "--verbose=123"]);
 
         assert_eq!(
@@ -1076,7 +1075,7 @@ mod tests {
     #[test]
     fn t_parsed_output_050() {
         let parsed = OptSpecs::new()
-            .option("debug", "d", OptValueType::Optional)
+            .option("debug", "d", OptValue::Optional)
             .getopt(["-abcd", "-adbc"]);
 
         assert_eq!(None, parsed.options_first("debug").unwrap().value);
@@ -1094,10 +1093,10 @@ mod tests {
     #[test]
     fn t_parsed_output_060() {
         let parsed = OptSpecs::new()
-            .option("aaa", "bbb", OptValueType::None)
-            .option("aaa", "c", OptValueType::None)
-            .option("aaa", "d", OptValueType::None)
-            .option("aaa", "eee", OptValueType::None)
+            .option("aaa", "bbb", OptValue::None)
+            .option("aaa", "c", OptValue::None)
+            .option("aaa", "d", OptValue::None)
+            .option("aaa", "eee", OptValue::None)
             .getopt(["--bbb", "-cd", "--eee"]);
 
         let m: Vec<&Opt> = parsed.options_all("aaa").collect();
@@ -1111,8 +1110,8 @@ mod tests {
     fn t_parsed_output_070() {
         let parsed = OptSpecs::new()
             .flag(OptFlags::PrefixMatchLongOptions)
-            .option("version", "version", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
+            .option("version", "version", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
             .getopt(["--ver", "--verb", "--versi", "--verbose"]);
 
         assert_eq!("ver", parsed.unknown[0]);
@@ -1126,8 +1125,8 @@ mod tests {
     fn t_parsed_output_080() {
         let parsed = OptSpecs::new()
             // .flag(OptFlags::PrefixMatchLongOptions) Must be commented!
-            .option("version", "version", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
+            .option("version", "version", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
             .getopt(["--version", "--ver", "--verb", "--versi", "--verbose"]);
 
         assert_eq!("ver", parsed.unknown[0]);
@@ -1141,8 +1140,8 @@ mod tests {
     fn t_parsed_output_090() {
         let parsed = OptSpecs::new()
             .flag(OptFlags::OptionsEverywhere)
-            .option("help", "h", OptValueType::None)
-            .option("file", "file", OptValueType::Required)
+            .option("help", "h", OptValue::None)
+            .option("file", "file", OptValue::Required)
             .getopt(["-h", "foo", "--file=123", "--", "bar", "--file", "456"]);
 
         assert_eq!("h", parsed.options_first("help").unwrap().name);
@@ -1162,7 +1161,7 @@ mod tests {
     #[test]
     fn t_parsed_output_100() {
         let parsed = OptSpecs::new()
-            .option("file", "file", OptValueType::Required)
+            .option("file", "file", OptValue::Required)
             .getopt(["--file=", "--file"]);
 
         assert_eq!(true, parsed.options_first("file").unwrap().value_required);
@@ -1176,8 +1175,8 @@ mod tests {
     #[test]
     fn t_parsed_output_110() {
         let parsed = OptSpecs::new()
-            .option("file", "f", OptValueType::Required)
-            .option("debug", "d", OptValueType::Required)
+            .option("file", "f", OptValue::Required)
+            .option("debug", "d", OptValue::Required)
             .getopt(["-fx", "-d", "", "-f"]);
 
         assert_eq!(true, parsed.options_first("file").unwrap().value_required);
@@ -1200,8 +1199,8 @@ mod tests {
     #[test]
     fn t_parsed_output_120() {
         let parsed = OptSpecs::new()
-            .option("file", "f", OptValueType::Required)
-            .option("debug", "d", OptValueType::Required)
+            .option("file", "f", OptValue::Required)
+            .option("debug", "d", OptValue::Required)
             .getopt(["-f123", "-d", "", "-f", "456", "-f"]);
 
         let f: Vec<&String> = parsed.options_value_all("file").collect();
@@ -1223,8 +1222,8 @@ mod tests {
     #[test]
     fn t_parsed_output_130() {
         let parsed = OptSpecs::new()
-            .option("file", "file", OptValueType::Required)
-            .option("debug", "debug", OptValueType::Required)
+            .option("file", "file", OptValue::Required)
+            .option("debug", "debug", OptValue::Required)
             .getopt(["--file=123", "--debug", "", "--file", "456", "--file"]);
 
         let f: Vec<&String> = parsed.options_value_all("file").collect();
@@ -1247,8 +1246,8 @@ mod tests {
     fn t_parsed_output_140() {
         let parsed = OptSpecs::new()
             .flag(OptFlags::OptionsEverywhere)
-            .option("debug", "d", OptValueType::Optional)
-            .option("debug", "debug", OptValueType::Optional)
+            .option("debug", "d", OptValue::Optional)
+            .option("debug", "debug", OptValue::Optional)
             .getopt([
                 "-d",
                 "-d123",
@@ -1299,7 +1298,7 @@ mod tests {
     #[test]
     fn t_parsed_output_160() {
         let parsed = OptSpecs::new()
-            .option("file", "file", OptValueType::Required)
+            .option("file", "file", OptValue::Required)
             .getopt(["--file", "--", "--", "--"]);
 
         assert_eq!(
@@ -1324,7 +1323,7 @@ mod tests {
     fn t_parsed_output_180() {
         let parsed = OptSpecs::new()
             .limit_unknown_options(3)
-            .option("bar", "bar", OptValueType::None)
+            .option("bar", "bar", OptValue::None)
             .getopt(["-aaa", "--foo", "--foo", "--bar=", "--bar=", "-x"]);
 
         assert_eq!(3, parsed.unknown.len());
@@ -1336,8 +1335,8 @@ mod tests {
     #[test]
     fn t_parsed_output_190() {
         let parsed = OptSpecs::new()
-            .option("äiti", "äiti", OptValueType::Required)
-            .option("€uro", "€uro", OptValueType::Required)
+            .option("äiti", "äiti", OptValue::Required)
+            .option("€uro", "€uro", OptValue::Required)
             .getopt(["--äiti=ööö", "--€uro", "€€€", "--äiti", "ää", "--äiti"]);
 
         let a: Vec<&String> = parsed.options_value_all("äiti").collect();
@@ -1392,9 +1391,9 @@ mod tests {
     #[test]
     fn t_parsed_output_220() {
         let parsed = OptSpecs::new()
-            .option("file", "f", OptValueType::Required)
-            .option("file", "file", OptValueType::Required)
-            .option("help", "help", OptValueType::None)
+            .option("file", "f", OptValue::Required)
+            .option("file", "file", OptValue::Required)
+            .option("help", "help", OptValue::None)
             .limit_options(3)
             .limit_other_args(1)
             .limit_unknown_options(3)
@@ -1429,8 +1428,8 @@ mod tests {
     #[test]
     fn t_parsed_output_230() {
         let parsed = OptSpecs::new()
-            .option("file", "f", OptValueType::Required)
-            .option("file", "file", OptValueType::Required)
+            .option("file", "f", OptValue::Required)
+            .option("file", "file", OptValue::Required)
             .limit_options(3)
             .getopt(["-f", "one", "-ftwo", "--file=three", "--unknown"]);
 
@@ -1445,7 +1444,7 @@ mod tests {
     #[test]
     fn t_parsed_output_240() {
         let parsed = OptSpecs::new()
-            .option("help", "h", OptValueType::None)
+            .option("help", "h", OptValue::None)
             .limit_options(3)
             .getopt(["-xhhhh"]);
 
@@ -1458,7 +1457,7 @@ mod tests {
     #[test]
     fn t_parsed_output_250() {
         let parsed = OptSpecs::new()
-            .option("help", "h", OptValueType::None)
+            .option("help", "h", OptValue::None)
             .limit_options(3)
             .getopt(["-x", "-h", "-h", "-h", "-h"]);
 
@@ -1471,7 +1470,7 @@ mod tests {
     #[test]
     fn t_parsed_output_260() {
         let parsed = OptSpecs::new()
-            .option("help", "h", OptValueType::None)
+            .option("help", "h", OptValue::None)
             .limit_options(3)
             .getopt(["-x", "-h", "-h", "--", "-h", "-h"]);
 
@@ -1487,8 +1486,8 @@ mod tests {
     fn t_parsed_output_270() {
         let parsed = OptSpecs::new()
             .flag(OptFlags::OptionsEverywhere)
-            .option("help", "h", OptValueType::None)
-            .option("file", "f", OptValueType::Required)
+            .option("help", "h", OptValue::None)
+            .option("file", "f", OptValue::Required)
             .limit_options(1)
             .limit_other_args(2)
             .limit_unknown_options(1)
@@ -1509,8 +1508,8 @@ mod tests {
     fn t_parsed_output_280() {
         let parsed = OptSpecs::new()
             .flag(OptFlags::OptionsEverywhere)
-            .option("help", "help", OptValueType::None)
-            .option("file", "file", OptValueType::Required)
+            .option("help", "help", OptValue::None)
+            .option("file", "file", OptValue::Required)
             .limit_options(1)
             .limit_other_args(2)
             .limit_unknown_options(1)

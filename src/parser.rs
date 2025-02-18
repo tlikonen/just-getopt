@@ -1,4 +1,4 @@
-use crate::{Args, Opt, OptFlags, OptSpecs, OptValueType};
+use crate::{Args, Opt, OptFlags, OptSpecs, OptValue};
 
 pub fn parse<I>(specs: &OptSpecs, mut iter: I) -> Args
 where
@@ -39,7 +39,7 @@ where
                     let value: Option<String>;
 
                     match spec.value_type {
-                        OptValueType::Required => {
+                        OptValue::Required => {
                             value_required = true;
                             value = if is_long_option_equal_sign(&arg) {
                                 Some(get_long_option_equal_value(&arg))
@@ -48,7 +48,7 @@ where
                             }
                         }
 
-                        OptValueType::Optional => {
+                        OptValue::Optional => {
                             value_required = false;
                             value = if is_long_option_equal_sign(&arg) {
                                 Some(get_long_option_equal_value(&arg))
@@ -57,7 +57,7 @@ where
                             }
                         }
 
-                        OptValueType::None => {
+                        OptValue::None => {
                             value_required = false;
                             value = None;
                             if is_long_option_equal_sign(&arg) {
@@ -107,7 +107,7 @@ where
                         let value: Option<String>;
 
                         match spec.value_type {
-                            OptValueType::Required => {
+                            OptValue::Required => {
                                 value_required = true;
                                 let mut chars = String::new();
                                 for c in char_iter.by_ref() {
@@ -119,7 +119,7 @@ where
                                 }
                             }
 
-                            OptValueType::Optional => {
+                            OptValue::Optional => {
                                 value_required = false;
                                 let mut chars = String::new();
                                 for c in char_iter.by_ref() {
@@ -131,7 +131,7 @@ where
                                 }
                             }
 
-                            OptValueType::None => {
+                            OptValue::None => {
                                 value_required = false;
                                 value = None;
                             }
@@ -438,11 +438,11 @@ mod tests {
     #[test]
     fn t_get_short_option_match() {
         let spec = OptSpecs::new()
-            .option("help", "help", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
-            .option("verbose", "v", OptValueType::None)
-            .option("€uro", "€", OptValueType::None)
-            .option("file", "f", OptValueType::None);
+            .option("help", "help", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
+            .option("verbose", "v", OptValue::None)
+            .option("€uro", "€", OptValue::None)
+            .option("file", "f", OptValue::None);
 
         {
             let m = &spec.get_short_option_match("v");
@@ -450,7 +450,7 @@ mod tests {
             let m = m.unwrap();
             assert_eq!("verbose", m.id);
             assert_eq!("v", m.name);
-            assert_eq!(OptValueType::None, m.value_type);
+            assert_eq!(OptValue::None, m.value_type);
         }
 
         {
@@ -459,7 +459,7 @@ mod tests {
             let m = m.unwrap();
             assert_eq!("file", m.id);
             assert_eq!("f", m.name);
-            assert_eq!(OptValueType::None, m.value_type);
+            assert_eq!(OptValue::None, m.value_type);
         }
 
         {
@@ -468,7 +468,7 @@ mod tests {
             let m = m.unwrap();
             assert_eq!("€uro", m.id);
             assert_eq!("€", m.name);
-            assert_eq!(OptValueType::None, m.value_type);
+            assert_eq!(OptValue::None, m.value_type);
         }
 
         {
@@ -480,11 +480,11 @@ mod tests {
     #[test]
     fn t_get_long_option_match() {
         let spec = OptSpecs::new()
-            .option("help", "help", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
-            .option("verbose", "v", OptValueType::None)
-            .option("€uro", "€uro", OptValueType::None)
-            .option("file", "f", OptValueType::None);
+            .option("help", "help", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
+            .option("verbose", "v", OptValue::None)
+            .option("€uro", "€uro", OptValue::None)
+            .option("file", "f", OptValue::None);
 
         {
             let m = &spec.get_long_option_match("verbose");
@@ -492,7 +492,7 @@ mod tests {
             let v = &m.unwrap();
             assert_eq!("verbose", v.id);
             assert_eq!("verbose", v.name);
-            assert_eq!(OptValueType::None, v.value_type);
+            assert_eq!(OptValue::None, v.value_type);
         }
 
         {
@@ -501,7 +501,7 @@ mod tests {
             let v = &m.unwrap();
             assert_eq!("help", v.id);
             assert_eq!("help", v.name);
-            assert_eq!(OptValueType::None, v.value_type);
+            assert_eq!(OptValue::None, v.value_type);
         }
 
         {
@@ -510,7 +510,7 @@ mod tests {
             let v = &m.unwrap();
             assert_eq!("€uro", v.id);
             assert_eq!("€uro", v.name);
-            assert_eq!(OptValueType::None, v.value_type);
+            assert_eq!(OptValue::None, v.value_type);
         }
 
         {
@@ -524,10 +524,10 @@ mod tests {
         use crate::OptSpec;
 
         let spec = OptSpecs::new()
-            .option("foo", "foo-option", OptValueType::None)
-            .option("bar", "foo-€ö-option", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
-            .option("version", "version", OptValueType::None);
+            .option("foo", "foo-option", OptValue::None)
+            .option("bar", "foo-€ö-option", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
+            .option("version", "version", OptValue::None);
 
         assert_eq!(true, spec.get_long_option_prefix_match("ver").is_none());
         assert_eq!(true, spec.get_long_option_prefix_match("foo-").is_none());

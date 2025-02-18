@@ -1,4 +1,4 @@
-use just_getopt::{OptFlags, OptSpecs, OptValueType};
+use just_getopt::{OptFlags, OptSpecs, OptValue};
 use std::process::ExitCode;
 
 fn main() -> ExitCode {
@@ -16,12 +16,12 @@ fn main() -> ExitCode {
     // the command-line is parsed as non-options.
     let specs = OptSpecs::new()
         .flag(OptFlags::OptionsEverywhere) // Argument: (flag)
-        .option("help", "h", OptValueType::None) // Arguments: (id, name, value_type)
-        .option("help", "help", OptValueType::None)
-        .option("file", "f", OptValueType::Required)
-        .option("file", "file", OptValueType::Required)
-        .option("verbose", "v", OptValueType::Optional)
-        .option("verbose", "verbose", OptValueType::Optional);
+        .option("help", "h", OptValue::None) // Arguments: (id, name, value_type)
+        .option("help", "help", OptValue::None)
+        .option("file", "f", OptValue::Required)
+        .option("file", "file", OptValue::Required)
+        .option("verbose", "v", OptValue::Optional)
+        .option("verbose", "verbose", OptValue::Optional);
 
     // Get arguments iterator from operating system and skip the first item
     let args = std::env::args().skip(1); // which is this program's file path.
