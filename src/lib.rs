@@ -72,7 +72,7 @@
 //!
 //! If option accepts an optional value the value must always be entered
 //! directly after the option name and `=` character (`--foo=VALUE`).
-//! Otherwise (like in `--foo`) there is no value for this option.
+//! Otherwise there is no value for this option.
 //!
 //! Option `--foo=` is valid format when the option requires a value or
 //! accepts an optional value. It means that the value is empty string.
@@ -108,12 +108,14 @@
 //!     .flag(OptFlags::OptionsEverywhere);
 //! ```
 //!
-//! The [`option`](OptSpecs::option) methods above add a single option
+//! Each [`option`](OptSpecs::option) method above adds a single option
 //! information to the option specification. Method's arguments are:
 //!
 //!  1. `id`: Programmer's identifier string for the option. The same
 //!     identifier is used later to check if this particular option was
-//!     present in the command line.
+//!     present in the command line. Several options may have the same
+//!     `id`. This makes sense when short option and long option have
+//!     the same meaning, like `-h` and `--help` for printing help.
 //!
 //!  2. `name`: Option's name string in the command line, without
 //!     prefix. A single-character name (like `h`) defines a short
@@ -121,8 +123,8 @@
 //!     name defines a long option which is entered like `--help` in the
 //!     command line.
 //!
-//!  3. `value_type`: Whether or not this option accepts a value and is
-//!     the value optional or required. The argument is a variant of
+//!  3. `value_type`: Whether or not this option accepts a value and if
+//!     the value is optional or required. The argument is a variant of
 //!     enum [`OptValueType`].
 //!
 //! The [`flag`](OptSpecs::flag) method above adds a configuration flag
