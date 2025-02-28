@@ -56,7 +56,7 @@ Incompatible Changes in 2.0
 ---------------------------
 
 Version 2.0.0 introduced some incompatible changes. When updating the
-crate from 1.x versions the following changes needs to be addressed.
+crate from 1.x versions the following changes must be addressed.
 
   - Some methods of `Args` struct no longer return a vector. They return
     a type which implements the trait `DoubleEndedIterator`. The methods
