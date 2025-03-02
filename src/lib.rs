@@ -368,7 +368,8 @@ struct OptSpec {
 
 /// Option's value type.
 ///
-/// See [`OptSpecs::option`] method for more information.
+/// Usually used with [`OptSpecs::option`] method. Variants of this enum
+/// define if and how an option accepts a value.
 
 #[derive(Debug, PartialEq)]
 #[non_exhaustive]
@@ -388,7 +389,9 @@ pub enum OptValue {
 
 /// Flags for changing command-line parser's behavior.
 ///
-/// See [`OptSpecs::flag`] method for more information.
+/// Usually used with [`OptSpecs::flag`] method. Variants of this enum
+/// are general configuration flags that change command-line parser's
+/// behavior.
 
 #[derive(Debug, PartialEq)]
 #[non_exhaustive]
@@ -456,8 +459,9 @@ impl OptSpecs {
     ///     option name can't be `-` and long option names can't have
     ///     any `=` characters nor `-` as their first character.
     ///
-    ///  3. `value_type`: A variant of enum [`OptValue`] which defines
-    ///     if this option accepts a value.
+    ///  3. `value_type`: The argument is a variant of enum [`OptValue`]
+    ///     and it defines if and how this option accepts a value. See
+    ///     the enum's documentation for more information.
     ///
     /// The return value is the same struct instance which was modified.
     pub fn option(mut self, id: &str, name: &str, value_type: OptValue) -> Self {
@@ -499,24 +503,9 @@ impl OptSpecs {
 
     /// Add a flag that changes parser's behavior.
     ///
-    /// Method's only argument `flag` is a variant of enum [`OptFlags`].
-    /// Their names and meanings are:
-    ///
-    ///   - [`OptFlags::OptionsEverywhere`]: Accept command-line options
-    ///     and other arguments in mixed order in the command line. That
-    ///     is, options can come after non-option arguments.
-    ///
-    ///     This is not the default behavior. By default the first
-    ///     non-option argument in the command line stops option parsing
-    ///     and the rest of the command line is parsed as non-options
-    ///     (other arguments), even if they look like options.
-    ///
-    ///   - [`OptFlags::PrefixMatchLongOptions`]: With this flag long
-    ///     options don't need to be written in full in the command
-    ///     line. They can be shortened as long as there are enough
-    ///     characters to find a unique prefix match. If there are more
-    ///     than one match the option which was given in the command
-    ///     line is classified as unknown.
+    /// Method's only argument `flag` is a variant of enum [`OptFlags`]
+    /// and it is a configuration flag that changes parser's general
+    /// behavior. See the enum's documentation for more information.
     ///
     /// The return value is the same struct instance which was modified.
     pub fn flag(mut self, flag: OptFlags) -> Self {
