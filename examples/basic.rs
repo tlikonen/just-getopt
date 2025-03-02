@@ -20,8 +20,8 @@ fn main() -> ExitCode {
         .option("help", "help", OptValue::None)
         .option("file", "f", OptValue::RequiredNonEmpty)
         .option("file", "file", OptValue::RequiredNonEmpty)
-        .option("verbose", "v", OptValue::Optional)
-        .option("verbose", "verbose", OptValue::Optional);
+        .option("verbose", "v", OptValue::OptionalNonEmpty)
+        .option("verbose", "verbose", OptValue::OptionalNonEmpty);
 
     // Get arguments iterator from operating system and skip the first item
     let args = std::env::args().skip(1); // which is this program's file path.

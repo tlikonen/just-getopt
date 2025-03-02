@@ -103,8 +103,8 @@
 //!     .option("help", "help", OptValue::None)
 //!     .option("file", "f", OptValue::RequiredNonEmpty)
 //!     .option("file", "file", OptValue::RequiredNonEmpty)
-//!     .option("verbose", "v", OptValue::Optional)
-//!     .option("verbose", "verbose", OptValue::Optional)
+//!     .option("verbose", "v", OptValue::OptionalNonEmpty)
+//!     .option("verbose", "verbose", OptValue::OptionalNonEmpty)
 //!     .flag(OptFlags::OptionsEverywhere);
 //! ```
 //!
