@@ -371,6 +371,7 @@ struct OptSpec {
 /// See [`OptSpecs::option`] method for more information.
 
 #[derive(Debug, PartialEq)]
+#[non_exhaustive]
 pub enum OptValue {
     /// Option does not accept a value.
     None,
