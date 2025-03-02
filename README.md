@@ -55,15 +55,11 @@ programming examples.
 Plans
 -----
 
-Possible [backward-incompatible changes][2.0.0] for the future 2.0.0
-release.
+Possible backward-incompatible changes for the future 2.0.0 release.
 
   - Some methods of `Args` struct will return an iterator, instead of
     vector.
-  - Enum `OptValueType` could be renamed to `OptValue`.
-
-
-[2.0.0]: https://github.com/tlikonen/just-getopt/milestone/1
+  - Enum `OptValueType` is renamed to `OptValue`.
 
 
 License
