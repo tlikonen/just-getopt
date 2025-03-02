@@ -101,8 +101,8 @@
 //! let specs = OptSpecs::new()
 //!     .option("help", "h", OptValue::None) // Arguments: (id, name, value_type)
 //!     .option("help", "help", OptValue::None)
-//!     .option("file", "f", OptValue::Required)
-//!     .option("file", "file", OptValue::Required)
+//!     .option("file", "f", OptValue::RequiredNonEmpty)
+//!     .option("file", "file", OptValue::RequiredNonEmpty)
 //!     .option("verbose", "v", OptValue::Optional)
 //!     .option("verbose", "verbose", OptValue::Optional)
 //!     .flag(OptFlags::OptionsEverywhere);
@@ -225,24 +225,26 @@
 //!
 //! ### Unknown Options
 //!
-//! We probably want to tell program's user if there were unknown
-//! options. An error message to [`std::io::stderr`] stream is usually
-//! enough. No need to panic.
+//! Usually we want to tell program's user if there were unknown
+//! options.
 //!
-//! ```
+//! ```no_run
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! for u in &parsed.unknown {
 //!     eprintln!("Unknown option: {}", u);
 //! }
+//! if !parsed.unknown.is_empty() {
+//!     eprintln!("Use '-h' for help.");
+//!     std::process::exit(1);
+//! }
 //! ```
 //!
 //! ### Required Value Missing
 //!
-//! More serious error is a missing value to an option which requires a
-//! value (like `file` option in our example, see above). That can be a
-//! good reason to exit the program.
+//! It is a serious error if the value is missing for an option which
+//! requires a value (like `--file` option in our example, see above).
 //!
 //! ```no_run
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
@@ -250,6 +252,9 @@
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! for o in parsed.required_value_missing() {
 //!     eprintln!("Value is required for option '{}'.", o.name);
+//! }
+//! if parsed.required_value_missing().count() > 0 {
+//!     eprintln!("Use '-h' for help.");
 //!     std::process::exit(1);
 //! }
 //! ```

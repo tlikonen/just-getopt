@@ -18,8 +18,8 @@ fn main() -> ExitCode {
         .flag(OptFlags::OptionsEverywhere) // Argument: (flag)
         .option("help", "h", OptValue::None) // Arguments: (id, name, value_type)
         .option("help", "help", OptValue::None)
-        .option("file", "f", OptValue::Required)
-        .option("file", "file", OptValue::Required)
+        .option("file", "f", OptValue::RequiredNonEmpty)
+        .option("file", "file", OptValue::RequiredNonEmpty)
         .option("verbose", "v", OptValue::Optional)
         .option("verbose", "verbose", OptValue::Optional);
 
@@ -37,11 +37,18 @@ fn main() -> ExitCode {
     for u in &parsed.unknown {
         eprintln!("Unknown option: {}", u);
     }
+    if !parsed.unknown.is_empty() {
+        eprintln!("Use '-h' for help.");
+        return ExitCode::FAILURE;
+    }
 
     // Report user about missing values for options that require them
     // (i.e. "file"). Exit the program with error code.
     for o in parsed.required_value_missing() {
         eprintln!("Value is required for option '{}'.", o.name);
+    }
+    if parsed.required_value_missing().count() > 0 {
+        eprintln!("Use '-h' for help.");
         return ExitCode::FAILURE;
     }
 
