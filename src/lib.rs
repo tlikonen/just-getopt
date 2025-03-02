@@ -1233,6 +1233,29 @@ mod tests {
     }
 
     #[test]
+    fn t_parsed_output_125() {
+        let parsed = OptSpecs::new()
+            .option("file", "f", OptValue::Required)
+            .option("debug", "d", OptValue::RequiredNonEmpty)
+            .getopt(["-f123", "-d", "", "-f", "456", "-f"]);
+
+        let f: Vec<&String> = parsed.options_value_all("file").collect();
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
+
+        assert_eq!(2, f.len());
+        assert_eq!("123", f[0]);
+        assert_eq!("456", f[1]);
+
+        assert_eq!(0, d.len());
+
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
+        let m: Vec<&Opt> = parsed.required_value_missing().collect();
+        assert_eq!(2, m.len());
+        assert_eq!("d", m[0].name);
+        assert_eq!("f", m[1].name);
+    }
+
+    #[test]
     fn t_parsed_output_130() {
         let parsed = OptSpecs::new()
             .option("file", "file", OptValue::Required)
@@ -1253,6 +1276,51 @@ mod tests {
         let m: Vec<&Opt> = parsed.required_value_missing().collect();
         assert_eq!(1, m.len());
         assert_eq!("file", m[0].name);
+    }
+
+    #[test]
+    fn t_parsed_output_135() {
+        let parsed = OptSpecs::new()
+            .option("file", "file", OptValue::RequiredNonEmpty)
+            .option("debug", "debug", OptValue::RequiredNonEmpty)
+            .getopt(["--file=123", "--debug", "", "--file", "456", "--file="]);
+
+        let f: Vec<&String> = parsed.options_value_all("file").collect();
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
+
+        assert_eq!(2, f.len());
+        assert_eq!("123", f[0]);
+        assert_eq!("456", f[1]);
+
+        assert_eq!(0, d.len());
+
+        assert_eq!(None, parsed.options_last("file").unwrap().value);
+        let m: Vec<&Opt> = parsed.required_value_missing().collect();
+        assert_eq!(2, m.len());
+        assert_eq!("debug", m[0].name);
+        assert_eq!("file", m[1].name);
+    }
+
+    #[test]
+    fn t_parsed_output_137() {
+        let parsed = OptSpecs::new()
+            .option("debug", "d", OptValue::OptionalNonEmpty)
+            .option("debug", "debug", OptValue::OptionalNonEmpty)
+            .getopt([
+                "-d",
+                "-d123",
+                "--debug",
+                "--debug=",
+                "--debug=456",
+                "--debug=",
+            ]);
+
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
+        assert_eq!(2, d.len());
+        assert_eq!("123", d[0]);
+        assert_eq!("456", d[1]);
+        assert_eq!("123", parsed.options_value_first("debug").unwrap());
+        assert_eq!("456", parsed.options_value_last("debug").unwrap());
     }
 
     #[test]
