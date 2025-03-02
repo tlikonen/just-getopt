@@ -305,7 +305,6 @@
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! if parsed.option_exists("verbose") {
 //!     println!("Option 'verbose' was given.");
-//!
 //!     for v in parsed.options_value_all("verbose") {
 //!         println!("Verbose level: {:?}", v);
 //!     }

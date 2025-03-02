@@ -14,13 +14,13 @@ fn main() {
     // parsing stops at the first non-option argument and the rest of
     // the command-line is parsed as non-options.
     let specs = OptSpecs::new()
-        .flag(OptFlags::OptionsEverywhere) // Argument: (flag)
         .option("help", "h", OptValue::None) // Arguments: (id, name, value_type)
         .option("help", "help", OptValue::None)
         .option("file", "f", OptValue::RequiredNonEmpty)
         .option("file", "file", OptValue::RequiredNonEmpty)
         .option("verbose", "v", OptValue::OptionalNonEmpty)
-        .option("verbose", "verbose", OptValue::OptionalNonEmpty);
+        .option("verbose", "verbose", OptValue::OptionalNonEmpty)
+        .flag(OptFlags::OptionsEverywhere);
 
     // Get arguments iterator from operating system and skip the first item
     let args = std::env::args().skip(1); // which is this program's file path.
@@ -71,7 +71,6 @@ fn main() {
     // identifier (id) string "verbose".
     if parsed.option_exists("verbose") {
         println!("Option 'verbose' was given.");
-
         for v in parsed.options_value_all("verbose") {
             println!("Verbose level: {:?}", v);
         }
