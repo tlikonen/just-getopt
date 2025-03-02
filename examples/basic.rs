@@ -1,7 +1,6 @@
 use just_getopt::{OptFlags, OptSpecs, OptValue};
-use std::process::ExitCode;
 
-fn main() -> ExitCode {
+fn main() {
     // The `OptSpecs::new()` function below creates a new option
     // specification struct `OptSpecs`. Its `option()` methods configure
     // three different options for logical meanings "help", "file" and
@@ -34,22 +33,22 @@ fn main() -> ExitCode {
     eprintln!("{:#?}", parsed);
 
     // Report user about unknown options.
-    for u in &parsed.unknown {
-        eprintln!("Unknown option: {}", u);
-    }
     if !parsed.unknown.is_empty() {
+        for u in &parsed.unknown {
+            eprintln!("Unknown option: {}", u);
+        }
         eprintln!("Use '-h' for help.");
-        return ExitCode::FAILURE;
+        std::process::exit(1);
     }
 
     // Report user about missing values for options that require them
     // (i.e. "file"). Exit the program with error code.
-    for o in parsed.required_value_missing() {
-        eprintln!("Value is required for option '{}'.", o.name);
-    }
-    if parsed.required_value_missing().count() > 0 {
+    if parsed.required_value_missing().next().is_some() {
+        for o in parsed.required_value_missing() {
+            eprintln!("Value is required for option '{}'.", o.name);
+        }
         eprintln!("Use '-h' for help.");
-        return ExitCode::FAILURE;
+        std::process::exit(1);
     }
 
     // Print help and exit because "-h" or "--help" was given. We use
@@ -58,7 +57,7 @@ fn main() -> ExitCode {
     // `option()` methods above.
     if parsed.option_exists("help") {
         println!("Print friendly help about program's usage.");
-        return ExitCode::from(2);
+        std::process::exit(1);
     }
 
     // Collect all (required) values for "-f" and "--file". We use
@@ -82,8 +81,4 @@ fn main() -> ExitCode {
     for o in &parsed.other {
         println!("Other argument: {:?}", o);
     }
-
-    // Try to run this program with various command-line options to see
-    // the output.
-    ExitCode::SUCCESS
 }

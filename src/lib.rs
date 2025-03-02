@@ -232,10 +232,10 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! for u in &parsed.unknown {
-//!     eprintln!("Unknown option: {}", u);
-//! }
-//! if !parsed.unknown.is_empty() {
+//! if !&parsed.unknown.is_empty() {
+//!     for u in &parsed.unknown {
+//!         eprintln!("Unknown option: {}", u);
+//!     }
 //!     eprintln!("Use '-h' for help.");
 //!     std::process::exit(1);
 //! }
@@ -250,10 +250,10 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! for o in parsed.required_value_missing() {
-//!     eprintln!("Value is required for option '{}'.", o.name);
-//! }
-//! if parsed.required_value_missing().count() > 0 {
+//! if parsed.required_value_missing().next().is_some() {
+//!     for o in parsed.required_value_missing() {
+//!         eprintln!("Value is required for option '{}'.", o.name);
+//!     }
 //!     eprintln!("Use '-h' for help.");
 //!     std::process::exit(1);
 //! }
@@ -271,7 +271,7 @@
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! if parsed.option_exists("help") {
 //!     println!("Print friendly help about program's usage.");
-//!     std::process::exit(2);
+//!     std::process::exit(1);
 //! }
 //! ```
 //!
