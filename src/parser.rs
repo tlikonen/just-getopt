@@ -36,25 +36,25 @@ where
 
                 if let Some(spec) = opt_match {
                     let value_required: bool;
-                    let value: Option<String>;
+                    let mut value: Option<String>;
 
                     match spec.value_type {
-                        OptValue::Required => {
+                        OptValue::Required | OptValue::RequiredNonEmpty => {
                             value_required = true;
                             value = if is_long_option_equal_sign(&arg) {
                                 Some(get_long_option_equal_value(&arg))
                             } else {
                                 iter.next()
-                            }
+                            };
                         }
 
-                        OptValue::Optional => {
+                        OptValue::Optional | OptValue::OptionalNonEmpty => {
                             value_required = false;
                             value = if is_long_option_equal_sign(&arg) {
                                 Some(get_long_option_equal_value(&arg))
                             } else {
                                 None
-                            }
+                            };
                         }
 
                         OptValue::None => {
@@ -74,6 +74,17 @@ where
                     }
 
                     if option_count < specs.option_limit {
+                        match spec.value_type {
+                            OptValue::RequiredNonEmpty | OptValue::OptionalNonEmpty => {
+                                if let Some(v) = &value {
+                                    if v.is_empty() {
+                                        value = None;
+                                    }
+                                }
+                            }
+                            _ => (),
+                        }
+
                         parsed.options.push(Opt {
                             id: spec.id.clone(),
                             name,
@@ -104,10 +115,10 @@ where
                 if is_valid_short_option_name(&name) {
                     if let Some(spec) = specs.get_short_option_match(&name) {
                         let value_required: bool;
-                        let value: Option<String>;
+                        let mut value: Option<String>;
 
                         match spec.value_type {
-                            OptValue::Required => {
+                            OptValue::Required | OptValue::RequiredNonEmpty => {
                                 value_required = true;
                                 let mut chars = String::new();
                                 for c in char_iter.by_ref() {
@@ -116,10 +127,10 @@ where
                                 value = match chars.chars().count() {
                                     0 => iter.next(),
                                     _ => Some(chars),
-                                }
+                                };
                             }
 
-                            OptValue::Optional => {
+                            OptValue::Optional | OptValue::OptionalNonEmpty => {
                                 value_required = false;
                                 let mut chars = String::new();
                                 for c in char_iter.by_ref() {
@@ -128,7 +139,7 @@ where
                                 value = match chars.chars().count() {
                                     0 => None,
                                     _ => Some(chars),
-                                }
+                                };
                             }
 
                             OptValue::None => {
@@ -138,6 +149,17 @@ where
                         }
 
                         if option_count < specs.option_limit {
+                            match spec.value_type {
+                                OptValue::RequiredNonEmpty | OptValue::OptionalNonEmpty => {
+                                    if let Some(v) = &value {
+                                        if v.is_empty() {
+                                            value = None;
+                                        }
+                                    }
+                                }
+                                _ => (),
+                            }
+
                             parsed.options.push(Opt {
                                 id: spec.id.clone(),
                                 name,

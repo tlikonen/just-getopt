@@ -371,8 +371,13 @@ pub enum OptValue {
     None,
     /// Option accepts an optional value.
     Optional,
+    /// Option accepts an optional value. Empty string is not considered
+    /// a value.
+    OptionalNonEmpty,
     /// Option requires a value.
     Required,
+    /// Option requires a value. Empty string is not considered a value.
+    RequiredNonEmpty,
 }
 
 /// Flags for changing command-line parser's behavior.
@@ -446,10 +451,7 @@ impl OptSpecs {
     ///     any `=` characters nor `-` as their first character.
     ///
     ///  3. `value_type`: A variant of enum [`OptValue`] which defines
-    ///     if this option accepts a value. If not, use
-    ///     [`OptValue::None`] as method's argument. If an optional
-    ///     value is accepted, use [`OptValue::Optional`]. If the option
-    ///     requires a value, use [`OptValue::Required`].
+    ///     if this option accepts a value.
     ///
     /// The return value is the same struct instance which was modified.
     pub fn option(mut self, id: &str, name: &str, value_type: OptValue) -> Self {
@@ -692,9 +694,13 @@ impl Args {
     /// specification defined that an option requires a value but
     /// program's user didn't give one in the command line. Such thing
     /// can happen if an option like `--file` is the last argument in
-    /// the command line and that option requires a value. Empty string
-    /// `""` is not classified as missing value because it can be valid
-    /// user input in many situations.
+    /// the command line and that option requires a value.
+    ///
+    /// If option's value type is [`OptValue::Required`] the empty
+    /// string `""` is not classified as missing value because it can be
+    /// valid user input in many situations. If option's value type is
+    /// [`OptValue::RequiredNonEmpty`] the empty string that was given
+    /// in the command line will be classified as missing value.
     ///
     /// The return value implements the [`DoubleEndedIterator`] trait
     /// (possibly empty, if no matches) and each item is a reference to
