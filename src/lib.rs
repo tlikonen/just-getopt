@@ -377,12 +377,13 @@ pub enum OptValue {
     None,
     /// Option accepts an optional value.
     Optional,
-    /// Option accepts an optional value. Empty string is not considered
-    /// a value.
+    /// Option accepts an optional value but empty string is not
+    /// considered a value.
     OptionalNonEmpty,
     /// Option requires a value.
     Required,
-    /// Option requires a value. Empty string is not considered a value.
+    /// Option requires a value but empty string is not considered a
+    /// value.
     RequiredNonEmpty,
 }
 
