@@ -55,16 +55,16 @@ programming examples.
 Incompatible Changes in 2.0
 ---------------------------
 
-Version 2.0.0 introduced some incompatible changes. When updating the
-crate from 1.x versions the following changes must be addressed.
+Version 2.0 introduced some incompatible changes. When updating the
+crate from 1.x versions the following changes must be addressed:
 
-  - Some methods of `Args` struct no longer return a vector. They return
-    a type which implements the trait `DoubleEndedIterator`. The methods
+  - Methods of `Args` struct no longer return a vector. They return a
+    type which implements the trait `DoubleEndedIterator`. The methods
     are: `required_value_missing`, `options_all` and
     `options_value_all`.
   - Enum `OptValueType` is renamed to `OptValue` and the enum is marked
-    as non-exhaustive: more variants were added in 2.0.0 and can be
-    added in the future.
+    as non-exhaustive: more variants were added in 2.0 and can be added
+    in the future.
 
 
 License
