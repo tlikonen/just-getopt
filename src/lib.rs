@@ -952,6 +952,30 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
+    fn t_create_optspecs_05() {
+        let _spec = OptSpecs::new().option("h", "-", OptValue::None);
+    }
+
+    #[test]
+    #[should_panic]
+    fn t_create_optspecs_06() {
+        let _spec = OptSpecs::new().option("h", " ", OptValue::None);
+    }
+
+    #[test]
+    #[should_panic]
+    fn t_create_optspecs_07() {
+        let _spec = OptSpecs::new().option("h", "hh ", OptValue::None);
+    }
+
+    #[test]
+    #[should_panic]
+    fn t_create_optspecs_08() {
+        let _spec = OptSpecs::new().option("h", "hh=hh", OptValue::None);
+    }
+
+    #[test]
     fn t_is_flag() {
         let mut spec = OptSpecs::new().flag(OptFlags::OptionsEverywhere);
         assert_eq!(true, spec.is_flag(OptFlags::OptionsEverywhere));
