@@ -232,7 +232,7 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! if !&parsed.unknown.is_empty() {
+//! if !parsed.unknown.is_empty() {
 //!     for u in &parsed.unknown {
 //!         eprintln!("Unknown option: {}", u);
 //!     }
