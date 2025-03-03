@@ -1,3 +1,8 @@
+// In normal Rust development environment you can run this example code
+// with commmands like
+//     cargo run --example basic -- -abc --foo
+//     cargo run --example basic -- -f 123 --file=456 foo -v3 bar
+
 use just_getopt::{OptFlags, OptSpecs, OptValue};
 
 fn main() {
