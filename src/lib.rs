@@ -1206,12 +1206,11 @@ mod tests {
             .getopt(["-f123", "-d", "", "-f", "456", "-f"]);
 
         let f: Vec<&String> = parsed.options_value_all("file").collect();
-        let d: Vec<&String> = parsed.options_value_all("debug").collect();
-
         assert_eq!(2, f.len());
         assert_eq!("123", f[0]);
         assert_eq!("456", f[1]);
 
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
         assert_eq!(1, d.len());
         assert_eq!("", d[0]);
 
@@ -1229,12 +1228,11 @@ mod tests {
             .getopt(["-f123", "-d", "", "-f", "456", "-f"]);
 
         let f: Vec<&String> = parsed.options_value_all("file").collect();
-        let d: Vec<&String> = parsed.options_value_all("debug").collect();
-
         assert_eq!(2, f.len());
         assert_eq!("123", f[0]);
         assert_eq!("456", f[1]);
 
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
         assert_eq!(0, d.len());
 
         assert_eq!(None, parsed.options_last("file").unwrap().value);
@@ -1252,12 +1250,11 @@ mod tests {
             .getopt(["--file=123", "--debug", "", "--file", "456", "--file"]);
 
         let f: Vec<&String> = parsed.options_value_all("file").collect();
-        let d: Vec<&String> = parsed.options_value_all("debug").collect();
-
         assert_eq!(2, f.len());
         assert_eq!("123", f[0]);
         assert_eq!("456", f[1]);
 
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
         assert_eq!(1, d.len());
         assert_eq!("", d[0]);
 
@@ -1275,12 +1272,11 @@ mod tests {
             .getopt(["--file=123", "--debug", "", "--file", "456", "--file="]);
 
         let f: Vec<&String> = parsed.options_value_all("file").collect();
-        let d: Vec<&String> = parsed.options_value_all("debug").collect();
-
         assert_eq!(2, f.len());
         assert_eq!("123", f[0]);
         assert_eq!("456", f[1]);
 
+        let d: Vec<&String> = parsed.options_value_all("debug").collect();
         assert_eq!(0, d.len());
 
         assert_eq!(None, parsed.options_last("file").unwrap().value);
@@ -1410,14 +1406,13 @@ mod tests {
             .getopt(["--äiti=ööö", "--€uro", "€€€", "--äiti", "ää", "--äiti"]);
 
         let a: Vec<&String> = parsed.options_value_all("äiti").collect();
-        let e: Vec<&String> = parsed.options_value_all("€uro").collect();
-
         assert_eq!(2, a.len());
         assert_eq!("ööö", a[0]);
         assert_eq!("ää", a[1]);
         assert_eq!("ööö", parsed.options_value_first("äiti").unwrap());
         assert_eq!("ää", parsed.options_value_last("äiti").unwrap());
 
+        let e: Vec<&String> = parsed.options_value_all("€uro").collect();
         assert_eq!(1, e.len());
         assert_eq!("€€€", e[0]);
         assert_eq!("€€€", parsed.options_value_first("€uro").unwrap());
