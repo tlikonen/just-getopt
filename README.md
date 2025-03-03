@@ -52,14 +52,16 @@ programming examples.
 [docs.rs]:   https://docs.rs/just-getopt/
 
 
-Plans
------
+Plans for 2.0
+-------------
 
-Possible backward-incompatible changes for the future 2.0.0 release.
+Possible backward-incompatible changes for the future 2.0 release.
 
-  - Some methods of `Args` struct will return an iterator, instead of
-    vector.
-  - Enum `OptValueType` is renamed to `OptValue`.
+  - Some methods of `Args` struct no longer return a vector. They return
+    a type that implements the `DoubleEndedIterator` trait.
+  - Enum `OptValueType` is renamed to `OptValue`. The enum is marked as
+    non-exhaustive: more variants are added in 2.0 and can be added
+    later.
 
 
 License
