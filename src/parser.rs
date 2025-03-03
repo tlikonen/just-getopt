@@ -76,11 +76,7 @@ where
                     if option_count < specs.option_limit {
                         match spec.value_type {
                             OptValue::RequiredNonEmpty | OptValue::OptionalNonEmpty => {
-                                if let Some(v) = &value {
-                                    if v.is_empty() {
-                                        value = None;
-                                    }
-                                }
+                                value = value.filter(|v| !v.is_empty());
                             }
                             _ => (),
                         }
@@ -151,11 +147,7 @@ where
                         if option_count < specs.option_limit {
                             match spec.value_type {
                                 OptValue::RequiredNonEmpty | OptValue::OptionalNonEmpty => {
-                                    if let Some(v) = &value {
-                                        if v.is_empty() {
-                                            value = None;
-                                        }
-                                    }
+                                    value = value.filter(|v| !v.is_empty());
                                 }
                                 _ => (),
                             }
