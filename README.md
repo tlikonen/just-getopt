@@ -62,9 +62,9 @@ crate from 1.x versions the following changes must be addressed:
     type which implements the trait `DoubleEndedIterator`. The methods
     are: `required_value_missing`, `options_all` and
     `options_value_all`.
-  - Enum `OptValueType` is renamed to `OptValue` and the enum is marked
-    as non-exhaustive: more variants were added in 2.0 and can be added
-    in the future.
+  - Enum `OptValueType` was renamed to `OptValue` and the enum is now
+    marked as non-exhaustive: more variants were added in 2.0 and can be
+    added in the future.
 
 
 License
