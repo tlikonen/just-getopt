@@ -470,27 +470,20 @@ impl OptSpecs {
             "Option's \"id\" must be at least 1 character long."
         );
 
-        let name_count = name.chars().count();
-
-        if name_count == 1 {
-            assert!(
+        match name.chars().count() {
+            0 => panic!("Option's \"name\" must be at least 1 character long."),
+            1 => assert!(
                 parser::is_valid_short_option_name(name),
                 "Not a valid short option name."
-            );
-        } else if name_count >= 2 {
-            assert!(
+            ),
+            _ => assert!(
                 parser::is_valid_long_option_name(name),
                 "Not a valid long option name."
-            );
-        } else {
-            panic!("Option's \"name\" must be at least 1 character long.");
+            ),
         }
 
-        for e in &self.options {
-            assert!(
-                e.name != name,
-                "No duplicates allowed for option's \"name\"."
-            );
+        if self.options.iter().any(|o| o.name == name) {
+            panic!("No duplicates allowed for option's \"name\".")
         }
 
         self.options.push(OptSpec {
