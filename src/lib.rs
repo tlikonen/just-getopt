@@ -1607,4 +1607,34 @@ mod tests {
         assert_eq!(1, parsed.unknown.len());
         assert_eq!("a", parsed.unknown[0]);
     }
+
+    #[test]
+    fn t_parsed_output_290() {
+        let parsed = OptSpecs::new()
+            .option("file", "f", OptValue::RequiredNonEmpty)
+            .option("debug", "d", OptValue::RequiredNonEmpty)
+            .getopt(["-f1", "-d", "", "-f", "", "-f", "2", "-f"]);
+
+        let mut i = parsed.options_all("file").rev();
+        assert_eq!("f", i.next().unwrap().name);
+        assert_eq!("f", i.next().unwrap().name);
+        assert_eq!("f", i.next().unwrap().name);
+        assert_eq!("f", i.next().unwrap().name);
+        assert_eq!(None, i.next());
+
+        let mut i = parsed.options_all("debug").rev();
+        assert_eq!("d", i.next().unwrap().name);
+        assert_eq!(None, i.next());
+
+        let mut i = parsed.options_value_all("file").rev();
+        assert_eq!("2", i.next().unwrap());
+        assert_eq!("1", i.next().unwrap());
+        assert_eq!(None, i.next());
+
+        let mut i = parsed.required_value_missing().rev();
+        assert_eq!("f", i.next().unwrap().name);
+        assert_eq!("f", i.next().unwrap().name);
+        assert_eq!("d", i.next().unwrap().name);
+        assert_eq!(None, i.next());
+    }
 }
