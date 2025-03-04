@@ -878,7 +878,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn t_create_optspecs_01() {
+    fn t_create_optspecs_010() {
         let mut spec;
         let mut expect;
 
@@ -932,13 +932,13 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn t_create_optspecs_02() {
+    fn t_create_optspecs_020() {
         OptSpecs::new().option("", "h", OptValue::None);
     }
 
     #[test]
     #[should_panic]
-    fn t_create_optspecs_03() {
+    fn t_create_optspecs_030() {
         OptSpecs::new()
             .option("h", "h", OptValue::None)
             .option("h", "h", OptValue::None);
@@ -946,31 +946,31 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn t_create_optspecs_04() {
+    fn t_create_optspecs_040() {
         OptSpecs::new().option("h", "", OptValue::None);
     }
 
     #[test]
     #[should_panic]
-    fn t_create_optspecs_05() {
+    fn t_create_optspecs_050() {
         OptSpecs::new().option("h", "-", OptValue::None);
     }
 
     #[test]
     #[should_panic]
-    fn t_create_optspecs_06() {
+    fn t_create_optspecs_060() {
         OptSpecs::new().option("h", " ", OptValue::None);
     }
 
     #[test]
     #[should_panic]
-    fn t_create_optspecs_07() {
+    fn t_create_optspecs_070() {
         OptSpecs::new().option("h", "hh ", OptValue::None);
     }
 
     #[test]
     #[should_panic]
-    fn t_create_optspecs_08() {
+    fn t_create_optspecs_080() {
         OptSpecs::new().option("h", "hh=hh", OptValue::None);
     }
 
