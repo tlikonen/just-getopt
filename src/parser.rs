@@ -217,8 +217,7 @@ fn is_long_option_prefix(s: &str) -> bool {
     s.starts_with(LONG_OPTION_PREFIX)
         && s.chars()
             .nth(LONG_OPTION_PREFIX_COUNT)
-            .filter(|c| *c != '-')
-            .is_some()
+            .map_or(false, |c| c != '-')
 }
 
 fn get_long_option(s: &str) -> String {
