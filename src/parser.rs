@@ -202,7 +202,10 @@ where
 
 const OPTION_TERMINATOR: &str = "--";
 const LONG_OPTION_PREFIX: &str = "--";
+const LONG_OPTION_PREFIX_COUNT: usize = 2;
+const LONG_OPTION_NAME_MIN_COUNT: usize = 2;
 const SHORT_OPTION_PREFIX: &str = "-";
+const SHORT_OPTION_PREFIX_COUNT: usize = 1;
 const INVALID_SHORT_OPTION_CHARS: &str = " -";
 const INVALID_LONG_OPTION_CHARS: &str = " =";
 
@@ -211,110 +214,59 @@ fn is_option_terminator(s: &str) -> bool {
 }
 
 fn is_long_option_prefix(s: &str) -> bool {
-    if !s.starts_with(LONG_OPTION_PREFIX) {
-        return false;
-    }
-
-    let chars: Vec<char> = s.chars().collect();
-    let prefix_count = LONG_OPTION_PREFIX.chars().count();
-
-    if chars.len() > prefix_count {
-        let next = chars[prefix_count];
-        next != '-'
-    } else {
-        false
-    }
+    s.starts_with(LONG_OPTION_PREFIX)
+        && s.chars()
+            .nth(LONG_OPTION_PREFIX_COUNT)
+            .filter(|c| *c != '-')
+            .is_some()
 }
 
 fn get_long_option(s: &str) -> String {
     if !is_long_option_prefix(s) {
         panic!("Not a valid long option {}.", s);
     }
-    let chars: Vec<char> = s.chars().collect();
-    let prefix_count = LONG_OPTION_PREFIX.chars().count();
-    let mut string = String::new();
-    for c in &chars[prefix_count..] {
-        string.push(*c);
-    }
-    string
+    s.chars().skip(LONG_OPTION_PREFIX_COUNT).collect()
 }
 
 fn get_long_option_name(s: &str) -> String {
-    let option = get_long_option(s);
-    let mut iter = option.split('=');
-    match iter.next() {
-        None => panic!("Not a valid long option."),
-        Some(n) => n.to_string(),
-    }
+    get_long_option(s).split('=').next().unwrap().to_string()
 }
 
 fn is_long_option_equal_sign(s: &str) -> bool {
-    let option = get_long_option(s);
-    let chars: Vec<char> = option.chars().collect();
-    for c in &chars[2..] {
-        // Long option name is at least 2 chars long.
-        if *c == '=' {
-            return true;
-        }
-    }
-    false
+    get_long_option(s)
+        .chars()
+        .skip(LONG_OPTION_NAME_MIN_COUNT)
+        .any(|c| c == '=')
 }
 
 fn get_long_option_equal_value(s: &str) -> String {
-    let option = get_long_option(s);
-    let v = option.split_once('=');
-    match v {
-        None => "".to_string(),
-        Some((_, v)) => v.to_string(),
-    }
+    get_long_option(s)
+        .split_once('=')
+        .map_or_else(|| "", |(_, v)| v)
+        .to_string()
 }
 
 pub fn is_valid_long_option_name(s: &str) -> bool {
-    if s.starts_with('-') || s.chars().count() < 2 {
-        return false;
-    }
-    for c in INVALID_LONG_OPTION_CHARS.chars() {
-        if s.contains(c) {
-            return false;
-        }
-    }
-    true
+    !s.starts_with('-')
+        && s.chars().nth(LONG_OPTION_NAME_MIN_COUNT - 1).is_some()
+        && !s.chars().any(|c| INVALID_LONG_OPTION_CHARS.contains(c))
 }
 
 pub fn is_valid_short_option_name(s: &str) -> bool {
-    if s.chars().count() != 1 {
-        return false;
-    }
-    for c in INVALID_SHORT_OPTION_CHARS.chars() {
-        if s.contains(c) {
-            return false;
-        }
-    }
-    true
+    s.chars().count() == 1 && !INVALID_SHORT_OPTION_CHARS.contains(s)
 }
 
 fn is_short_option_prefix(s: &str) -> bool {
-    if !s.starts_with(SHORT_OPTION_PREFIX) {
-        return false;
-    }
-
-    let prefix_count = SHORT_OPTION_PREFIX.chars().count();
-    let chars: Vec<char> = s.chars().collect();
-    if chars.len() < 1 + prefix_count {
-        return false;
-    }
-
-    is_valid_short_option_name(&chars[prefix_count].to_string())
+    s.starts_with(SHORT_OPTION_PREFIX)
+        && s.chars()
+            .nth(SHORT_OPTION_PREFIX_COUNT)
+            .map_or(false, |c| !INVALID_SHORT_OPTION_CHARS.contains(c))
+    // Rust 1.70:
+    // .is_some_and(|c| !INVALID_SHORT_OPTION_CHARS.contains(c))
 }
 
 fn get_short_option_series(s: &str) -> String {
-    let prefix_count = SHORT_OPTION_PREFIX.chars().count();
-    let chars: Vec<char> = s.chars().collect();
-    let mut string = String::new();
-    for c in &chars[prefix_count..] {
-        string.push(*c);
-    }
-    string
+    s.chars().skip(SHORT_OPTION_PREFIX_COUNT).collect()
 }
 
 #[cfg(test)]
@@ -374,6 +326,7 @@ mod tests {
         assert_eq!(true, is_long_option_equal_sign("--ab=123"));
         assert_eq!(true, is_long_option_equal_sign("--ä€=123"));
         assert_eq!(true, is_long_option_equal_sign("--ab=123=123"));
+        assert_eq!(false, is_long_option_equal_sign("--abcd"));
         assert_eq!(false, is_long_option_equal_sign("--ab"));
         assert_eq!(false, is_long_option_equal_sign("--a="));
     }
