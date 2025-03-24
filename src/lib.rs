@@ -1,4 +1,5 @@
 #![warn(missing_docs)]
+#![cfg_attr(not(test), no_std)]
 
 //! # Introduction
 //!
@@ -336,6 +337,12 @@
 //!   - [`Args`] struct and its methods.
 
 mod parser;
+
+extern crate alloc;
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
 /// Specification for program's valid command-line options.
 ///

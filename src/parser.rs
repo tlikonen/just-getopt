@@ -1,4 +1,8 @@
 use crate::{Args, Opt, OptFlags, OptSpecs, OptValue};
+use alloc::{
+    format,
+    string::{String, ToString},
+};
 
 pub fn parse<I>(specs: &OptSpecs, mut iter: I) -> Args
 where
