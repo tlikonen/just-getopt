@@ -1,6 +1,3 @@
-#![warn(missing_docs)]
-#![cfg_attr(not(test), no_std)]
-
 //! # Introduction
 //!
 //! This library crate implements a Posix `getopt`-like command-line
@@ -335,6 +332,9 @@
 //!
 //!   - [`OptSpecs`] struct and its methods.
 //!   - [`Args`] struct and its methods.
+
+#![warn(missing_docs)]
+#![cfg_attr(not(test), no_std)]
 
 mod parser;
 
