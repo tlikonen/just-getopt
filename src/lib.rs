@@ -334,7 +334,7 @@
 //!   - [`Args`] struct and its methods.
 
 #![warn(missing_docs)]
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(doc), no_std)]
 
 mod parser;
 
@@ -883,6 +883,7 @@ pub struct Opt {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn t_create_optspecs_010() {
