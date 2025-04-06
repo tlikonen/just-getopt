@@ -221,37 +221,48 @@
 //! }
 //! ```
 //!
-//! ### Unknown Options
+//! ### Check for Bad Options
 //!
-//! Usually we want to tell program's user if there were unknown
-//! options.
+//! Usually we want to check if there were bad options, and if so, exit
+//! the program with friendly help messages. We create a flag variable
+//! to hold the condition if we need to exit.
 //!
-//! ```no_run
+//! ```
+//! let mut error_exit = false;
+//! ```
+//!
+//! Print error messages about possible unknown options.
+//!
+//! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! if !parsed.unknown.is_empty() {
-//!     for u in &parsed.unknown {
-//!         eprintln!("Unknown option: {}", u);
-//!     }
-//!     eprintln!("Use '-h' for help.");
-//!     std::process::exit(1);
+//! # let mut error_exit = false;
+//! for u in &parsed.unknown {
+//!     eprintln!("Unknown option: {}", u);
+//!     error_exit = true;
 //! }
 //! ```
 //!
-//! ### Required Value Missing
+//! Print error message about possible missing values for options which
+//! require a value.
 //!
-//! It is a serious error if the value is missing for an option which
-//! requires a value (like `--file` option in our example, see above).
-//!
-//! ```no_run
+//! ```
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! if parsed.required_value_missing().next().is_some() {
-//!     for o in parsed.required_value_missing() {
-//!         eprintln!("Value is required for option '{}'.", o.name);
-//!     }
+//! # let mut error_exit = false;
+//! for o in parsed.required_value_missing() {
+//!     eprintln!("Value is required for option '{}'.", o.name);
+//!     error_exit = true;
+//! }
+//! ```
+//!
+//! Exit the program if there were bad options (see above).
+//!
+//! ```no_run
+//! # let mut error_exit = false;
+//! if error_exit {
 //!     eprintln!("Use '-h' for help.");
 //!     std::process::exit(1);
 //! }
@@ -269,7 +280,7 @@
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! if parsed.option_exists("help") {
 //!     println!("Print friendly help about program's usage.");
-//!     std::process::exit(1);
+//!     std::process::exit(0);
 //! }
 //! ```
 //!

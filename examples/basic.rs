@@ -37,21 +37,24 @@ fn main() {
     // struct.
     eprintln!("{:#?}", parsed);
 
+    // Create a condition variable for possible exit on error.
+    let mut error_exit = false;
+
     // Report user about unknown options.
-    if !parsed.unknown.is_empty() {
-        for u in &parsed.unknown {
-            eprintln!("Unknown option: {}", u);
-        }
-        eprintln!("Use '-h' for help.");
-        std::process::exit(1);
+    for u in &parsed.unknown {
+        eprintln!("Unknown option: {}", u);
+        error_exit = true;
     }
 
     // Report user about missing values for options that require them
     // (i.e. "file"). Exit the program with error code.
-    if parsed.required_value_missing().next().is_some() {
-        for o in parsed.required_value_missing() {
-            eprintln!("Value is required for option '{}'.", o.name);
-        }
+    for o in parsed.required_value_missing() {
+        eprintln!("Value is required for option '{}'.", o.name);
+        error_exit = true;
+    }
+
+    // Exit if there were bad command-line arguments.
+    if error_exit {
         eprintln!("Use '-h' for help.");
         std::process::exit(1);
     }
@@ -62,7 +65,7 @@ fn main() {
     // `option()` methods above.
     if parsed.option_exists("help") {
         println!("Print friendly help about program's usage.");
-        std::process::exit(1);
+        std::process::exit(0);
     }
 
     // Collect all (required) values for "-f" and "--file". We use
