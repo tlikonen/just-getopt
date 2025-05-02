@@ -47,7 +47,7 @@ fn main() {
     }
 
     // Report user about missing values for options that require them
-    // (i.e. "file"). Exit the program with error code.
+    // (i.e. "file").
     for o in parsed.required_value_missing() {
         eprintln!("Value is required for option '{}'.", o.name);
         error_exit = true;
