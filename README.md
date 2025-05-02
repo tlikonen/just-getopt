@@ -52,16 +52,19 @@ programming examples.
 [docs.rs]:   https://docs.rs/just-getopt/
 
 
-Plans for 2.0
--------------
+Incompatible Changes in 2.0
+---------------------------
 
-Possible backward-incompatible changes for the future 2.0 release.
+Version 2.0 introduced some backward incompatible changes. When updating
+the crate from 1.x versions the following changes must be addressed:
 
-  - Some methods of `Args` struct no longer return a vector. They return
-    a type that implements the `DoubleEndedIterator` trait.
-  - Enum `OptValueType` is renamed to `OptValue`. The enum is marked as
-    non-exhaustive: more variants are added in 2.0 and can be added
-    later.
+  - Methods of `Args` struct no longer return a vector. They return a
+    type which implements the trait `DoubleEndedIterator`. The methods
+    are: `required_value_missing`, `options_all` and
+    `options_value_all`.
+  - Enum `OptValueType` was renamed to `OptValue` and the enum is now
+    marked as non-exhaustive: more variants were added in 2.0 and can be
+    added in the future.
 
 
 License

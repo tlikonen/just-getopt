@@ -1,4 +1,8 @@
-use crate::{Args, Opt, OptFlags, OptSpecs, OptValueType};
+use crate::{Args, Opt, OptFlags, OptSpecs, OptValue};
+use alloc::{
+    format,
+    string::{String, ToString},
+};
 
 pub fn parse<I>(specs: &OptSpecs, mut iter: I) -> Args
 where
@@ -36,28 +40,28 @@ where
 
                 if let Some(spec) = opt_match {
                     let value_required: bool;
-                    let value: Option<String>;
+                    let mut value: Option<String>;
 
                     match spec.value_type {
-                        OptValueType::Required => {
+                        OptValue::Required | OptValue::RequiredNonEmpty => {
                             value_required = true;
                             value = if is_long_option_equal_sign(&arg) {
                                 Some(get_long_option_equal_value(&arg))
                             } else {
                                 iter.next()
-                            }
+                            };
                         }
 
-                        OptValueType::Optional => {
+                        OptValue::Optional | OptValue::OptionalNonEmpty => {
                             value_required = false;
                             value = if is_long_option_equal_sign(&arg) {
                                 Some(get_long_option_equal_value(&arg))
                             } else {
                                 None
-                            }
+                            };
                         }
 
-                        OptValueType::None => {
+                        OptValue::None => {
                             value_required = false;
                             value = None;
                             if is_long_option_equal_sign(&arg) {
@@ -74,6 +78,13 @@ where
                     }
 
                     if option_count < specs.option_limit {
+                        match spec.value_type {
+                            OptValue::RequiredNonEmpty | OptValue::OptionalNonEmpty => {
+                                value = value.filter(|v| !v.is_empty());
+                            }
+                            _ => (),
+                        }
+
                         parsed.options.push(Opt {
                             id: spec.id.clone(),
                             name,
@@ -104,40 +115,47 @@ where
                 if is_valid_short_option_name(&name) {
                     if let Some(spec) = specs.get_short_option_match(&name) {
                         let value_required: bool;
-                        let value: Option<String>;
+                        let mut value: Option<String>;
 
                         match spec.value_type {
-                            OptValueType::Required => {
+                            OptValue::Required | OptValue::RequiredNonEmpty => {
                                 value_required = true;
-                                let mut chars = String::new();
+                                let mut chars = String::with_capacity(5);
                                 for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
                                 value = match chars.chars().count() {
                                     0 => iter.next(),
                                     _ => Some(chars),
-                                }
+                                };
                             }
 
-                            OptValueType::Optional => {
+                            OptValue::Optional | OptValue::OptionalNonEmpty => {
                                 value_required = false;
-                                let mut chars = String::new();
+                                let mut chars = String::with_capacity(5);
                                 for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
                                 value = match chars.chars().count() {
                                     0 => None,
                                     _ => Some(chars),
-                                }
+                                };
                             }
 
-                            OptValueType::None => {
+                            OptValue::None => {
                                 value_required = false;
                                 value = None;
                             }
                         }
 
                         if option_count < specs.option_limit {
+                            match spec.value_type {
+                                OptValue::RequiredNonEmpty | OptValue::OptionalNonEmpty => {
+                                    value = value.filter(|v| !v.is_empty());
+                                }
+                                _ => (),
+                            }
+
                             parsed.options.push(Opt {
                                 id: spec.id.clone(),
                                 name,
@@ -188,7 +206,10 @@ where
 
 const OPTION_TERMINATOR: &str = "--";
 const LONG_OPTION_PREFIX: &str = "--";
+const LONG_OPTION_PREFIX_COUNT: usize = 2;
+const LONG_OPTION_NAME_MIN_COUNT: usize = 2;
 const SHORT_OPTION_PREFIX: &str = "-";
+const SHORT_OPTION_PREFIX_COUNT: usize = 1;
 const INVALID_SHORT_OPTION_CHARS: &str = " -";
 const INVALID_LONG_OPTION_CHARS: &str = " =";
 
@@ -197,110 +218,58 @@ fn is_option_terminator(s: &str) -> bool {
 }
 
 fn is_long_option_prefix(s: &str) -> bool {
-    if !s.starts_with(LONG_OPTION_PREFIX) {
-        return false;
-    }
-
-    let chars: Vec<char> = s.chars().collect();
-    let prefix_count = LONG_OPTION_PREFIX.chars().count();
-
-    if chars.len() > prefix_count {
-        let next = chars[prefix_count];
-        next != '-'
-    } else {
-        false
-    }
+    s.starts_with(LONG_OPTION_PREFIX)
+        && s.chars()
+            .nth(LONG_OPTION_PREFIX_COUNT)
+            .map_or(false, |c| c != '-')
 }
 
 fn get_long_option(s: &str) -> String {
     if !is_long_option_prefix(s) {
         panic!("Not a valid long option {}.", s);
     }
-    let chars: Vec<char> = s.chars().collect();
-    let prefix_count = LONG_OPTION_PREFIX.chars().count();
-    let mut string = String::new();
-    for c in &chars[prefix_count..] {
-        string.push(*c);
-    }
-    string
+    s.chars().skip(LONG_OPTION_PREFIX_COUNT).collect()
 }
 
 fn get_long_option_name(s: &str) -> String {
-    let option = get_long_option(s);
-    let mut iter = option.split('=');
-    match iter.next() {
-        None => panic!("Not a valid long option."),
-        Some(n) => n.to_string(),
-    }
+    get_long_option(s).split('=').next().unwrap().to_string()
 }
 
 fn is_long_option_equal_sign(s: &str) -> bool {
-    let option = get_long_option(s);
-    let chars: Vec<char> = option.chars().collect();
-    for c in &chars[2..] {
-        // Long option name is at least 2 chars long.
-        if *c == '=' {
-            return true;
-        }
-    }
-    false
+    get_long_option(s)
+        .chars()
+        .skip(LONG_OPTION_NAME_MIN_COUNT)
+        .any(|c| c == '=')
 }
 
 fn get_long_option_equal_value(s: &str) -> String {
-    let option = get_long_option(s);
-    let v = option.split_once('=');
-    match v {
-        None => "".to_string(),
-        Some((_, v)) => v.to_string(),
-    }
+    get_long_option(s)
+        .split_once('=')
+        .map_or_else(|| "", |(_, v)| v)
+        .to_string()
 }
 
 pub fn is_valid_long_option_name(s: &str) -> bool {
-    if s.starts_with('-') || s.chars().count() < 2 {
-        return false;
-    }
-    for c in INVALID_LONG_OPTION_CHARS.chars() {
-        if s.contains(c) {
-            return false;
-        }
-    }
-    true
+    !s.starts_with('-')
+        && s.chars().nth(LONG_OPTION_NAME_MIN_COUNT - 1).is_some()
+        && !s.chars().any(|c| INVALID_LONG_OPTION_CHARS.contains(c))
 }
 
 pub fn is_valid_short_option_name(s: &str) -> bool {
-    if s.chars().count() != 1 {
-        return false;
-    }
-    for c in INVALID_SHORT_OPTION_CHARS.chars() {
-        if s.contains(c) {
-            return false;
-        }
-    }
-    true
+    s.chars().count() == 1 && !INVALID_SHORT_OPTION_CHARS.contains(s)
 }
 
 fn is_short_option_prefix(s: &str) -> bool {
-    if !s.starts_with(SHORT_OPTION_PREFIX) {
-        return false;
-    }
-
-    let prefix_count = SHORT_OPTION_PREFIX.chars().count();
-    let chars: Vec<char> = s.chars().collect();
-    if chars.len() < 1 + prefix_count {
-        return false;
-    }
-
-    is_valid_short_option_name(&chars[prefix_count].to_string())
+    s.starts_with(SHORT_OPTION_PREFIX)
+        && s.chars()
+            .nth(SHORT_OPTION_PREFIX_COUNT)
+            .map_or(false, |c| !INVALID_SHORT_OPTION_CHARS.contains(c))
+    // Rust 1.70:
+    // .is_some_and(|c| !INVALID_SHORT_OPTION_CHARS.contains(c))
 }
 
 fn get_short_option_series(s: &str) -> String {
-    let prefix_count = SHORT_OPTION_PREFIX.chars().count();
-    let chars: Vec<char> = s.chars().collect();
-    let mut string = String::new();
-    for c in &chars[prefix_count..] {
-        string.push(*c);
-    }
-    string
+    s.chars().skip(SHORT_OPTION_PREFIX_COUNT).collect()
 }
 
 #[cfg(test)]
@@ -360,6 +329,7 @@ mod tests {
         assert_eq!(true, is_long_option_equal_sign("--ab=123"));
         assert_eq!(true, is_long_option_equal_sign("--ä€=123"));
         assert_eq!(true, is_long_option_equal_sign("--ab=123=123"));
+        assert_eq!(false, is_long_option_equal_sign("--abcd"));
         assert_eq!(false, is_long_option_equal_sign("--ab"));
         assert_eq!(false, is_long_option_equal_sign("--a="));
     }
@@ -438,11 +408,11 @@ mod tests {
     #[test]
     fn t_get_short_option_match() {
         let spec = OptSpecs::new()
-            .option("help", "help", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
-            .option("verbose", "v", OptValueType::None)
-            .option("€uro", "€", OptValueType::None)
-            .option("file", "f", OptValueType::None);
+            .option("help", "help", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
+            .option("verbose", "v", OptValue::None)
+            .option("€uro", "€", OptValue::None)
+            .option("file", "f", OptValue::None);
 
         {
             let m = &spec.get_short_option_match("v");
@@ -450,7 +420,7 @@ mod tests {
             let m = m.unwrap();
             assert_eq!("verbose", m.id);
             assert_eq!("v", m.name);
-            assert_eq!(OptValueType::None, m.value_type);
+            assert_eq!(OptValue::None, m.value_type);
         }
 
         {
@@ -459,7 +429,7 @@ mod tests {
             let m = m.unwrap();
             assert_eq!("file", m.id);
             assert_eq!("f", m.name);
-            assert_eq!(OptValueType::None, m.value_type);
+            assert_eq!(OptValue::None, m.value_type);
         }
 
         {
@@ -468,7 +438,7 @@ mod tests {
             let m = m.unwrap();
             assert_eq!("€uro", m.id);
             assert_eq!("€", m.name);
-            assert_eq!(OptValueType::None, m.value_type);
+            assert_eq!(OptValue::None, m.value_type);
         }
 
         {
@@ -480,11 +450,11 @@ mod tests {
     #[test]
     fn t_get_long_option_match() {
         let spec = OptSpecs::new()
-            .option("help", "help", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
-            .option("verbose", "v", OptValueType::None)
-            .option("€uro", "€uro", OptValueType::None)
-            .option("file", "f", OptValueType::None);
+            .option("help", "help", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
+            .option("verbose", "v", OptValue::None)
+            .option("€uro", "€uro", OptValue::None)
+            .option("file", "f", OptValue::None);
 
         {
             let m = &spec.get_long_option_match("verbose");
@@ -492,7 +462,7 @@ mod tests {
             let v = &m.unwrap();
             assert_eq!("verbose", v.id);
             assert_eq!("verbose", v.name);
-            assert_eq!(OptValueType::None, v.value_type);
+            assert_eq!(OptValue::None, v.value_type);
         }
 
         {
@@ -501,7 +471,7 @@ mod tests {
             let v = &m.unwrap();
             assert_eq!("help", v.id);
             assert_eq!("help", v.name);
-            assert_eq!(OptValueType::None, v.value_type);
+            assert_eq!(OptValue::None, v.value_type);
         }
 
         {
@@ -510,7 +480,7 @@ mod tests {
             let v = &m.unwrap();
             assert_eq!("€uro", v.id);
             assert_eq!("€uro", v.name);
-            assert_eq!(OptValueType::None, v.value_type);
+            assert_eq!(OptValue::None, v.value_type);
         }
 
         {
@@ -524,10 +494,10 @@ mod tests {
         use crate::OptSpec;
 
         let spec = OptSpecs::new()
-            .option("foo", "foo-option", OptValueType::None)
-            .option("bar", "foo-€ö-option", OptValueType::None)
-            .option("verbose", "verbose", OptValueType::None)
-            .option("version", "version", OptValueType::None);
+            .option("foo", "foo-option", OptValue::None)
+            .option("bar", "foo-€ö-option", OptValue::None)
+            .option("verbose", "verbose", OptValue::None)
+            .option("version", "version", OptValue::None);
 
         assert_eq!(true, spec.get_long_option_prefix_match("ver").is_none());
         assert_eq!(true, spec.get_long_option_prefix_match("foo-").is_none());
