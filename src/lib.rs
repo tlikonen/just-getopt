@@ -441,8 +441,8 @@ impl OptSpecs {
     /// for parsing command-line.
     pub fn new() -> Self {
         Self {
-            options: Vec::new(),
-            flags: Vec::new(),
+            options: Vec::with_capacity(5),
+            flags: Vec::with_capacity(2),
             option_limit: COUNTER_LIMIT,
             other_limit: COUNTER_LIMIT,
             unknown_limit: COUNTER_LIMIT,

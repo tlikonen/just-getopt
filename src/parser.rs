@@ -120,7 +120,7 @@ where
                         match spec.value_type {
                             OptValue::Required | OptValue::RequiredNonEmpty => {
                                 value_required = true;
-                                let mut chars = String::new();
+                                let mut chars = String::with_capacity(5);
                                 for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
@@ -132,7 +132,7 @@ where
 
                             OptValue::Optional | OptValue::OptionalNonEmpty => {
                                 value_required = false;
-                                let mut chars = String::new();
+                                let mut chars = String::with_capacity(5);
                                 for c in char_iter.by_ref() {
                                     chars.push(c);
                                 }
