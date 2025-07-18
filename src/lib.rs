@@ -239,7 +239,7 @@
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! # let mut error_exit = false;
 //! for u in &parsed.unknown {
-//!     eprintln!("Unknown option: {}", u);
+//!     eprintln!("Unknown option: {u}");
 //!     error_exit = true;
 //! }
 //! ```

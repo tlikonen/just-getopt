@@ -42,7 +42,7 @@ fn main() {
 
     // Report user about unknown options.
     for u in &parsed.unknown {
-        eprintln!("Unknown option: {}", u);
+        eprintln!("Unknown option: {u}");
         error_exit = true;
     }
 
