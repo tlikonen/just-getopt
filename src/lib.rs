@@ -614,6 +614,10 @@ impl OptSpecs {
             return None;
         }
 
+        if let Some(exact) = self.get_long_option_match(name) {
+            return Some(exact);
+        }
+
         let mut result = None;
 
         for e in &self.options {
@@ -1172,6 +1176,21 @@ mod tests {
         assert_eq!("versi", parsed.unknown[2]);
         assert_eq!("version", parsed.options_first("version").unwrap().name);
         assert_eq!("verbose", parsed.options_first("verbose").unwrap().name);
+    }
+
+    #[test]
+    fn t_parsed_output_085() {
+        let parsed = OptSpecs::new()
+            .flag(OptFlags::PrefixMatchLongOptions)
+            .option("foo1", "foo", OptValue::None)
+            .option("foo2", "foo-longer", OptValue::None)
+            .getopt(["--fo", "--foo", "--foo-", "--foo-longer"]);
+
+        assert_eq!("fo", parsed.unknown[0]);
+        assert_eq!("foo", parsed.options_first("foo1").unwrap().name);
+        assert_eq!("foo", parsed.options_last("foo1").unwrap().name);
+        assert_eq!("foo-", parsed.options_first("foo2").unwrap().name);
+        assert_eq!("foo-longer", parsed.options_last("foo2").unwrap().name);
     }
 
     #[test]
