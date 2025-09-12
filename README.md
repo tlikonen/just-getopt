@@ -70,11 +70,10 @@ the crate from 1.x versions the following changes must be addressed:
 License
 -------
 
-Author: Teemu Likonen <<tlikonen@iki.fi>>
-
-OpenPGP key: [6965F03973F0D4CA22B9410F0F2CAE0E07608462][PGP]
+Author: Teemu Likonen <<tlikonen@iki.fi>> ([web][], [PGP][])
 
 License: [Creative Commons CC0][CC0] (public domain dedication)
 
-[PGP]: http://www.iki.fi/tlikonen/pgp-key.asc
+[web]: http://www.iki.fi/tlikonen/
+[PGP]: http://www.iki.fi/tlikonen/teemu.pgp
 [CC0]: https://creativecommons.org/publicdomain/zero/1.0/legalcode
