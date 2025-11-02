@@ -277,22 +277,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn t_is_long_option_prefix() {
-        assert_eq!(true, is_long_option_prefix("--ab"));
-        assert_eq!(true, is_long_option_prefix("--abc"));
-        assert_eq!(true, is_long_option_prefix("--a"));
-        assert_eq!(true, is_long_option_prefix("--ä"));
-        assert_eq!(false, is_long_option_prefix("---ab"));
-        assert_eq!(false, is_long_option_prefix("---"));
-        assert_eq!(false, is_long_option_prefix(""));
-        assert_eq!(false, is_long_option_prefix(" "));
-        assert_eq!(false, is_long_option_prefix("-x"));
-        assert_eq!(false, is_long_option_prefix("--"));
-        assert_eq!(false, is_long_option_prefix("-"));
+    fn is_long_option_prefix_fn() {
+        assert!(is_long_option_prefix("--ab"));
+        assert!(is_long_option_prefix("--abc"));
+        assert!(is_long_option_prefix("--a"));
+        assert!(is_long_option_prefix("--ä"));
+        assert!(!is_long_option_prefix("---ab"));
+        assert!(!is_long_option_prefix("---"));
+        assert!(!is_long_option_prefix(""));
+        assert!(!is_long_option_prefix(" "));
+        assert!(!is_long_option_prefix("-x"));
+        assert!(!is_long_option_prefix("--"));
+        assert!(!is_long_option_prefix("-"));
     }
 
     #[test]
-    fn t_get_long_option() {
+    fn get_long_option_fn() {
         assert_eq!("abc", get_long_option("--abc"));
         assert_eq!("ab", get_long_option("--ab"));
         assert_eq!("abc=", get_long_option("--abc="));
@@ -302,14 +302,14 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn t_get_long_option_panic() {
+    fn get_long_option_fn_panic() {
         get_long_option("-");
         get_long_option("--");
         get_long_option("--a");
     }
 
     #[test]
-    fn t_get_long_option_name() {
+    fn get_long_option_name_fn() {
         assert_eq!("abc", get_long_option_name("--abc"));
         assert_eq!("ä€", get_long_option_name("--ä€"));
         assert_eq!("abc", get_long_option_name("--abc="));
@@ -322,20 +322,20 @@ mod tests {
     }
 
     #[test]
-    fn t_is_long_option_equal_sign() {
-        assert_eq!(true, is_long_option_equal_sign("--abc="));
-        assert_eq!(true, is_long_option_equal_sign("--ab="));
-        assert_eq!(true, is_long_option_equal_sign("--ab=1"));
-        assert_eq!(true, is_long_option_equal_sign("--ab=123"));
-        assert_eq!(true, is_long_option_equal_sign("--ä€=123"));
-        assert_eq!(true, is_long_option_equal_sign("--ab=123=123"));
-        assert_eq!(false, is_long_option_equal_sign("--abcd"));
-        assert_eq!(false, is_long_option_equal_sign("--ab"));
-        assert_eq!(false, is_long_option_equal_sign("--a="));
+    fn is_long_option_equal_sign_fn() {
+        assert!(is_long_option_equal_sign("--abc="));
+        assert!(is_long_option_equal_sign("--ab="));
+        assert!(is_long_option_equal_sign("--ab=1"));
+        assert!(is_long_option_equal_sign("--ab=123"));
+        assert!(is_long_option_equal_sign("--ä€=123"));
+        assert!(is_long_option_equal_sign("--ab=123=123"));
+        assert!(!is_long_option_equal_sign("--abcd"));
+        assert!(!is_long_option_equal_sign("--ab"));
+        assert!(!is_long_option_equal_sign("--a="));
     }
 
     #[test]
-    fn t_get_long_option_equal_value() {
+    fn get_long_option_equal_value_fn() {
         assert_eq!("", get_long_option_equal_value("--abc"));
         assert_eq!("", get_long_option_equal_value("--abc="));
         assert_eq!("1", get_long_option_equal_value("--abc=1"));
@@ -350,55 +350,55 @@ mod tests {
     }
 
     #[test]
-    fn t_is_valid_long_option_name() {
-        assert_eq!(true, is_valid_long_option_name("ab"));
-        assert_eq!(true, is_valid_long_option_name("ab-"));
-        assert_eq!(true, is_valid_long_option_name("ab-abc"));
-        assert_eq!(true, is_valid_long_option_name("ä€"));
-        assert_eq!(false, is_valid_long_option_name("a"));
-        assert_eq!(false, is_valid_long_option_name("€"));
-        assert_eq!(false, is_valid_long_option_name("-abc"));
-        assert_eq!(false, is_valid_long_option_name("abc="));
-        assert_eq!(false, is_valid_long_option_name("abc "));
-        assert_eq!(false, is_valid_long_option_name(" abc "));
-        assert_eq!(false, is_valid_long_option_name("abc ab"));
+    fn is_valid_long_option_name_fn() {
+        assert!(is_valid_long_option_name("ab"));
+        assert!(is_valid_long_option_name("ab-"));
+        assert!(is_valid_long_option_name("ab-abc"));
+        assert!(is_valid_long_option_name("ä€"));
+        assert!(!is_valid_long_option_name("a"));
+        assert!(!is_valid_long_option_name("€"));
+        assert!(!is_valid_long_option_name("-abc"));
+        assert!(!is_valid_long_option_name("abc="));
+        assert!(!is_valid_long_option_name("abc "));
+        assert!(!is_valid_long_option_name(" abc "));
+        assert!(!is_valid_long_option_name("abc ab"));
     }
 
     #[test]
-    fn t_is_valid_short_option_name() {
-        assert_eq!(true, is_valid_short_option_name("a"));
-        assert_eq!(true, is_valid_short_option_name("ä"));
-        assert_eq!(true, is_valid_short_option_name("€"));
-        assert_eq!(true, is_valid_short_option_name("1"));
-        assert_eq!(true, is_valid_short_option_name("?"));
-        assert_eq!(true, is_valid_short_option_name("="));
-        assert_eq!(true, is_valid_short_option_name("%"));
-        assert_eq!(false, is_valid_short_option_name("-"));
-        assert_eq!(false, is_valid_short_option_name(" "));
+    fn is_valid_short_option_name_fn() {
+        assert!(is_valid_short_option_name("a"));
+        assert!(is_valid_short_option_name("ä"));
+        assert!(is_valid_short_option_name("€"));
+        assert!(is_valid_short_option_name("1"));
+        assert!(is_valid_short_option_name("?"));
+        assert!(is_valid_short_option_name("="));
+        assert!(is_valid_short_option_name("%"));
+        assert!(!is_valid_short_option_name("-"));
+        assert!(!is_valid_short_option_name(" "));
     }
 
     #[test]
-    fn t_is_short_option_prefix() {
-        assert_eq!(true, is_short_option_prefix("-a"));
-        assert_eq!(true, is_short_option_prefix("-ä"));
-        assert_eq!(true, is_short_option_prefix("-€"));
-        assert_eq!(true, is_short_option_prefix("-="));
-        assert_eq!(true, is_short_option_prefix("-?"));
-        assert_eq!(true, is_short_option_prefix("-abcd"));
-        assert_eq!(false, is_short_option_prefix("-"));
-        assert_eq!(false, is_short_option_prefix("--"));
-        assert_eq!(false, is_short_option_prefix("a"));
-        assert_eq!(false, is_short_option_prefix("aa"));
-        assert_eq!(false, is_short_option_prefix("aaa"));
-        assert_eq!(false, is_short_option_prefix(""));
-        assert_eq!(false, is_short_option_prefix(" "));
-        assert_eq!(false, is_short_option_prefix("- "));
-        assert_eq!(false, is_short_option_prefix("--ab"));
-        assert_eq!(false, is_short_option_prefix("--a"));
+    fn is_short_option_prefix_fn() {
+        assert!(is_short_option_prefix("-a"));
+        assert!(is_short_option_prefix("-ä"));
+        assert!(is_short_option_prefix("-€"));
+        assert!(is_short_option_prefix("-="));
+        assert!(is_short_option_prefix("-?"));
+        assert!(is_short_option_prefix("-abcd"));
+        assert!(!is_short_option_prefix("-"));
+        assert!(!is_short_option_prefix("--"));
+        assert!(!is_short_option_prefix("a"));
+        assert!(!is_short_option_prefix("aa"));
+        assert!(!is_short_option_prefix("aaa"));
+        assert!(!is_short_option_prefix(""));
+        assert!(!is_short_option_prefix(" "));
+        assert!(!is_short_option_prefix("- "));
+        assert!(!is_short_option_prefix("--ab"));
+        assert!(!is_short_option_prefix("--a"));
     }
 
     #[test]
-    fn t_get_short_option_series() {
+    fn get_short_option_series_fn() {
         assert_eq!("a", get_short_option_series("-a"));
         assert_eq!("ab", get_short_option_series("-ab"));
         assert_eq!("ä€", get_short_option_series("-ä€"));
@@ -406,7 +406,7 @@ mod tests {
     }
 
     #[test]
-    fn t_get_short_option_match() {
+    fn get_short_option_match() {
         let spec = OptSpecs::new()
             .option("help", "help", OptValue::None)
             .option("verbose", "verbose", OptValue::None)
@@ -448,7 +448,7 @@ mod tests {
     }
 
     #[test]
-    fn t_get_long_option_match() {
+    fn get_long_option_match() {
         let spec = OptSpecs::new()
             .option("help", "help", OptValue::None)
             .option("verbose", "verbose", OptValue::None)
@@ -490,7 +490,7 @@ mod tests {
     }
 
     #[test]
-    fn t_get_long_option_prefix_match() {
+    fn get_long_option_prefix_match() {
         use crate::OptSpec;
 
         let spec = OptSpecs::new()
