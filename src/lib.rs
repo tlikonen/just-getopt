@@ -1707,21 +1707,14 @@ mod tests {
             .getopt(["-aä€d", "--föo"]);
 
         assert_eq!(4, parsed.unknown.len());
+
         let mut u = parsed.unknown_options();
         assert_eq!("-a", u.next().unwrap());
         assert_eq!("-ä", u.next().unwrap());
         assert_eq!("-€", u.next().unwrap());
         assert_eq!("--föo", u.next().unwrap());
         assert_eq!(None, u.next());
-    }
 
-    #[test]
-    fn parsed_output_310() {
-        let parsed = OptSpecs::new()
-            .option("debug", "d", OptValue::None)
-            .getopt(["-aä€d", "--föo"]);
-
-        assert_eq!(4, parsed.unknown.len());
         let u = parsed.unknown_options().collect::<Vec<String>>();
         assert_eq!(vec!["-a", "-ä", "-€", "--föo"], u);
     }
