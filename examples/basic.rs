@@ -41,7 +41,7 @@ fn main() {
     let mut error_exit = false;
 
     // Report user about unknown options.
-    for u in &parsed.unknown {
+    for u in parsed.unknown_options() {
         eprintln!("Unknown option: {u}");
         error_exit = true;
     }

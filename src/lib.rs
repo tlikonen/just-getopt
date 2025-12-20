@@ -238,7 +238,7 @@
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
 //! # let mut error_exit = false;
-//! for u in &parsed.unknown {
+//! for u in parsed.unknown_options() {
 //!     eprintln!("Unknown option: {u}");
 //!     error_exit = true;
 //! }
@@ -351,6 +351,7 @@ mod parser;
 
 extern crate alloc;
 use alloc::{
+    format,
     string::{String, ToString},
     vec::Vec,
 };
@@ -848,6 +849,29 @@ impl Args {
             Some(o) => o.value.as_ref(),
             None => None,
         }
+    }
+
+    /// List unknown options with prefix.
+    ///
+    /// Command-line arguments that look like options but were not part
+    /// of [`OptSpecs`] specification are classified as unknown. They
+    /// can be listed with this method which iterates over
+    /// [`Args::unknown`] field and outputs options with their prefix
+    /// (`-` or `--`). Possible duplicate unknown options have been
+    /// filtered out.
+    ///
+    /// The return value implements the [`DoubleEndedIterator`] trait
+    /// (possibly empty, if no matches). Iterator's each item creates a
+    /// new `String` which has the short or long option prefix (`-` or
+    /// `--`) followed by the option name string. You can collect the
+    /// iterator to a vector by applying method
+    /// [`collect`](core::iter::Iterator::collect)`::<Vec<String>>()`.
+    pub fn unknown_options(&self) -> impl DoubleEndedIterator<Item = String> + '_ {
+        self.unknown.iter().map(|o| match o.chars().count() {
+            0 => panic!("zero-length string in Args::unknown"),
+            1 => format!("-{}", o),
+            _ => format!("--{}", o),
+        })
     }
 }
 
@@ -1674,5 +1698,31 @@ mod tests {
         assert_eq!("f", i.next().unwrap().name);
         assert_eq!("d", i.next().unwrap().name);
         assert_eq!(None, i.next());
+    }
+
+    #[test]
+    fn parsed_output_300() {
+        let parsed = OptSpecs::new()
+            .option("debug", "d", OptValue::None)
+            .getopt(["-aä€d", "--föo"]);
+
+        assert_eq!(4, parsed.unknown.len());
+        let mut u = parsed.unknown_options();
+        assert_eq!("-a", u.next().unwrap());
+        assert_eq!("-ä", u.next().unwrap());
+        assert_eq!("-€", u.next().unwrap());
+        assert_eq!("--föo", u.next().unwrap());
+        assert_eq!(None, u.next());
+    }
+
+    #[test]
+    fn parsed_output_310() {
+        let parsed = OptSpecs::new()
+            .option("debug", "d", OptValue::None)
+            .getopt(["-aä€d", "--föo"]);
+
+        assert_eq!(4, parsed.unknown.len());
+        let u = parsed.unknown_options().collect::<Vec<String>>();
+        assert_eq!(vec!["-a", "-ä", "-€", "--föo"], u);
     }
 }
