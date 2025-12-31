@@ -180,7 +180,7 @@
 //! # use just_getopt::{OptFlags, OptSpecs, OptValue};
 //! # let specs = OptSpecs::new();
 //! # let parsed = specs.getopt(["--file=123", "-f456", "foo", "-av", "bar"]);
-//! eprintln!("{:#?}", parsed);
+//! dbg!(&parsed);
 //! ```
 //!
 //! That could print something like this:

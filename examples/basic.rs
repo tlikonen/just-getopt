@@ -35,7 +35,7 @@ fn main() {
 
     // With this you can see the parsed output which is an `Args`
     // struct.
-    eprintln!("{:#?}", parsed);
+    dbg!(&parsed);
 
     // Create a condition variable for possible exit on error.
     let mut error_exit = false;
